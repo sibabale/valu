@@ -3,13 +3,17 @@
 
 echo "🔍 Running pre-commit checks..."
 
+# Get the repository root directory
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+CLIENT_DIR="$REPO_ROOT/client"
+
 echo "📝 Running linting..."
-cd client && npm run lint
+cd "$CLIENT_DIR" && npm run lint
 
 echo "🧪 Running tests..."
-cd client && npm run test
+cd "$CLIENT_DIR" && npm run test
 
 echo "🔧 Running type checking..."
-cd client && npm run type-check
+cd "$CLIENT_DIR" && npm run type-check
 
 echo "✅ All pre-commit checks passed!"
