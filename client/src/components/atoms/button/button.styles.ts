@@ -1,52 +1,56 @@
 import styled from 'styled-components/native';
 import { ButtonProps } from './button.interface';
 
-type ButtonStyleProps = Pick<ButtonProps, 'variant' | 'size'>;
-
-const getVariantColors = (variant: ButtonProps['variant'] = 'primary') => {
+const getVariantColors = (variant: ButtonProps['variant']) => {
   switch (variant) {
+    case 'primary':
+      return { bg: '#DCFCE7', text: '#008236', border: '#B9F8CF' };
     case 'secondary':
-      return { bg: '#6c757d', text: '#ffffff' };
+      return { bg: '#FEF9C2', text: '#A65F00', border: '#FFF085' };
     case 'success':
-      return { bg: '#28a745', text: '#ffffff' };
+      return { bg: '#DCFCE7', text: '#008236', border: '#B9F8CF' };
     case 'warning':
-      return { bg: '#ffc107', text: '#000000' };
+      return { bg: '#FFEDD4', text: '#CA3500', border: '#FFD7A8' };
     case 'danger':
-      return { bg: '#dc3545', text: '#ffffff' };
+      return { bg: '#FFE2E2', text: '#C10007', border: '#FFC9C9' };
     default:
-      return { bg: '#007aff', text: '#ffffff' };
+      return { bg: '#DCFCE7', text: '#008236', border: '#B9F8CF' };
   }
 };
 
-const getSizeStyles = (size: ButtonProps['size'] = 'medium') => {
+const getSizeStyles = (size: ButtonProps['size']) => {
   switch (size) {
     case 'xx-small':
       return { padding: '4px 8px', fontSize: '10px' };
     case 'x-small':
-      return { padding: '6px 12px', fontSize: '12px' };
+      return { padding: '8px 16px', fontSize: '12px' };
     case 'small':
       return { padding: '8px 16px', fontSize: '14px' };
-    case 'large':
-      return { padding: '16px 32px', fontSize: '18px' };
-    default:
+    case 'medium':
       return { padding: '12px 24px', fontSize: '16px' };
+    case 'large':
+      return { padding: '16px 32px', fontSize: '16px' };
+    default:
+      return { padding: '16px 32px', fontSize: '18px' };
   }
 };
 
-export const ButtonContainer = styled.TouchableOpacity<ButtonStyleProps>`
-  background-color: ${({ variant }: ButtonStyleProps) =>
-    getVariantColors(variant).bg};
-  padding: ${({ size }: ButtonStyleProps) => getSizeStyles(size).padding};
+export const StyledButton = styled.TouchableOpacity<ButtonProps>`
+  background-color: ${({ variant }: ButtonProps) => getVariantColors(variant).bg};
+  padding: ${({ size }: ButtonProps) => getSizeStyles(size).padding};
   border-radius: 8px;
   align-items: center;
   justify-content: center;
   flex-direction: row;
-  min-height: 44px;
+  border-width: 1px;
+  opacity: ${({ disabled }: ButtonProps) => (disabled ? 0.6 : 1)};
+  border-color: ${({ variant }: ButtonProps) =>
+    getVariantColors(variant).border};
 `;
 
-export const ButtonText = styled.Text<ButtonStyleProps>`
-  color: ${({ variant }: ButtonStyleProps) => getVariantColors(variant).text};
-  font-size: ${({ size }: ButtonStyleProps) => getSizeStyles(size).fontSize};
-  font-weight: bold;
+export const ButtonText = styled.Text<ButtonProps>`
+  color: ${({ variant }: ButtonProps) => getVariantColors(variant).text};
+  font-size: ${({ size }: ButtonProps) => getSizeStyles(size).fontSize};
+  font-family: 'Space Grotesk Medium';
   text-align: center;
 `;
