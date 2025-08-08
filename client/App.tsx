@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
-import { 
+import { Provider } from 'react-redux';
+import {
   useFonts,
   SpaceGrotesk_300Light,
   SpaceGrotesk_400Regular,
   SpaceGrotesk_500Medium,
   SpaceGrotesk_600SemiBold,
-  SpaceGrotesk_700Bold
+  SpaceGrotesk_700Bold,
 } from '@expo-google-fonts/space-grotesk';
-import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
 import { HomePage } from './src/components/pages';
 import * as SplashScreen from 'expo-splash-screen';
 
-// Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [isReady, setIsReady] = useState(false);
-
   const [loaded, error] = useFonts({
-    // 'Space Grotesk Light': SpaceGrotesk_300Light,
-    // 'Space Grotesk': SpaceGrotesk_400Regular,
-    // 'Space Grotesk Medium': SpaceGrotesk_500Medium,
-    // 'Space Grotesk SemiBold': SpaceGrotesk_600SemiBold,
-    // 'Space Grotesk Bold': SpaceGrotesk_700Bold,
-    SpaceGrotesk_300Light
+    'Space Grotesk Light': SpaceGrotesk_300Light,
+    'Space Grotesk': SpaceGrotesk_400Regular,
+    'Space Grotesk Medium': SpaceGrotesk_500Medium,
+    'Space Grotesk SemiBold': SpaceGrotesk_600SemiBold,
+    'Space Grotesk Bold': SpaceGrotesk_700Bold,
   });
 
   useEffect(() => {
@@ -47,39 +43,27 @@ export default function App() {
     console.log('Info pressed');
   };
 
-  // Show loading screen until fonts are actually loaded
-  if (!loaded || !isReady) {
+  if (!loaded && !error) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5'
-      }}>
-        <Text style={{ 
-          fontSize: 18, 
-          color: '#333',
-          fontFamily: 'System' // Use system font for loading text
-        }}>
-          Loading fonts...
-        </Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading fonts...</Text>
       </View>
     );
   }
 
   // Test component to verify fonts are working
-  if (loaded && isReady) {
+  if (loaded) {
     console.log('Testing fonts with inline styles...');
   }
 
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <HomePage 
+        <HomePage
           onCompanyPress={handleCompanyPress}
           onInfoPress={handleInfoPress}
         />
       </PersistGate>
     </Provider>
   );
-} 
+}
