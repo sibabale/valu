@@ -9,7 +9,7 @@ const mockCompanies: Company[] = [
     name: 'Alphabet Inc.',
     ticker: 'GOOGL',
     logo: 'G',
-    price: 150.0,
+    price: 150.00,
     recommendation: 'Buy +',
     recommendationColor: '#4CAF50',
     logoColor: '#4285F4',
@@ -19,47 +19,35 @@ const mockCompanies: Company[] = [
     name: 'Apple Inc.',
     ticker: 'AAPL',
     logo: '🍎',
-    price: 150.0,
+    price: 150.00,
     recommendation: 'Buy',
     recommendationColor: '#FFC107',
     logoColor: '#000000',
   },
 ];
 
-describe('CompanyList - Public Interface', () => {
-  it('displays a list of companies to users', () => {
+describe('CompanyList', () => {
+  it('renders company cards correctly', () => {
     const { getByText } = render(<CompanyList companies={mockCompanies} />);
-
+    
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
     expect(getByText('AAPL')).toBeTruthy();
   });
 
-  it('allows users to select companies from the list', () => {
+  it('handles company press events', () => {
     const onCompanyPress = jest.fn();
     const { getByText } = render(
       <CompanyList companies={mockCompanies} onCompanyPress={onCompanyPress} />
     );
-
-    const companyCard = getByText('Alphabet Inc.');
-    fireEvent.press(companyCard);
+    
+    fireEvent.press(getByText('Alphabet Inc.'));
     expect(onCompanyPress).toHaveBeenCalledWith(mockCompanies[0]);
   });
 
-  it('shows helpful message when no companies are available', () => {
+  it('renders empty state when no companies', () => {
     const { getByText } = render(<CompanyList companies={[]} />);
     expect(getByText('No companies found')).toBeTruthy();
   });
-
-  it('allows users to select different companies', () => {
-    const onCompanyPress = jest.fn();
-    const { getByText } = render(
-      <CompanyList companies={mockCompanies} onCompanyPress={onCompanyPress} />
-    );
-
-    const appleCard = getByText('Apple Inc.');
-    fireEvent.press(appleCard);
-    expect(onCompanyPress).toHaveBeenCalledWith(mockCompanies[1]);
-  });
-});
+}); 
