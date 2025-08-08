@@ -1,0 +1,69 @@
+[
+  {
+    "id": "1",
+    "name": "Alphabet Inc.",
+    "ticker": "GOOGL",
+    "logo": "G",
+    "price": 150.00,
+    "recommendation": "Buy +",
+    "recommendationColor": "#4CAF50",
+    "logoColor": "#4285F4"
+  },
+  {
+    "id": "2",
+    "name": "Apple Inc.",
+    "ticker": "AAPL",
+    "logo": "🍎",
+    "price": 150.00,
+    "recommendation": "Buy",
+    "recommendationColor": "#FFC107",
+    "logoColor": "#000000"
+  },
+  {
+    "id": "3",
+    "name": "Spotify Technology",
+    "ticker": "SPOT",
+    "logo": "🎵",
+    "price": 150.00,
+    "recommendation": "Hold",
+    "recommendationColor": "#FF9800",
+    "logoColor": "#1DB954"
+  },
+  {
+    "id": "4",
+    "name": "Slack",
+    "ticker": "SLAC",
+    "logo": "💬",
+    "price": 150.00,
+    "recommendation": "Avoid",
+    "recommendationColor": "#F44336",
+    "logoColor": "#4A154B"
+  } , {
+    "id": "5",
+    "name": "Slack",
+    "ticker": "SLAC",
+    "logo": "💬",
+    "price": 150.00,
+    "recommendation": "Avoid",
+    "recommendationColor": "#F44336",
+    "logoColor": "#4A154B"
+  }, {
+    "id": "6",
+    "name": "Slack",
+    "ticker": "SLAC",
+    "logo": "💬",
+    "price": 150.00,
+    "recommendation": "Avoid",
+    "recommendationColor": "#F44336",
+    "logoColor": "#4A154B"
+  }, {
+    "id": "7",
+    "name": "Slack",
+    "ticker": "SLAC",
+    "logo": "💬",
+    "price": 150.00,
+    "recommendation": "Avoid",
+    "recommendationColor": "#F44336",
+    "logoColor": "#4A154B"
+  }
+] 

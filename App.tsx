@@ -1,20 +1,69 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text } from 'react-native';
+import { Provider } from 'react-redux';
+import {
+  useFonts,
+  SpaceGrotesk_300Light,
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+  SpaceGrotesk_600SemiBold,
+  SpaceGrotesk_700Bold,
+} from '@expo-google-fonts/space-grotesk';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './src/store';
+import { HomePage } from './src/components/pages';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const [loaded, error] = useFonts({
+    'Space Grotesk Light': SpaceGrotesk_300Light,
+    'Space Grotesk': SpaceGrotesk_400Regular,
+    'Space Grotesk Medium': SpaceGrotesk_500Medium,
+    'Space Grotesk SemiBold': SpaceGrotesk_600SemiBold,
+    'Space Grotesk Bold': SpaceGrotesk_700Bold,
+  });
+
+  useEffect(() => {
+    if (loaded || error) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error]);
+
+  if (!loaded && !error) {
+    return null;
+  }
+
+  const handleCompanyPress = (company: any) => {
+    console.log('Company pressed:', company);
+  };
+
+  const handleInfoPress = () => {
+    console.log('Info pressed');
+  };
+
+  if (!loaded && !error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Loading fonts...</Text>
+      </View>
+    );
+  }
+
+  // Test component to verify fonts are working
+  if (loaded) {
+    console.log('Testing fonts with inline styles...');
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <HomePage
+          onCompanyPress={handleCompanyPress}
+          onInfoPress={handleInfoPress}
+        />
+      </PersistGate>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
