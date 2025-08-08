@@ -8,6 +8,7 @@ import { CompanyList } from '../../organisms/company-list/companylist';
 import { Company } from '../../../types/company.interface';
 import companiesData from '../../../data/companies.json';
 
+
 export const HomePage: React.FC<HomePageProps> = ({
   onCompanyPress,
   onInfoPress,
@@ -16,10 +17,9 @@ export const HomePage: React.FC<HomePageProps> = ({
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
-    const filtered = companiesData.filter(
-      company =>
-        company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        company.ticker.toLowerCase().includes(searchQuery.toLowerCase())
+    const filtered = companiesData.filter((company) =>
+      company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      company.ticker.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredCompanies(filtered);
   }, [searchQuery]);
@@ -54,4 +54,4 @@ export const HomePage: React.FC<HomePageProps> = ({
       </PageContainer>
     </SafeAreaView>
   );
-};
+}; 
