@@ -4,12 +4,12 @@
 echo "🔍 Running pre-commit checks..."
 
 echo "📝 Running linting..."
-npm run lint
+cd client && npm run lint
 
 echo "🧪 Running tests..."
-npm run test
+cd client && npm run test
 
 echo "🔧 Running type checking..."
-npm run type-check
+cd client && npm run type-check
 
-echo "✅ All pre-commit checks passed!"
+echo "✅ All pre-commit checks passed!" 
