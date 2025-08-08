@@ -12,4 +12,4 @@ cd client && npm run test
 echo "🔧 Running type checking..."
 cd client && npm run type-check
 
-echo "✅ All pre-commit checks passed!" 
+echo "✅ All pre-commit checks passed!"
