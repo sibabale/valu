@@ -1,18 +1,25 @@
 import React from 'react';
 import { ButtonProps } from './button.interface';
-import { ButtonContainer, ButtonText } from './button.styles';
+import { StyledButton, ButtonText } from './button.styles';
 
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',
   size = 'medium',
+  disabled = false,
   ...props
 }) => {
   return (
-    <ButtonContainer variant={variant} size={size} {...props}>
+    <StyledButton
+      variant={variant}
+      size={size}
+      disabled={disabled}
+      activeOpacity={0.8}
+      {...props}
+    >
       <ButtonText variant={variant} size={size}>
         {children}
       </ButtonText>
-    </ButtonContainer>
+    </StyledButton>
   );
 };
