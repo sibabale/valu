@@ -27,7 +27,6 @@ const getRecommendationButton = (recommendation: string) => {
       return 'primary';
   }
 };
-
 export const CompanyCard: React.FC<CompanyCardProps> = ({
   company,
   onPress,
