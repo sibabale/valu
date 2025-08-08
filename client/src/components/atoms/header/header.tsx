@@ -12,11 +12,9 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <HeaderContainer {...props}>
       <Title>{title}</Title>
-      {onInfoPress && (
-        <Pressable onPress={onInfoPress} testID="info-button">
-          <InfoIcon fill="#000000" />
-        </Pressable>
-      )}
+      <Pressable onPress={onInfoPress} testID="info-button">
+        <InfoIcon fill="#000000" />
+      </Pressable>
     </HeaderContainer>
   );
-};
+}; 
