@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated } from 'react-native';
+import { Animated, View } from 'react-native';
 import styled from 'styled-components/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { RootState } from '../store';
 import { loginSuccess, logout } from '../store/slices/authSlice';
+import { HomePage } from '../components/pages';
 
 const Container = styled.View`
   flex: 1;
@@ -44,6 +46,7 @@ const StatusText = styled.Text`
 
 const HomeScreen: React.FC = () => {
   const dispatch = useDispatch();
+  const navigation = useNavigation();
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
   );
@@ -83,35 +86,22 @@ const HomeScreen: React.FC = () => {
     dispatch(logout());
   };
 
+  const handleCompanyPress = (company: any) => {
+    // Navigate to company details screen with the company data
+    (navigation as any).navigate('CompanyDetails', { company });
+  };
+
+  const handleInfoPress = () => {
+    console.log('Info pressed');
+    // Info modal logic would go here
+  };
+
+  // Show the HomePage component for the main app functionality
   return (
-    <Container>
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-        }}
-      >
-        <Title>Welcome to Valu App</Title>
-
-        <StatusText>
-          Status: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
-        </StatusText>
-
-        {user && <StatusText>User: {user.name}</StatusText>}
-
-        {!isAuthenticated ? (
-          <Button onPress={handleLogin}>
-            <Ionicons name="log-in" size={20} color="white" />
-            <ButtonText>Login</ButtonText>
-          </Button>
-        ) : (
-          <Button onPress={handleLogout}>
-            <Ionicons name="log-out" size={20} color="white" />
-            <ButtonText>Logout</ButtonText>
-          </Button>
-        )}
-      </Animated.View>
-    </Container>
+    <HomePage
+      onCompanyPress={handleCompanyPress}
+      onInfoPress={handleInfoPress}
+    />
   );
 };
 

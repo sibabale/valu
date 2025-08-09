@@ -7,6 +7,7 @@ import { CompanyCard } from '../../molecules/company-card/companycard';
 export const CompanyList: React.FC<CompanyListProps> = ({
   companies,
   onCompanyPress,
+  bottomInset = 0,
 }) => {
   if (companies.length === 0) {
     return (
@@ -29,8 +30,12 @@ export const CompanyList: React.FC<CompanyListProps> = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 20, paddingBottom: 20, paddingHorizontal: 20 }}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        contentContainerStyle={{ 
+          paddingTop: 16, 
+          paddingBottom: Math.max(16, bottomInset + 16), 
+          paddingHorizontal: 20 
+        }}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
       />
     </ListContainer>
   );

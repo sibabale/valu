@@ -5,18 +5,20 @@ import { combineReducers } from '@reduxjs/toolkit';
 
 // Import your reducers here
 import authReducer from './slices/authSlice';
+import searchReducer from './slices/searchSlice';
 // import userReducer from './slices/userSlice';
 
 const rootReducer = combineReducers({
   // Add your reducers here
   auth: authReducer,
+  search: searchReducer,
   // user: userReducer,
 });
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'user'], // Add the reducers you want to persist
+  whitelist: ['auth', 'search', 'user'], // Add the reducers you want to persist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

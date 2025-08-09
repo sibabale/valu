@@ -1,3 +1,5 @@
 export { Button } from './button/button';
-export { SearchBar } from './searchbar/searchbar';
+export { Searchbar } from './searchbar/searchbar';
 export { Header } from './header/header';
+export { default as ChevronUpIcon } from './icons/chevron-up';
+export { default as ChevronDownIcon } from './icons/chevron-down';
