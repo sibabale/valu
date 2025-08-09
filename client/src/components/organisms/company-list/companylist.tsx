@@ -29,8 +29,8 @@ export const CompanyList: React.FC<CompanyListProps> = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: 20, paddingBottom: 20, paddingHorizontal: 20 }}
-        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: 16, paddingHorizontal: 20 }}
+        ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
       />
     </ListContainer>
   );
