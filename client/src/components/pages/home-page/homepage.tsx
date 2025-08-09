@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HomePageProps } from './homepage.interface';
 import { PageContainer, PaddedContent, ContentContainer } from './homepage.styles';
 import { Header } from '../../atoms/header/header';
-import { SearchBar } from '../../atoms/searchbar/searchbar';
+import { Searchbar } from '../../atoms/searchbar/searchbar';
 import { CompanyList } from '../../organisms/company-list/companylist';
 import { Company } from '../../../types/company.interface';
 import companiesData from '../../../data/companies.json';
-
 
 export const HomePage: React.FC<HomePageProps> = ({
   onCompanyPress,
@@ -15,6 +14,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     const filtered = companiesData.filter((company) =>
@@ -36,21 +36,26 @@ export const HomePage: React.FC<HomePageProps> = ({
     onInfoPress?.();
   };
 
+  const handleStockSelect = (stock: string) => {
+    setSearchQuery(stock);
+  };
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
       <PageContainer>
         <PaddedContent>
           <Header title="VALU" onInfoPress={handleInfoPress} />
-          <SearchBar
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder="Search"
+
+          <Searchbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
           />
         </PaddedContent>
         <ContentContainer>
           <CompanyList
             companies={filteredCompanies}
             onCompanyPress={handleCompanyPress}
+            bottomInset={insets.bottom}
           />
         </ContentContainer>
       </PageContainer>
