@@ -1,124 +1,63 @@
 import styled from 'styled-components/native';
-
-export const SectionContainer = styled.View`
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  margin: 16px 0;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  shadow-opacity: 0.15;
-  shadow-radius: 8px;
-  elevation: 5;
-`;
-
-export const HeaderSection = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-`;
-
-export const Title = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-  color: #333333;
-`;
-
-export const ValueContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-export const Value = styled.Text`
-  font-size: 20px;
-  font-weight: bold;
-  color: #333333;
-  margin-right: 8px;
-`;
-
-interface TrendContainerProps {
-  trend: 'up' | 'down' | 'neutral';
-}
-
-export const TrendContainer = styled.View<TrendContainerProps>`
-  flex-direction: row;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background-color: ${(props: TrendContainerProps) => {
-    switch (props.trend) {
-      case 'up':
-        return '#e8f5e8';
-      case 'down':
-        return '#ffe8e8';
-      default:
-        return '#f0f0f0';
-    }
-  }};
-`;
-
-export const TrendText = styled.Text<TrendContainerProps>`
-  font-size: 12px;
-  font-weight: 500;
-  color: ${(props: TrendContainerProps) => {
-    switch (props.trend) {
-      case 'up':
-        return '#28a745';
-      case 'down':
-        return '#dc3545';
-      default:
-        return '#666666';
-    }
-  }};
-  margin-left: 4px;
-`;
+import { theme } from '../../../utils/theme';
 
 export const ScoreSection = styled.View`
-  margin-bottom: 16px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${theme.spacing.lg}px;
 `;
 
 export const ScoreLabel = styled.Text`
   font-size: 14px;
-  color: #666666;
-  margin-bottom: 8px;
+  color: ${theme.colors.text.secondary};
+  font-family: ${theme.fonts.regular};
 `;
 
-export const ProgressBarContainer = styled.View`
-  height: 8px;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 8px;
+export const ProgressContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 `;
+
 
 interface ProgressBarProps {
   progress: number;
 }
 
 export const ProgressBar = styled.View<ProgressBarProps>`
-  height: 100%;
+  width: 60px;
+  height: 8px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+`;
+
+export const ProgressBarFill = styled.View<ProgressBarProps>`
   width: ${(props: ProgressBarProps) => props.progress}%;
-  background-color: #28a745;
+  height: 100%;
+  background-color: ${theme.colors.primary};
   border-radius: 4px;
 `;
 
 export const ScoreValue = styled.Text`
   font-size: 14px;
-  font-weight: 600;
-  color: #333333;
+  font-weight: bold;
+  color: ${theme.colors.text.primary};
+  font-family: ${theme.fonts.bold};
 `;
 
 export const Assessment = styled.Text`
   font-size: 14px;
-  font-weight: 600;
   color: #ff8c00;
-  margin-bottom: 12px;
+  font-weight: 500;
+  margin-bottom: ${theme.spacing.md}px;
+  font-family: ${theme.fonts.medium};
 `;
 
 export const Description = styled.Text`
   font-size: 14px;
-  color: #666666;
+  color: ${theme.colors.text.secondary};
   line-height: 20px;
-  text-align: justify;
+  font-family: ${theme.fonts.regular};
 `;
