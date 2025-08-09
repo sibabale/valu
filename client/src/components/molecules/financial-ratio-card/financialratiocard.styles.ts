@@ -1,18 +1,22 @@
 import styled from 'styled-components/native';
+import { theme } from '../../../utils/theme';
 
 export const CardContainer = styled.TouchableOpacity`
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  margin: 8px 0;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  background-color: ${theme.colors.background.secondary};
+  border-radius: ${theme.borderRadius.xl}px;
+  padding: ${theme.spacing.lg}px;
+  margin: ${theme.spacing.sm}px 0;
   shadow-color: #000;
   shadow-offset: 0px 2px;
   shadow-opacity: 0.1;
-  shadow-radius: 4px;
+  shadow-radius: 8px;
   elevation: 3;
+`;
+
+export const MainContent = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 export const LeftSection = styled.View`
@@ -21,26 +25,30 @@ export const LeftSection = styled.View`
 
 export const Title = styled.Text`
   font-size: 16px;
-  font-weight: 600;
-  color: #333333;
-  margin-bottom: 4px;
+  font-weight: bold;
+  color: ${theme.colors.text.primary};
+  margin-bottom: ${theme.spacing.xs}px;
+  font-family: ${theme.fonts.bold};
 `;
 
 export const Description = styled.Text`
-  font-size: 12px;
-  color: #666666;
-  line-height: 16px;
+  font-size: 14px;
+  color: ${theme.colors.text.secondary};
+  line-height: 18px;
+  font-family: ${theme.fonts.regular};
 `;
 
 export const RightSection = styled.View`
   align-items: flex-end;
+  justify-content: center;
 `;
 
 export const Value = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  color: #333333;
-  margin-bottom: 4px;
+  color: ${theme.colors.text.primary};
+  margin-bottom: ${theme.spacing.xs}px;
+  font-family: ${theme.fonts.bold};
 `;
 
 interface TrendContainerProps {
@@ -50,18 +58,6 @@ interface TrendContainerProps {
 export const TrendContainer = styled.View<TrendContainerProps>`
   flex-direction: row;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background-color: ${(props: TrendContainerProps) => {
-    switch (props.trend) {
-      case 'up':
-        return '#e8f5e8';
-      case 'down':
-        return '#ffe8e8';
-      default:
-        return '#f0f0f0';
-    }
-  }};
 `;
 
 export const TrendText = styled.Text<TrendContainerProps>`
@@ -77,5 +73,20 @@ export const TrendText = styled.Text<TrendContainerProps>`
         return '#666666';
     }
   }};
-  margin-left: 4px;
+  margin-left: ${theme.spacing.xs}px;
+  font-family: ${theme.fonts.medium};
+`;
+
+export const ExpandedContent = styled.View`
+  margin-top: ${theme.spacing.md}px;
+  padding-top: ${theme.spacing.md}px;
+  border-top-width: 1px;
+  border-top-color: #f0f0f0;
+`;
+
+export const ExpandedDescription = styled.Text`
+  font-size: 14px;
+  color: ${theme.colors.text.secondary};
+  line-height: 20px;
+  font-family: ${theme.fonts.regular};
 `;

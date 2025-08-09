@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FinancialRatioCardProps } from './financialratiocard.interface';
 import {
   CardContainer,
+  MainContent,
   LeftSection,
   Title,
   Description,
@@ -9,6 +10,8 @@ import {
   Value,
   TrendContainer,
   TrendText,
+  ExpandedContent,
+  ExpandedDescription,
 } from './financialratiocard.styles';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -41,26 +44,43 @@ export const FinancialRatioCard: React.FC<FinancialRatioCardProps> = ({
   description,
   onPress,
 }) => {
-  return (
-    <CardContainer onPress={onPress} activeOpacity={0.8}>
-      <LeftSection>
-        <Title>{title}</Title>
-        {description && <Description>{description}</Description>}
-      </LeftSection>
+  const [isExpanded, setIsExpanded] = useState(false);
 
-      <RightSection>
-        <Value>{value}</Value>
-        <TrendContainer trend={trend}>
-          <Ionicons
-            name={getTrendIcon(trend) as any}
-            size={16}
-            color={getTrendColor(trend)}
-          />
-          <TrendText trend={trend}>
-            {trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : 'Neutral'}
-          </TrendText>
-        </TrendContainer>
-      </RightSection>
+  const handlePress = () => {
+    setIsExpanded(!isExpanded);
+    if (onPress) {
+      onPress();
+    }
+  };
+
+  return (
+    <CardContainer onPress={handlePress} activeOpacity={0.8}>
+      <MainContent>
+        <LeftSection>
+          <Title>{title}</Title>
+          {!isExpanded && description && <Description>{description}</Description>}
+        </LeftSection>
+
+        <RightSection>
+          <Value>{value}</Value>
+          <TrendContainer trend={trend}>
+            <Ionicons
+              name={getTrendIcon(trend) as any}
+              size={16}
+              color={getTrendColor(trend)}
+            />
+            <TrendText trend={trend}>
+              {trend === 'up' ? 'Up' : trend === 'down' ? 'Down' : 'Neutral'}
+            </TrendText>
+          </TrendContainer>
+        </RightSection>
+      </MainContent>
+      
+      {isExpanded && (
+        <ExpandedContent>
+          <ExpandedDescription>{description}</ExpandedDescription>
+        </ExpandedContent>
+      )}
     </CardContainer>
   );
 };
