@@ -8,6 +8,7 @@ import SearchIcon from '../icons/search';
 import CloseIcon from '../icons/close';
 import { addRecentSearch, clearRecentSearches } from '../../../store/slices/searchSlice';
 import { SearchbarProps } from './searchbar.interface';
+import companiesData from '../../../data/companies.json';
 import {
   Container,
   SearchContainer,
@@ -58,16 +59,27 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     }
   }, [isFocused, searchQuery, fadeAnim]);
 
+  // Validate if a search query matches a valid ticker
+  const isValidTicker = (query: string): boolean => {
+    const trimmedQuery = query.trim().toUpperCase();
+    return companiesData.some(company => 
+      company.ticker.toUpperCase() === trimmedQuery ||
+      company.name.toUpperCase().includes(trimmedQuery)
+    );
+  };
+
   const addToRecent = (query: string) => {
     if (!query.trim()) return;
-    dispatch(addRecentSearch(query.trim()));
+    // Only add to recent searches if it's a valid ticker/company
+    if (isValidTicker(query)) {
+      dispatch(addRecentSearch(query.trim()));
+    }
   };
 
   const handleSearch = (query: string) => {
     onSearchChange(query);
-    if (query.trim()) {
-      addToRecent(query.trim());
-    }
+    // Don't automatically add to recent searches on every keystroke
+    // Only add when a valid company is selected
   };
 
   const handleClearInput = () => {
@@ -88,6 +100,10 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     // Only dismiss dropdown if we're not interacting with it
     if (!isDropdownInteraction.current) {
       setTimeout(() => setIsFocused(false), 200);
+      // Add to recent searches when blurring if there's a valid search query
+      if (searchQuery.trim()) {
+        addToRecent(searchQuery.trim());
+      }
     }
   };
 
@@ -119,6 +135,12 @@ export const Searchbar: React.FC<SearchbarProps> = ({
             onChangeText={handleSearch}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onSubmitEditing={() => {
+              // Add to recent searches when user submits the search
+              if (searchQuery.trim()) {
+                addToRecent(searchQuery.trim());
+              }
+            }}
             isFocused={isFocused}
           />
           
@@ -174,7 +196,11 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                         <TagButton
                           key={index}
                           onPressIn={handleDropdownPressIn}
-                          onPress={() => handleSearch(search)}
+                          onPress={() => {
+                            handleSearch(search);
+                            // Add to recent searches when selecting from recent
+                            addToRecent(search);
+                          }}
                         >
                           <TagText>{search}</TagText>
                         </TagButton>
@@ -195,7 +221,11 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                     <TagButton
                       key={index}
                       onPressIn={handleDropdownPressIn}
-                      onPress={() => handleSearch(stock)}
+                      onPress={() => {
+                        handleSearch(stock);
+                        // Add to recent searches when selecting a popular stock
+                        addToRecent(stock);
+                      }}
                     >
                       <TagText>{stock}</TagText>
                     </TagButton>
