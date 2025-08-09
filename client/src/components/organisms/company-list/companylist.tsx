@@ -29,7 +29,7 @@ export const CompanyList: React.FC<CompanyListProps> = ({
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 20 }}
         ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
       />
     </ListContainer>
