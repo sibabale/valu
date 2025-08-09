@@ -13,7 +13,6 @@ import {
   ContentWrapper,
 } from './expandablecard.styles';
 import ChevronUpIcon from '../../atoms/icons/chevron-up';
-import ChevronDownIcon from '../../atoms/icons/chevron-down';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -28,7 +27,7 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
   onToggle,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const fadeAnim = useRef(new Animated.Value(defaultExpanded ? 1 : 0)).current;
+  const rotationValue = useRef(new Animated.Value(defaultExpanded ? 1 : 0)).current;
 
   const toggleExpanded = () => {
     const customLayoutAnimation = {
@@ -45,7 +44,7 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
     
     LayoutAnimation.configureNext(customLayoutAnimation);
     
-    Animated.timing(fadeAnim, {
+    Animated.timing(rotationValue, {
       toValue: isExpanded ? 0 : 1,
       duration: 300,
       easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
@@ -56,6 +55,11 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
     setIsExpanded(newState);
     onToggle?.(newState);
   };
+
+  const rotateAnimation = rotationValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '180deg'],
+  });
 
   return (
     <Container>
@@ -68,22 +72,10 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
           <Value>{value}</Value>
           <Animated.View
             style={{
-              opacity: fadeAnim,
-              transform: [
-                {
-                  scale: fadeAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.8, 1],
-                  }),
-                },
-              ],
+              transform: [{ rotate: rotateAnimation }],
             }}
           >
-            {isExpanded ? (
-              <ChevronUpIcon fill="#666666" />
-            ) : (
-              <ChevronDownIcon fill="#666666" />
-            )}
+            <ChevronUpIcon fill="#666666" />
           </Animated.View>
         </HeaderRight>
       </Header>
