@@ -1,57 +1,59 @@
 import React from 'react';
 import { CompanyOverviewCardProps } from './companyoverviewcard.interface';
+import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
 import {
   CardContainer,
-  HeaderSection,
+  Header,
   LogoContainer,
   LogoText,
-  CompanyInfo,
   CompanyName,
   TickerSymbol,
+  PriceContainer,
+  PriceSection,
+  ScoreSection,
   Price,
-  MarketCap,
-  MetricsSection,
-  RecommendationButton,
-  RecommendationText,
+  MarketCapLabel,
+  MarketCapValue,
+  Description,
+  Divider,
   ScoreContainer,
   ScoreLabel,
   ScoreValue,
-  Description,
 } from './companyoverviewcard.styles';
 
 export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
   company,
-  onPress: _onPress,
+  onPress,
 }) => {
   return (
     <CardContainer>
-      <HeaderSection>
+      <Header>
         <LogoContainer color={company.logoColor}>
           <LogoText>{company.logo}</LogoText>
         </LogoContainer>
+        <CompanyName>{company.name}</CompanyName>
+        <TickerSymbol>{company.ticker}</TickerSymbol>
+      </Header>
 
-        <CompanyInfo>
-          <CompanyName>{company.name}</CompanyName>
-          <TickerSymbol>{company.ticker}</TickerSymbol>
+      <PriceContainer>
+        <PriceSection>
           <Price>${company.price.toFixed(2)}</Price>
-          <MarketCap>Market Cap: {company.marketCap}</MarketCap>
-        </CompanyInfo>
-      </HeaderSection>
+          <MarketCapLabel>Market Cap: <MarketCapValue>{company.marketCap}</MarketCapValue></MarketCapLabel>
+        </PriceSection>
+        <ScoreSection>
+          <RecommendationLabel recommendation={company.recommendation} />
+          <ScoreContainer>
+            <ScoreLabel>Score: </ScoreLabel>
+            <ScoreValue>{company.score}/100</ScoreValue>
+          </ScoreContainer>
+        </ScoreSection>
+      </PriceContainer>
 
-      <MetricsSection>
-        <RecommendationButton recommendation={company.recommendation}>
-          <RecommendationText recommendation={company.recommendation}>
-            {company.recommendation}
-          </RecommendationText>
-        </RecommendationButton>
+      <Divider />
 
-        <ScoreContainer>
-          <ScoreLabel>Score:</ScoreLabel>
-          <ScoreValue>{company.score}/100</ScoreValue>
-        </ScoreContainer>
-      </MetricsSection>
-
-      <Description>{company.description}</Description>
+      <Description>
+        {company.description}
+      </Description>
     </CardContainer>
   );
 };
