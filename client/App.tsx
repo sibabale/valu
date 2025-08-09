@@ -31,14 +31,20 @@ export default function App() {
     }
   }, [loaded, error]);
 
+  // Show loading screen while fonts are loading
   if (!loaded && !error) {
-    return null;
-  }
-
-  if (!loaded || !error) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading fonts...</Text>
+      </View>
+    );
+  }
+
+  // Show error screen if font loading failed
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Error loading fonts</Text>
       </View>
     );
   }

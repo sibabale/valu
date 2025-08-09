@@ -54,17 +54,20 @@ export const CompanyDetailsPage: React.FC<CompanyDetailsPageProps> = ({
           description={company.peRatioDescription}
         />
 
-        <SectionTitle>Additional Financial Ratios</SectionTitle>
-
-        {company.financialRatios.map((ratio, index) => (
-          <FinancialRatioCard
-            key={index}
-            title={ratio.title}
-            value={ratio.value}
-            trend={ratio.trend}
-            description={ratio.description}
-          />
-        ))}
+        {company.financialRatios && company.financialRatios.length > 0 && (
+          <>
+            <SectionTitle>Additional Financial Ratios</SectionTitle>
+            {company.financialRatios.map((ratio, index) => (
+              <FinancialRatioCard
+                key={index}
+                title={ratio.title}
+                value={ratio.value}
+                trend={ratio.trend}
+                description={ratio.description}
+              />
+            ))}
+          </>
+        )}
       </ContentContainer>
     </PageContainer>
   );
