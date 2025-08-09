@@ -8,6 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import { CompanyDetailsScreen } from '../screens/CompanyDetailsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -49,6 +50,11 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Main"
           component={TabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CompanyDetails"
+          component={CompanyDetailsScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
