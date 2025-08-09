@@ -5,9 +5,12 @@
     "ticker": "GOOGL",
     "logo": "G",
     "price": 150.00,
+    "marketCap": "$1750.0B",
     "recommendation": "Buy +",
     "recommendationColor": "#4CAF50",
-    "logoColor": "#4285F4"
+    "logoColor": "#4285F4",
+    "score": 85,
+    "description": "Alphabet Inc. is a multinational technology conglomerate that specializes in Internet-related services and products, which include online advertising technologies, a search engine, cloud computing, software, and hardware."
   },
   {
     "id": "2",
@@ -15,9 +18,12 @@
     "ticker": "AAPL",
     "logo": "🍎",
     "price": 150.00,
-    "recommendation": "Buy",
+    "marketCap": "$1780.0B",
+    "recommendation": "Hold",
     "recommendationColor": "#FFC107",
-    "logoColor": "#000000"
+    "logoColor": "#000000",
+    "score": 75,
+    "description": "Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. The company serves consumers, small and mid-sized businesses, education, enterprise, and government customers."
   },
   {
     "id": "3",
@@ -25,9 +31,12 @@
     "ticker": "SPOT",
     "logo": "🎵",
     "price": 150.00,
+    "marketCap": "$25.0B",
     "recommendation": "Hold",
     "recommendationColor": "#FF9800",
-    "logoColor": "#1DB954"
+    "logoColor": "#1DB954",
+    "score": 70,
+    "description": "Spotify Technology S.A. operates as an audio streaming platform worldwide. The company offers music and podcast content to users from record labels and media companies."
   },
   {
     "id": "4",
@@ -35,35 +44,50 @@
     "ticker": "SLAC",
     "logo": "💬",
     "price": 150.00,
+    "marketCap": "$18.0B",
     "recommendation": "Avoid",
     "recommendationColor": "#F44336",
-    "logoColor": "#4A154B"
-  } , {
+    "logoColor": "#4A154B",
+    "score": 45,
+    "description": "Slack Technologies, Inc. operates a proprietary business communication platform worldwide that brings teams together wherever they are."
+  },
+  {
     "id": "5",
-    "name": "Slack",
-    "ticker": "SLAC",
-    "logo": "💬",
+    "name": "Tesla Inc.",
+    "ticker": "TSLA",
+    "logo": "⚡",
     "price": 150.00,
-    "recommendation": "Avoid",
-    "recommendationColor": "#F44336",
-    "logoColor": "#4A154B"
-  }, {
+    "marketCap": "$850.0B",
+    "recommendation": "Buy",
+    "recommendationColor": "#4CAF50",
+    "logoColor": "#E31837",
+    "score": 80,
+    "description": "Tesla Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems in the United States, China, and internationally."
+  },
+  {
     "id": "6",
-    "name": "Slack",
-    "ticker": "SLAC",
-    "logo": "💬",
+    "name": "Microsoft Corp.",
+    "ticker": "MSFT",
+    "logo": "🪟",
     "price": 150.00,
-    "recommendation": "Avoid",
-    "recommendationColor": "#F44336",
-    "logoColor": "#4A154B"
-  }, {
+    "marketCap": "$2100.0B",
+    "recommendation": "Buy +",
+    "recommendationColor": "#4CAF50",
+    "logoColor": "#00A1F1",
+    "score": 90,
+    "description": "Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide."
+  },
+  {
     "id": "7",
-    "name": "Slack",
-    "ticker": "SLAC",
-    "logo": "💬",
+    "name": "Meta Platforms",
+    "ticker": "META",
+    "logo": "📘",
     "price": 150.00,
-    "recommendation": "Avoid",
-    "recommendationColor": "#F44336",
-    "logoColor": "#4A154B"
+    "marketCap": "$900.0B",
+    "recommendation": "Hold",
+    "recommendationColor": "#FFC107",
+    "logoColor": "#1877F2",
+    "score": 65,
+    "description": "Meta Platforms, Inc. develops products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality headsets, and wearables worldwide."
   }
 ] 

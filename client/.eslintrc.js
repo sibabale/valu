@@ -1,32 +1,43 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended', 'prettier'],
+  extends: [
+    'eslint:recommended',
+  ],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'prettier'],
+  plugins: [
+    '@typescript-eslint',
+    'react',
+    'react-hooks',
+  ],
   rules: {
-    'prettier/prettier': 'error',
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      },
-    ],
+    // TypeScript rules
+    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
+    
+    // React rules
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    
+    // General rules
     'no-console': 'warn',
+    'no-debugger': 'error',
+    'prefer-const': 'error',
+    'no-var': 'error',
+    'no-undef': 'error',
   },
   env: {
-    es6: true,
+    browser: true,
+    es2021: true,
     node: true,
     jest: true,
   },
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-    ecmaFeatures: {
-      jsx: true,
+  settings: {
+    react: {
+      version: 'detect',
     },
   },
   globals: {
@@ -40,4 +51,4 @@ module.exports = {
     afterAll: 'readonly',
     React: 'readonly',
   },
-};
+}; 

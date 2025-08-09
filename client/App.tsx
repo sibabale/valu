@@ -11,7 +11,7 @@ import {
 } from '@expo-google-fonts/space-grotesk';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
-import { HomePage } from './src/components/pages';
+import AppNavigator from './src/navigation';
 import * as SplashScreen from 'expo-splash-screen';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,22 +31,20 @@ export default function App() {
     }
   }, [loaded, error]);
 
-  if (!loaded && !error) {
-    return null;
-  }
-
-  const handleCompanyPress = (company: any) => {
-    console.log('Company pressed:', company);
-  };
-
-  const handleInfoPress = () => {
-    console.log('Info pressed');
-  };
-
+  // Show loading screen while fonts are loading
   if (!loaded && !error) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Loading fonts...</Text>
+      </View>
+    );
+  }
+
+  // Show error screen if font loading failed
+  if (error) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Error loading fonts</Text>
       </View>
     );
   }
@@ -59,10 +57,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <HomePage
-          onCompanyPress={handleCompanyPress}
-          onInfoPress={handleInfoPress}
-        />
+        <AppNavigator />
       </PersistGate>
     </Provider>
   );

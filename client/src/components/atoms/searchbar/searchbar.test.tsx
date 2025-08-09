@@ -2,8 +2,8 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { SearchBar } from './searchbar';
 
-describe('SearchBar - Public Interface', () => {
-  it('provides a search input field for users', () => {
+describe('SearchBar', () => {
+  it('renders correctly with default props', () => {
     const onChangeText = jest.fn();
     const { getByPlaceholderText } = render(
       <SearchBar value="" onChangeText={onChangeText} />
@@ -11,34 +11,30 @@ describe('SearchBar - Public Interface', () => {
     expect(getByPlaceholderText('Search')).toBeTruthy();
   });
 
-  it('allows users to type custom search terms', () => {
+  it('renders with custom placeholder', () => {
+    const onChangeText = jest.fn();
+    const { getByPlaceholderText } = render(
+      <SearchBar value="" onChangeText={onChangeText} placeholder="Custom Search" />
+    );
+    expect(getByPlaceholderText('Custom Search')).toBeTruthy();
+  });
+
+  it('handles text input', () => {
     const onChangeText = jest.fn();
     const { getByPlaceholderText } = render(
       <SearchBar value="" onChangeText={onChangeText} />
     );
-
-    const searchInput = getByPlaceholderText('Search');
-    fireEvent.changeText(searchInput, 'Apple Inc');
-    expect(onChangeText).toHaveBeenCalledWith('Apple Inc');
+    
+    const input = getByPlaceholderText('Search');
+    fireEvent.changeText(input, 'test search');
+    expect(onChangeText).toHaveBeenCalledWith('test search');
   });
 
-  it('shows users their current search term', () => {
+  it('displays the current value', () => {
     const onChangeText = jest.fn();
     const { getByDisplayValue } = render(
-      <SearchBar value="GOOGL" onChangeText={onChangeText} />
+      <SearchBar value="current value" onChangeText={onChangeText} />
     );
-    expect(getByDisplayValue('GOOGL')).toBeTruthy();
+    expect(getByDisplayValue('current value')).toBeTruthy();
   });
-
-  it('supports custom placeholder text for different contexts', () => {
-    const onChangeText = jest.fn();
-    const { getByPlaceholderText } = render(
-      <SearchBar
-        value=""
-        onChangeText={onChangeText}
-        placeholder="Search companies..."
-      />
-    );
-    expect(getByPlaceholderText('Search companies...')).toBeTruthy();
-  });
-});
+}); 
