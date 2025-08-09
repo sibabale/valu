@@ -10,7 +10,6 @@ export const CardContainer = styled.TouchableOpacity`
   padding: 16px;
   border-width: 1px;
   border-color: #f6f3f4;
-  margin-bottom: 12px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
