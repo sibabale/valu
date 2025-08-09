@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CompanyOverviewCard } from '../../molecules/company-overview-card/companyoverviewcard';
 import { PERatioSection } from '../../molecules/pe-ratio-section/peratiosection';
 import { FinancialRatioCard } from '../../molecules/financial-ratio-card/financialratiocard';
+import peRatioMock from '../../../data/pe-ratio-mock.json';
 
 export const CompanyDetailsPage: React.FC<CompanyDetailsPageProps> = ({
   company,
@@ -47,11 +48,11 @@ export const CompanyDetailsPage: React.FC<CompanyDetailsPageProps> = ({
         />
 
         <PERatioSection
-          peRatio={company.peRatio}
-          valueScore={company.peRatioScore}
-          trend={company.peRatioTrend}
-          assessment={company.peRatioAssessment}
-          description={company.peRatioDescription}
+          peRatio={peRatioMock.peRatio}
+          valueScore={peRatioMock.valueScore}
+          trend={peRatioMock.trend as 'up' | 'down' | 'neutral'}
+          assessment={peRatioMock.assessment}
+          description={peRatioMock.description}
         />
 
         {company.financialRatios && company.financialRatios.length > 0 && (
