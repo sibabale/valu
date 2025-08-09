@@ -8,10 +8,12 @@ import {
   HeaderRight,
   Title,
   Value,
-  Subtitle,
   Content,
+  Subtitle,
   ContentWrapper,
 } from './expandablecard.styles';
+import ChevronUpIcon from '../../atoms/icons/chevron-up';
+import ChevronDownIcon from '../../atoms/icons/chevron-down';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -26,11 +28,11 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
   onToggle,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const rotationValue = useRef(new Animated.Value(defaultExpanded ? 0 : 1)).current;
+  const fadeAnim = useRef(new Animated.Value(defaultExpanded ? 1 : 0)).current;
 
   const toggleExpanded = () => {
     const customLayoutAnimation = {
-      duration: 350,
+      duration: 300,
       create: {
         type: LayoutAnimation.Types.easeInEaseOut,
         property: LayoutAnimation.Properties.scaleY,
@@ -43,9 +45,9 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
     
     LayoutAnimation.configureNext(customLayoutAnimation);
     
-    Animated.timing(rotationValue, {
-      toValue: isExpanded ? 1 : 0,
-      duration: 350,
+    Animated.timing(fadeAnim, {
+      toValue: isExpanded ? 0 : 1,
+      duration: 300,
       easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
       useNativeDriver: true,
     }).start();
@@ -64,23 +66,25 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
         </HeaderLeft>
         <HeaderRight>
           <Value>{value}</Value>
-          <Animated.Text
+          <Animated.View
             style={{
-              fontSize: 16,
-              color: '#666666',
-              fontWeight: 'bold',
+              opacity: fadeAnim,
               transform: [
                 {
-                  rotate: rotationValue.interpolate({
+                  scale: fadeAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: ['0deg', '180deg'],
+                    outputRange: [0.8, 1],
                   }),
                 },
               ],
             }}
           >
-            ^
-          </Animated.Text>
+            {isExpanded ? (
+              <ChevronUpIcon fill="#666666" />
+            ) : (
+              <ChevronDownIcon fill="#666666" />
+            )}
+          </Animated.View>
         </HeaderRight>
       </Header>
       
