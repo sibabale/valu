@@ -7,6 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
 
+// Add Alpha Vantage services
+builder.Services.AddHttpClient();
+builder.Services.Configure<AlphaVantageOptions>(
+    builder.Configuration.GetSection("AlphaVantage"));
+builder.Services.AddScoped<IAlphaVantageService, AlphaVantageService>();
+builder.Services.AddSingleton<SimpleCache>();
+
 // Add CORS for React Native client
 builder.Services.AddCors(options =>
 {
