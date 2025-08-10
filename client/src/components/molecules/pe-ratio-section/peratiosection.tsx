@@ -15,10 +15,8 @@ import {
 export const PERatioSection: React.FC<PERatioSectionProps> = ({
   peRatio,
   valueScore,
-  trend: _trend,
   assessment,
   description,
-  onPress: _onPress,
 }) => {
   return (
     <ExpandableCard

@@ -1,0 +1,76 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run checks in client directory
+if [ -d "client" ]; then
+    echo "📱 Checking client directory..."
+    cd client
+    
+    # Run linting
+    if [ -f "package.json" ] && grep -q "lint" package.json; then
+        echo "🔍 Running linting..."
+        npm run lint
+        if [ $? -ne 0 ]; then
+            echo "❌ Linting failed!"
+            exit 1
+        fi
+    fi
+    
+    # Run tests
+    if [ -f "package.json" ] && grep -q "test" package.json; then
+        echo "🧪 Running tests..."
+        npm test
+        if [ $? -ne 0 ]; then
+            echo "❌ Tests failed!"
+            exit 1
+        fi
+    fi
+    
+    # Run type checking (if TypeScript)
+    if [ -f "tsconfig.json" ]; then
+        echo "🔍 Running TypeScript checks..."
+        npx tsc --noEmit
+        if [ $? -ne 0 ]; then
+            echo "❌ TypeScript checks failed!"
+            exit 1
+        fi
+    fi
+    
+    cd ..
+fi
+
+# Run checks in other subdirectories if they exist
+for dir in */; do
+    if [ "$dir" != "client/" ] && [ "$dir" != "node_modules/" ] && [ -d "$dir" ]; then
+        if [ -f "${dir}package.json" ]; then
+            echo "📦 Checking $dir..."
+            cd "$dir"
+            
+            # Run linting
+            if grep -q "lint" package.json; then
+                echo "🔍 Running linting in $dir..."
+                npm run lint
+                if [ $? -ne 0 ]; then
+                    echo "❌ Linting failed in $dir!"
+                    exit 1
+                fi
+            fi
+            
+            # Run tests
+            if grep -q "test" package.json; then
+                echo "🧪 Running tests in $dir..."
+                npm test
+                if [ $? -ne 0 ]; then
+                    echo "❌ Tests failed in $dir!"
+                    exit 1
+                fi
+            fi
+            
+            cd ..
+        fi
+    fi
+done
+
+echo "✅ All pre-commit checks passed!" 

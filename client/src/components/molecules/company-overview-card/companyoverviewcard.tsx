@@ -23,7 +23,6 @@ import {
 
 export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
   company,
-  onPress,
 }) => {
   return (
     <CardContainer>
