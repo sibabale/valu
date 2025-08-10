@@ -13,6 +13,7 @@ builder.Services.Configure<AlphaVantageOptions>(
     builder.Configuration.GetSection("AlphaVantage"));
 builder.Services.AddScoped<IAlphaVantageService, AlphaVantageService>();
 builder.Services.AddSingleton<SimpleCache>();
+builder.Services.AddScoped<ICacheBuildingService, CacheBuildingService>();
 
 // Add CORS for React Native client
 builder.Services.AddCors(options =>
@@ -109,41 +110,44 @@ app.MapGet("/api/companies/popular", async (ICompanyService service) =>
     return Results.Ok(new { Stocks = popular });
 });
 
-// Value scoring endpoints
-app.MapPost("/api/value-score/calculate", async (IValueScoreService service, CalculateValueScoreRequest request) =>
+// Value Score endpoints
+app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IValueScoreService valueScoreService) =>
+{
+    var result = await valueScoreService.CalculateValueScoreAsync(request);
+    return Results.Ok(result);
+});
+
+app.MapGet("/api/value-score/{companyId}", async (Guid companyId, IValueScoreService valueScoreService) =>
+{
+    var result = await valueScoreService.GetValueScoreAsync(companyId);
+    return result != null ? Results.Ok(result) : Results.NotFound();
+});
+
+app.MapGet("/api/value-score/top", async (int count, IValueScoreService valueScoreService) =>
+{
+    if (count <= 0 || count > 100)
+        return Results.BadRequest("Count must be between 1 and 100");
+    
+    var result = await valueScoreService.GetTopValueStocksAsync(count);
+    return Results.Ok(result);
+});
+
+// Cache building endpoint (for testing)
+app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingService) =>
 {
     try
     {
-        var score = await service.CalculateValueScoreAsync(request);
-        return Results.Ok(score);
+        await cacheBuildingService.BuildInitialCacheAsync();
+        return Results.Ok(new { Message = "Cache building completed!", Timestamp = DateTime.UtcNow });
     }
-    catch (ArgumentException ex)
+    catch (Exception ex)
     {
-        return Results.BadRequest(new { Error = ex.Message });
+        return Results.Problem(
+            title: "Cache building failed",
+            detail: ex.Message,
+            statusCode: 500
+        );
     }
-});
-
-app.MapGet("/api/value-score/{companyId:guid}", async (Guid companyId, IValueScoreService service) =>
-{
-    var score = await service.GetValueScoreAsync(companyId);
-    return score is null ? Results.NotFound() : Results.Ok(score);
-});
-
-app.MapGet("/api/value-score/top", async (IValueScoreService service, int count = 10) =>
-{
-    // Validate count parameter to prevent excessive resource usage
-    if (count <= 0)
-    {
-        return Results.BadRequest(new { Error = "Count must be greater than 0" });
-    }
-    
-    if (count > 100)
-    {
-        return Results.BadRequest(new { Error = "Count cannot exceed 100" });
-    }
-    
-    var topStocks = await service.GetTopValueStocksAsync(count);
-    return Results.Ok(new { TopStocks = topStocks });
 });
 
 app.Run();
