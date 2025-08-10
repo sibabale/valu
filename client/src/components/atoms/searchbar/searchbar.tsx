@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableOpacity, Text, ScrollView, Animated, View } from 'react-native';
+import { TouchableOpacity, ScrollView, Animated, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import TrendUpIcon from '../icons/trend-up';
@@ -16,7 +16,6 @@ import {
   IconContainer,
   SearchInput,
   CloseButton,
-  ClearButton,
   DropdownContainer,
   DropdownCard,
   DropdownContent,
@@ -158,12 +157,6 @@ export const Searchbar: React.FC<SearchbarProps> = ({
             onTouchStart={handleDropdownPressIn}
             onTouchEnd={handleDropdownPressOut}
             style={{
-              position: 'absolute',
-              top: 150,
-              left: 20,
-              right: 20,
-              zIndex: 9999,
-              elevation: 9999,
               opacity: fadeAnim,
               transform: [{
                 translateY: fadeAnim.interpolate({
@@ -173,69 +166,71 @@ export const Searchbar: React.FC<SearchbarProps> = ({
               }],
             }}
           >
-          <DropdownContainer>
-            <DropdownCard>
-              <DropdownContent>
-                {recentSearches.length > 0 && (
-                  <ScrollView>
-                    <SectionHeader>
-                      <IconContainer>
-                        <HistoryIcon height='16px' width='16px' fill='#1E2939' />
-                      </IconContainer>
-                      <SectionTitle>Recent</SectionTitle>
-                      <TouchableOpacity 
-                        onPressIn={handleDropdownPressIn}
-                        onPress={clearRecent} 
-                        style={{ marginLeft: 'auto' }}>
-                        <ClearButtonText>Clear</ClearButtonText>
-                      </TouchableOpacity>
-                    </SectionHeader>
-                    
-                    <TagsContainer>
-                      {recentSearches.map((search, index) => (
-                        <TagButton
-                          key={index}
+            <DropdownContainer>
+              <DropdownCard>
+                <DropdownContent>
+                  {recentSearches.length > 0 && (
+                    <ScrollView>
+                      <SectionHeader>
+                        <IconContainer>
+                          <HistoryIcon height='16px' width='16px' fill='#1E2939' />
+                        </IconContainer>
+                        <SectionTitle>Recent</SectionTitle>
+                        <TouchableOpacity 
                           onPressIn={handleDropdownPressIn}
-                          onPress={() => {
-                            handleSearch(search);
-                            // Add to recent searches when selecting from recent
-                            addToRecent(search);
-                          }}
-                        >
-                          <TagText>{search}</TagText>
-                        </TagButton>
-                      ))}
-                    </TagsContainer>
-                  </ScrollView>
-                )}
+                          onPress={clearRecent} 
+                          style={{ marginLeft: 'auto' }}>
+                          <ClearButtonText>Clear</ClearButtonText>
+                        </TouchableOpacity>
+                      </SectionHeader>
+                      
+                      <TagsContainer>
+                        {recentSearches.map((search, index) => (
+                          <TagButton
+                            key={index}
+                            onPressIn={handleDropdownPressIn}
+                            onPress={() => {
+                              handleSearch(search);
+                              setIsFocused(false);
+                            }}
+                          >
+                            <TagText>{search}</TagText>
+                          </TagButton>
+                        ))}
+                      </TagsContainer>
+                    </ScrollView>
+                  )}
 
-                <SectionHeader>
-                  <IconContainer>
-                    <TrendUpIcon height='16px' width='16px' fill='#1E2939' />
-                  </IconContainer>
-                  <SectionTitle>Popular</SectionTitle>
-                </SectionHeader>
-                
-                <TagsContainer>
-                  {stocksToShow.map((stock, index) => (
-                    <TagButton
-                      key={index}
-                      onPressIn={handleDropdownPressIn}
-                      onPress={() => {
-                        handleSearch(stock);
-                        // Add to recent searches when selecting a popular stock
-                        addToRecent(stock);
-                      }}
-                    >
-                      <TagText>{stock}</TagText>
-                    </TagButton>
-                  ))}
-                </TagsContainer>
-              </DropdownContent>
-            </DropdownCard>
-          </DropdownContainer>
-        </Animated.View>
-      )}
+                  {stocksToShow && stocksToShow.length > 0 && (
+                    <ScrollView>
+                      <SectionHeader>
+                        <IconContainer>
+                          <TrendUpIcon height='16px' width='16px' fill='#1E2939' />
+                        </IconContainer>
+                        <SectionTitle>Popular</SectionTitle>
+                      </SectionHeader>
+                      
+                      <TagsContainer>
+                        {stocksToShow.map((stock, index) => (
+                          <TagButton
+                            key={index}
+                            onPressIn={handleDropdownPressIn}
+                            onPress={() => {
+                              handleSearch(stock);
+                              setIsFocused(false);
+                            }}
+                          >
+                            <TagText>{stock}</TagText>
+                          </TagButton>
+                        ))}
+                      </TagsContainer>
+                    </ScrollView>
+                  )}
+                </DropdownContent>
+              </DropdownCard>
+            </DropdownContainer>
+          </Animated.View>
+        )}
     </>
   );
 };

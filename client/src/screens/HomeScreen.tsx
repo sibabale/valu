@@ -1,55 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, View } from 'react-native';
-import styled from 'styled-components/native';
-import { useDispatch, useSelector } from 'react-redux';
-import { Ionicons } from '@expo/vector-icons';
+import { Animated } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { RootState } from '../store';
-import { loginSuccess, logout } from '../store/slices/authSlice';
 import { HomePage } from '../components/pages';
 
-const Container = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
-  padding: 20px;
-`;
-
-const Title = styled.Text`
-  font-size: 24px;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20px;
-`;
-
-const Button = styled.TouchableOpacity`
-  background-color: #007aff;
-  padding: 15px 30px;
-  border-radius: 8px;
-  margin: 10px 0;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const ButtonText = styled.Text`
-  color: white;
-  font-weight: bold;
-  margin-left: 10px;
-`;
-
-const StatusText = styled.Text`
-  font-size: 16px;
-  color: #666;
-  margin: 10px 0;
-`;
-
 const HomeScreen: React.FC = () => {
-  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { isAuthenticated, user } = useSelector(
-    (state: RootState) => state.auth
-  );
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -68,23 +23,6 @@ const HomeScreen: React.FC = () => {
       }),
     ]).start();
   }, [fadeAnim, slideAnim]);
-
-  const handleLogin = () => {
-    dispatch(
-      loginSuccess({
-        user: {
-          id: '1',
-          email: 'user@example.com',
-          name: 'John Doe',
-        },
-        token: 'sample-token',
-      })
-    );
-  };
-
-  const handleLogout = () => {
-    dispatch(logout());
-  };
 
   const handleCompanyPress = (company: any) => {
     // Navigate to company details screen with the company data

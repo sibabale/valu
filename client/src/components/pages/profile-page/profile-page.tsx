@@ -1,8 +1,9 @@
 import React from 'react';
+import { SafeAreaView } from 'react-native';
 import styled from 'styled-components/native';
 import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import { RootState } from '../store';
+import { RootState } from '../../../store';
 
 const Container = styled.View`
   flex: 1;
@@ -63,47 +64,49 @@ const InfoText = styled.Text`
   flex: 1;
 `;
 
-const ProfileScreen: React.FC = () => {
+export const ProfilePage: React.FC = () => {
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
 
   if (!isAuthenticated || !user) {
     return (
-      <Container>
-        <ProfileCard>
-          <Name>Please login to view profile</Name>
-        </ProfileCard>
-      </Container>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Container>
+          <ProfileCard>
+            <Name>Please login to view profile</Name>
+          </ProfileCard>
+        </Container>
+      </SafeAreaView>
     );
   }
 
   return (
-    <Container>
-      <ProfileCard>
-        <Avatar>
-          <Ionicons name="person" size={40} color="white" />
-        </Avatar>
-        <Name>{user.name}</Name>
-        <Email>{user.email}</Email>
-      </ProfileCard>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Container>
+        <ProfileCard>
+          <Avatar>
+            <Ionicons name="person" size={40} color="white" />
+          </Avatar>
+          <Name>{user.name}</Name>
+          <Email>{user.email}</Email>
+        </ProfileCard>
 
-      <ProfileCard>
-        <InfoRow>
-          <Ionicons name="person-outline" size={20} color="#007AFF" />
-          <InfoText>Account ID: {user.id}</InfoText>
-        </InfoRow>
-        <InfoRow>
-          <Ionicons name="mail-outline" size={20} color="#007AFF" />
-          <InfoText>Email: {user.email}</InfoText>
-        </InfoRow>
-        <InfoRow>
-          <Ionicons name="shield-checkmark-outline" size={20} color="#007AFF" />
-          <InfoText>Status: Active</InfoText>
-        </InfoRow>
-      </ProfileCard>
-    </Container>
+        <ProfileCard>
+          <InfoRow>
+            <Ionicons name="person-outline" size={20} color="#007AFF" />
+            <InfoText>Account ID: {user.id}</InfoText>
+          </InfoRow>
+          <InfoRow>
+            <Ionicons name="mail-outline" size={20} color="#007AFF" />
+            <InfoText>Email: {user.email}</InfoText>
+          </InfoRow>
+          <InfoRow>
+            <Ionicons name="person-outline" size={20} color="#007AFF" />
+            <InfoText>Name: {user.name}</InfoText>
+          </InfoRow>
+        </ProfileCard>
+      </Container>
+    </SafeAreaView>
   );
-};
-
-export default ProfileScreen;
+}; 
