@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Valu.Api.Models;
@@ -19,12 +20,12 @@ public class AlphaVantageService : IAlphaVantageService
 
     public async Task<AlphaVantageOverview?> GetCompanyOverviewAsync(string symbol, CancellationToken cancellationToken = default)
     {
-        WaitForRateLimit();
+        await WaitForRateLimitAsync(cancellationToken);
         
         var url = $"{_options.BaseUrl}?function=OVERVIEW&symbol={symbol}&apikey={_options.ApiKey}";
         var response = await _httpClient.GetStringAsync(url, cancellationToken);
         
-        var jsonDoc = JsonDocument.Parse(response);
+        using var jsonDoc = JsonDocument.Parse(response);
         var root = jsonDoc.RootElement;
         
         // Check if we got valid data (not error message)
@@ -55,12 +56,12 @@ public class AlphaVantageService : IAlphaVantageService
 
     public async Task<IEnumerable<AlphaVantageSearchResult>> SearchCompaniesAsync(string query, CancellationToken cancellationToken = default)
     {
-        WaitForRateLimit();
+        await WaitForRateLimitAsync(cancellationToken);
         
         var url = $"{_options.BaseUrl}?function=SYMBOL_SEARCH&keywords={Uri.EscapeDataString(query)}&apikey={_options.ApiKey}";
         var response = await _httpClient.GetStringAsync(url, cancellationToken);
         
-        var jsonDoc = JsonDocument.Parse(response);
+        using var jsonDoc = JsonDocument.Parse(response);
         var root = jsonDoc.RootElement;
         
         if (!root.TryGetProperty("bestMatches", out var matchesElement))
@@ -79,7 +80,7 @@ public class AlphaVantageService : IAlphaVantageService
                 MarketClose: GetStringValue(match, "6. marketClose"),
                 Timezone: GetStringValue(match, "7. timezone"),
                 Currency: GetStringValue(match, "8. currency"),
-                MatchScore: GetDecimalValue(match, "9. matchScore")
+                MatchScore: GetStringValue(match, "9. matchScore")
             );
             results.Add(result);
         }
@@ -87,8 +88,10 @@ public class AlphaVantageService : IAlphaVantageService
         return results;
     }
 
-    private void WaitForRateLimit()
+    private async Task WaitForRateLimitAsync(CancellationToken cancellationToken = default)
     {
+        TimeSpan waitTime = TimeSpan.Zero;
+        
         lock (_rateLimitLock)
         {
             // Remove old calls (older than 1 minute)
@@ -97,18 +100,34 @@ public class AlphaVantageService : IAlphaVantageService
                 _apiCalls.Dequeue();
             }
             
-            // If we've made too many calls, wait
+            // If we've made too many calls, calculate wait time
             if (_apiCalls.Count >= _options.RateLimitPerMinute)
             {
                 var oldestCall = _apiCalls.Peek();
-                var waitTime = TimeSpan.FromMinutes(1) - (DateTime.UtcNow - oldestCall);
-                if (waitTime > TimeSpan.Zero)
+                waitTime = TimeSpan.FromMinutes(1) - (DateTime.UtcNow - oldestCall);
+                if (waitTime <= TimeSpan.Zero)
                 {
-                    Task.Delay(waitTime).Wait();
+                    waitTime = TimeSpan.Zero;
                 }
             }
             
-            _apiCalls.Enqueue(DateTime.UtcNow);
+            // Only enqueue if we're not waiting (will enqueue after wait if needed)
+            if (waitTime == TimeSpan.Zero)
+            {
+                _apiCalls.Enqueue(DateTime.UtcNow);
+            }
+        }
+        
+        // Wait outside the lock to avoid blocking other requests
+        if (waitTime > TimeSpan.Zero)
+        {
+            await Task.Delay(waitTime, cancellationToken);
+            
+            // Re-acquire lock to enqueue the call after waiting
+            lock (_rateLimitLock)
+            {
+                _apiCalls.Enqueue(DateTime.UtcNow);
+            }
         }
     }
 
@@ -126,6 +145,6 @@ public class AlphaVantageService : IAlphaVantageService
         if (string.IsNullOrEmpty(value) || value == "None")
             return 0;
             
-        return decimal.TryParse(value, out var result) ? result : 0;
+        return decimal.TryParse(value, CultureInfo.InvariantCulture, out var result) ? result : 0;
     }
 } 
