@@ -7,16 +7,13 @@ import { Header } from '../../atoms/header/header';
 import { Searchbar } from '../../atoms/searchbar/searchbar';
 import { CompanyList } from '../../organisms/company-list/companylist';
 import { Company } from '../../../types/company.interface';
-import companiesData from '../../../data/companies.json';
 
 export const HomePage: React.FC = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const insets = useSafeAreaInsets();
-
-  console.log('HomePage render - searchQuery:', searchQuery);
-  console.log('HomePage render - filteredCompanies count:', filteredCompanies?.length);
 
   // Animation values for cascading sequence
   const headerAnim = useRef(new Animated.Value(1)).current; // Start at 1 (normal size)
@@ -39,20 +36,49 @@ export const HomePage: React.FC = () => {
       }),
     ]).start();
     
-    console.log('Info pressed');
     // Info modal logic would go here
   };
 
-  // Initialize companies, handle filtering, and start cascading animations
+  // Fetch companies from API
   useEffect(() => {
-    console.log('HomePage: Initializing with companies count:', companiesData.length);
-    
-    // Set initial companies data
-    setFilteredCompanies(companiesData);
+    console.log('HomePage: Fetching companies');
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch('https://b01068571f2b.ngrok-free.app/api/companies');
+        console.log('-----HomePage: Response-----', response);
+        if (response.ok) {
+          const apiCompanies = await response.json();
+          // Transform API data to match our Company interface
+          const transformedCompanies = apiCompanies.map((apiCompany: any) => {
+            console.log(apiCompany.recommendation);
+            
+            return {
+            id: apiCompany.id,
+            name: apiCompany.name,
+            ticker: apiCompany.symbol,
+            logo: apiCompany.symbol.charAt(0).toUpperCase(),
+            price: apiCompany.price || 0,
+            recommendation: apiCompany.recommendation,
+            logoColor: '#4285F4',
+          };
+        });
+
+          console.log('-----transformedCompanies-----', transformedCompanies.map((company: any) => company.recommendation));
+          setCompanies(transformedCompanies);
+          setFilteredCompanies(transformedCompanies);
+        }
+      } catch (error) {
+        console.error('Failed to fetch companies:', error);
+        // Fallback to empty array
+        setCompanies([]);
+        setFilteredCompanies([]);
+      }
+    };
+
+    fetchCompanies();
     
     // Start cascading animations after a brief delay to ensure state is set
     const timer = setTimeout(() => {
-      console.log('HomePage: Starting cascading animation sequence');
       
       // 🎬 Cascading Animation Sequence
       // Header (0s) → Search (0.2s) → List (0.4s)
@@ -79,16 +105,14 @@ export const HomePage: React.FC = () => {
 
   // Handle search filtering separately
   useEffect(() => {
-    if (companiesData.length > 0) {
-      console.log('HomePage: Filtering companies for query:', searchQuery);
-      const filtered = companiesData.filter((company) =>
+    if (companies.length > 0) {
+      const filtered = companies.filter((company: Company) =>
         company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         company.ticker.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      console.log('HomePage: Filtered companies count:', filtered.length);
       setFilteredCompanies(filtered);
     }
-  }, [searchQuery]);
+  }, [searchQuery, companies]);
 
   const handleCompanyPress = (company: Company) => {
     // Navigate to company details screen with the company data

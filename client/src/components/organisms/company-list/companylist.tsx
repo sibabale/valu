@@ -9,10 +9,10 @@ export const CompanyList: React.FC<CompanyListProps> = ({
   onCompanyPress,
   bottomInset = 0,
 }) => {
-  console.log('CompanyList render - companies prop:', companies);
-  console.log('CompanyList render - companies count:', companies?.length);
-  console.log('CompanyList render - companies type:', typeof companies);
-  console.log('CompanyList render - companies is array:', Array.isArray(companies));
+  // console.log('CompanyList render - companies prop:', companies);
+  // console.log('CompanyList render - companies count:', companies?.length);
+  // console.log('CompanyList render - companies type:', typeof companies);
+  // console.log('CompanyList render - companies is array:', Array.isArray(companies));
 
   if (!companies || !Array.isArray(companies) || companies.length === 0) {
     console.log('CompanyList: No companies to render');
