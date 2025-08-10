@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Animated } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { HomePageProps } from './homepage.interface';
+import { useNavigation } from '@react-navigation/native';
 import { PageContainer, PaddedContent, ContentContainer } from './homepage.styles';
 import { Header } from '../../atoms/header/header';
 import { Searchbar } from '../../atoms/searchbar/searchbar';
@@ -9,10 +9,8 @@ import { CompanyList } from '../../organisms/company-list/companylist';
 import { Company } from '../../../types/company.interface';
 import companiesData from '../../../data/companies.json';
 
-export const HomePage: React.FC<HomePageProps> = ({
-  onCompanyPress,
-  onInfoPress,
-}) => {
+export const HomePage: React.FC = () => {
+  const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
   const insets = useSafeAreaInsets();
@@ -41,8 +39,8 @@ export const HomePage: React.FC<HomePageProps> = ({
       }),
     ]).start();
     
-    // Call the original onInfoPress
-    onInfoPress?.();
+    console.log('Info pressed');
+    // Info modal logic would go here
   };
 
   // Initialize companies, handle filtering, and start cascading animations
@@ -93,22 +91,15 @@ export const HomePage: React.FC<HomePageProps> = ({
   }, [searchQuery]);
 
   const handleCompanyPress = (company: Company) => {
-    onCompanyPress?.(company);
-  };
-
-  const handleInfoPress = () => {
-    onInfoPress?.();
-  };
-
-  const handleStockSelect = (stock: string) => {
-    setSearchQuery(stock);
+    // Navigate to company details screen with the company data
+    (navigation as any).navigate('CompanyDetails', { company });
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
       <PageContainer>
+        {/* Header Section */}
         <PaddedContent>
-          {/* Header with scale animation on press */}
           <Animated.View
             style={{
               opacity: 1, // Always visible
@@ -119,33 +110,38 @@ export const HomePage: React.FC<HomePageProps> = ({
           >
             <Header title="VALU" onInfoPress={handleHeaderPress} />
           </Animated.View>
+        </PaddedContent>
 
-          {/* Search with slide-up and scale animation */}
-          <Animated.View
-            style={{
-              opacity: searchAnim,
-              transform: [{
-                translateY: searchAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [30, 0], // Slide up from below
-                }),
-              }, {
-                scale: searchAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.95, 1], // Subtle scale effect
-                }),
-              }],
-            }}
-          >
+        {/* Search Section - Separate container with higher z-index */}
+        <Animated.View
+          style={{
+            opacity: searchAnim,
+            transform: [{
+              translateY: searchAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [30, 0], // Slide up from below
+              }),
+            }, {
+              scale: searchAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.95, 1], // Subtle scale effect
+              }),
+            }],
+            zIndex: 1000, // Higher z-index to ensure dropdown appears above cards
+            elevation: 1000, // For Android
+            position: 'relative',
+          }}
+        >
+          <PaddedContent>
             <Searchbar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />
-          </Animated.View>
-        </PaddedContent>
+          </PaddedContent>
+        </Animated.View>
         
-        {/* Content container */}
-        <ContentContainer>
+        {/* Content container - Lower z-index */}
+        <ContentContainer style={{ zIndex: 1, elevation: 1 }}>
           <CompanyList
             companies={filteredCompanies}
             onCompanyPress={handleCompanyPress}

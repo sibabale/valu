@@ -24,4 +24,5 @@ export interface CompanyDetailsPageProps {
   };
   onBackPress?: () => void;
   onInfoPress?: () => void;
+  onNavigateToValueScore?: () => void;
 }
