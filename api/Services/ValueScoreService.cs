@@ -13,13 +13,13 @@ public class ValueScoreService : IValueScoreService
         _companyService = companyService;
     }
 
-    public async Task<ValueScore> CalculateValueScoreAsync(CalculateValueScoreRequest request)
+    public async Task<ValueScore> CalculateValueScoreAsync(CalculateValueScoreRequest request, CancellationToken cancellationToken = default)
     {
-        var company = await _companyService.GetByIdAsync(request.CompanyId);
+        var company = await _companyService.GetByIdAsync(request.CompanyId, cancellationToken);
         if (company == null)
             throw new ArgumentException("Company not found", nameof(request.CompanyId));
 
-        var details = await _companyService.GetDetailsAsync(request.CompanyId);
+        var details = await _companyService.GetDetailsAsync(request.CompanyId, cancellationToken);
         if (details == null)
             throw new ArgumentException("Company details not found", nameof(request.CompanyId));
 
@@ -29,7 +29,7 @@ public class ValueScoreService : IValueScoreService
             CalculatePERatioScore(details),
             CalculatePBRatioScore(details),
             CalculateROEScore(details),
-            CalculateDebtToEquityScore(details)
+            CalculateProfitMarginScore(details)
         };
 
         var totalScore = components.Sum(c => c.Score * c.Weight);
@@ -49,22 +49,22 @@ public class ValueScoreService : IValueScoreService
         return valueScore;
     }
 
-    public async Task<ValueScore?> GetValueScoreAsync(Guid companyId)
+    public async Task<ValueScore?> GetValueScoreAsync(Guid companyId, CancellationToken cancellationToken = default)
     {
         if (_cachedScores.TryGetValue(companyId, out var cachedScore))
             return cachedScore;
 
-        return await CalculateValueScoreAsync(new CalculateValueScoreRequest(companyId));
+        return await CalculateValueScoreAsync(new CalculateValueScoreRequest(companyId), cancellationToken);
     }
 
-    public async Task<IEnumerable<ValueScore>> GetTopValueStocksAsync(int count = 10)
+    public async Task<IEnumerable<ValueScore>> GetTopValueStocksAsync(int count = 10, CancellationToken cancellationToken = default)
     {
-        var companies = await _companyService.GetAllAsync();
+        var companies = await _companyService.GetAllAsync(cancellationToken);
         var scores = new List<ValueScore>();
 
         foreach (var company in companies.Take(count))
         {
-            var score = await CalculateValueScoreAsync(new CalculateValueScoreRequest(company.Id));
+            var score = await CalculateValueScoreAsync(new CalculateValueScoreRequest(company.Id), cancellationToken);
             scores.Add(score);
         }
 
@@ -95,12 +95,12 @@ public class ValueScoreService : IValueScoreService
         return new ScoreComponent("ROE", 0.25m, score, $"ROE of {roe:F1}%");
     }
 
-    private ScoreComponent CalculateDebtToEquityScore(CompanyDetails details)
+    private ScoreComponent CalculateProfitMarginScore(CompanyDetails details)
     {
-        var debtToEquity = details.Ratios.FirstOrDefault(r => r.Name == "Debt-to-Equity")?.Value ?? 0.5m;
-        var score = debtToEquity < 0.3m ? 100 : debtToEquity < 0.5m ? 75 : debtToEquity < 0.7m ? 50 : 25;
+        var profitMargin = details.Ratios.FirstOrDefault(r => r.Name == "Profit Margin")?.Value ?? 0.05m;
+        var score = profitMargin > 0.15m ? 100 : profitMargin > 0.10m ? 75 : profitMargin > 0.05m ? 50 : 25;
         
-        return new ScoreComponent("Debt-to-Equity", 0.2m, score, $"Debt-to-Equity of {debtToEquity:F2}");
+        return new ScoreComponent("Profit Margin", 0.2m, score, $"Profit Margin of {profitMargin:P1}");
     }
 
     private string GetGrade(decimal score)
