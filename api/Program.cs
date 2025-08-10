@@ -11,7 +11,7 @@ builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
 builder.Services.AddHttpClient();
 builder.Services.Configure<AlphaVantageOptions>(
     builder.Configuration.GetSection("AlphaVantage"));
-builder.Services.AddScoped<IAlphaVantageService, AlphaVantageService>();
+builder.Services.AddSingleton<IAlphaVantageService, AlphaVantageService>();
 builder.Services.AddSingleton<SimpleCache>();
 builder.Services.AddScoped<ICacheBuildingService, CacheBuildingService>();
 
