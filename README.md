@@ -91,7 +91,7 @@ The backend is built with:
 - `GET /api/companies/{id}` - Get company by ID
 - `GET /api/companies/{id}/details` - Get detailed company information
 - `GET /api/companies/search?query={query}` - Search companies
-- `GET /api/companies/popular` - Get popular stocks
+
 
 #### Value Scoring
 - `POST /api/value-score/calculate` - Calculate value score

@@ -7,7 +7,7 @@ A Minimal API for the Valu investment analysis application, built with ASP.NET C
 - **Company Search**: Search companies by name, symbol, or sector
 - **Company Details**: Get detailed financial information for companies
 - **Value Scoring**: Calculate value scores based on financial ratios
-- **Popular Stocks**: Get list of popular stocks
+
 - **Health Check**: API health monitoring endpoint
 
 ## Getting Started
@@ -43,7 +43,7 @@ A Minimal API for the Valu investment analysis application, built with ASP.NET C
 - `GET /api/companies/{id}` - Get company by ID
 - `GET /api/companies/{id}/details` - Get detailed company information
 - `GET /api/companies/search?query={query}&page={page}&pageSize={pageSize}` - Search companies
-- `GET /api/companies/popular` - Get popular stocks
+
 
 ### Value Scoring
 - `POST /api/value-score/calculate` - Calculate value score for a company

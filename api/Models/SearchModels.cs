@@ -14,6 +14,4 @@ public record SearchCompaniesResponse(
     List<Company> Companies
 );
 
-public record PopularStocksResponse(
-    List<Company> Stocks
-); 
+ 

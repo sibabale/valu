@@ -9,5 +9,5 @@ public interface ICompanyService
     Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<CompanyDetails?> GetDetailsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<SearchCompaniesResponse> SearchAsync(string query, int page = 1, int pageSize = 20, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Company>> GetPopularStocksAsync(CancellationToken cancellationToken = default);
+
 } 
