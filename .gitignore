@@ -1,2 +1,15 @@
 node_modules
 .env
+
+# .NET
+api/bin/
+api/obj/
+api/*.user
+api/*.suo
+api/*.cache
+api/*.dll
+api/*.exe
+api/*.pdb
+api/*.log
+api/appsettings.Development.json
+api/appsettings.Production.json
