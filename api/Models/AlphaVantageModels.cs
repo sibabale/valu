@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Valu.Api.Models;
 
 // Alpha Vantage API Response Models
@@ -10,16 +12,36 @@ public record AlphaVantageOverview(
     string Country,
     string Sector,
     string Industry,
-    decimal MarketCapitalization,
-    decimal PERatio,
-    decimal PriceToBookRatio,
-    decimal ReturnOnEquityTTM,
-    decimal ProfitMargin, // Replace DebtToEquityRatio with ProfitMargin
-    decimal EPS,
-    decimal BookValue,
-    decimal DividendYield,
-    decimal QuarterlyEarningsGrowthYOY,
-    decimal AnalystTargetPrice
+    [property: JsonPropertyName("MarketCapitalization")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? MarketCapitalization,
+    [property: JsonPropertyName("PERatio")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? PERatio,
+    [property: JsonPropertyName("PriceToBookRatio")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? PriceToBookRatio,
+    [property: JsonPropertyName("ReturnOnEquityTTM")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? ReturnOnEquityTTM,
+    [property: JsonPropertyName("ProfitMargin")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? ProfitMargin,
+    [property: JsonPropertyName("EPS")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? EPS,
+    [property: JsonPropertyName("BookValue")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? BookValue,
+    [property: JsonPropertyName("DividendYield")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? DividendYield,
+    [property: JsonPropertyName("QuarterlyEarningsGrowthYOY")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? QuarterlyEarningsGrowthYOY,
+    [property: JsonPropertyName("AnalystTargetPrice")]
+    [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    decimal? AnalystTargetPrice
 );
 
 public record AlphaVantageSearchResult(
@@ -31,7 +53,8 @@ public record AlphaVantageSearchResult(
     string MarketClose,
     string Timezone,
     string Currency,
-    decimal MatchScore
+    [property: JsonPropertyName("MatchScore")]
+    string? MatchScore
 );
 
 // Configuration model
@@ -41,4 +64,17 @@ public class AlphaVantageOptions
     public string BaseUrl { get; set; } = string.Empty;
     public int RateLimitPerMinute { get; set; }
     public int RateLimitPerDay { get; set; }
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(ApiKey))
+        {
+            throw new InvalidOperationException("AlphaVantage API key is required. Please set it via environment variable 'AlphaVantage__ApiKey' or user secrets.");
+        }
+        
+        if (string.IsNullOrWhiteSpace(BaseUrl))
+        {
+            throw new InvalidOperationException("AlphaVantage BaseUrl is required.");
+        }
+    }
 } 
