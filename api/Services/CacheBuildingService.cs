@@ -49,7 +49,7 @@ public class CacheBuildingService : ICacheBuildingService
                     Symbol: overview.Symbol,
                     Sector: overview.Sector,
                     Industry: overview.Industry,
-                    MarketCap: overview.MarketCapitalization,
+                    MarketCap: overview.MarketCapitalization ?? 0m,
                     Price: 0m, // Not available in OVERVIEW
                     Change: 0m, // Not available in OVERVIEW
                     ChangePercent: 0m, // Not available in OVERVIEW
@@ -57,21 +57,28 @@ public class CacheBuildingService : ICacheBuildingService
                 );
 
                 // Cache for 1 day
-                var cacheKey = $"company_{symbol}";
+                var cacheKey = $"company_symbol_{symbol}";
                 _cache.Set(cacheKey, company, TimeSpan.FromDays(1));
                 
                 successCount++;
 
                 // Wait 12 seconds between calls (5 calls per minute = 12 seconds per call)
-                if (symbol != _initialCompanies.Last())
+                if (symbol != _initialCompanies[^1])
                 {
                     await Task.Delay(12000, cancellationToken);
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Re-throw cancellation exceptions to allow cancellation to propagate
+                throw;
             }
             catch (Exception)
             {
                 failureCount++;
             }
         }
+
+        _logger.LogInformation("Cache building completed. Successes: {SuccessCount}, Failures: {FailureCount}", successCount, failureCount);
     }
 } 

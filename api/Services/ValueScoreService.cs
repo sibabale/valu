@@ -6,11 +6,13 @@ namespace Valu.Api.Services;
 public class ValueScoreService : IValueScoreService
 {
     private readonly ICompanyService _companyService;
+    private readonly IAlphaVantageService _alphaVantageService;
     private readonly ConcurrentDictionary<Guid, ValueScore> _cachedScores = new();
 
-    public ValueScoreService(ICompanyService companyService)
+    public ValueScoreService(ICompanyService companyService, IAlphaVantageService alphaVantageService)
     {
         _companyService = companyService;
+        _alphaVantageService = alphaVantageService;
     }
 
     public async Task<ValueScore> CalculateValueScoreAsync(CalculateValueScoreRequest request, CancellationToken cancellationToken = default)
@@ -19,17 +21,18 @@ public class ValueScoreService : IValueScoreService
         if (company == null)
             throw new ArgumentException("Company not found", nameof(request.CompanyId));
 
-        var details = await _companyService.GetDetailsAsync(request.CompanyId, cancellationToken);
-        if (details == null)
-            throw new ArgumentException("Company details not found", nameof(request.CompanyId));
+        // Get Alpha Vantage data directly for scoring
+        var overview = await _alphaVantageService.GetCompanyOverviewAsync(company.Symbol, cancellationToken);
+        if (overview == null)
+            throw new ArgumentException("Company financial data not found", nameof(request.CompanyId));
 
-        // Simple value scoring algorithm
+        // Simple value scoring algorithm using Alpha Vantage data directly
         var components = new List<ScoreComponent>
         {
-            CalculatePERatioScore(details),
-            CalculatePBRatioScore(details),
-            CalculateROEScore(details),
-            CalculateProfitMarginScore(details)
+            CalculatePERatioScore(overview),
+            CalculatePBRatioScore(overview),
+            CalculateROEScore(overview),
+            CalculateProfitMarginScore(overview)
         };
 
         var totalScore = components.Sum(c => c.Score * c.Weight);
@@ -71,36 +74,36 @@ public class ValueScoreService : IValueScoreService
         return scores.OrderByDescending(s => s.Score);
     }
 
-    private ScoreComponent CalculatePERatioScore(CompanyDetails details)
+    private ScoreComponent CalculatePERatioScore(AlphaVantageOverview overview)
     {
-        var peRatio = details.Ratios.FirstOrDefault(r => r.Name == "P/E Ratio")?.Value ?? 20;
+        var peRatio = overview.PERatio;
         var score = peRatio < 15m ? 100 : peRatio < 25m ? 75 : peRatio < 35m ? 50 : 25;
         
         return new ScoreComponent("P/E Ratio", 0.3m, score, $"P/E Ratio of {peRatio:F2}");
     }
 
-    private ScoreComponent CalculatePBRatioScore(CompanyDetails details)
+    private ScoreComponent CalculatePBRatioScore(AlphaVantageOverview overview)
     {
-        var pbRatio = details.Ratios.FirstOrDefault(r => r.Name == "P/B Ratio")?.Value ?? 3;
+        var pbRatio = overview.PriceToBookRatio;
         var score = pbRatio < 1.5m ? 100 : pbRatio < 3m ? 75 : pbRatio < 5m ? 50 : 25;
         
         return new ScoreComponent("P/B Ratio", 0.25m, score, $"P/B Ratio of {pbRatio:F2}");
     }
 
-    private ScoreComponent CalculateROEScore(CompanyDetails details)
+    private ScoreComponent CalculateROEScore(AlphaVantageOverview overview)
     {
-        var roe = details.Ratios.FirstOrDefault(r => r.Name == "ROE")?.Value ?? 15;
+        var roe = overview.ReturnOnEquityTTM * 100; // Convert to percentage
         var score = roe > 20m ? 100 : roe > 15m ? 75 : roe > 10m ? 50 : 25;
         
         return new ScoreComponent("ROE", 0.25m, score, $"ROE of {roe:F1}%");
     }
 
-    private ScoreComponent CalculateProfitMarginScore(CompanyDetails details)
+    private ScoreComponent CalculateProfitMarginScore(AlphaVantageOverview overview)
     {
-        var profitMargin = details.Ratios.FirstOrDefault(r => r.Name == "Profit Margin")?.Value ?? 0.05m;
-        var score = profitMargin > 0.15m ? 100 : profitMargin > 0.10m ? 75 : profitMargin > 0.05m ? 50 : 25;
+        var profitMargin = overview.ProfitMargin * 100; // Convert to percentage
+        var score = profitMargin > 15m ? 100 : profitMargin > 10m ? 75 : profitMargin > 5m ? 50 : 25;
         
-        return new ScoreComponent("Profit Margin", 0.2m, score, $"Profit Margin of {profitMargin:P1}");
+        return new ScoreComponent("Profit Margin", 0.2m, score, $"Profit Margin of {profitMargin:F1}%");
     }
 
     private string GetGrade(decimal score)
