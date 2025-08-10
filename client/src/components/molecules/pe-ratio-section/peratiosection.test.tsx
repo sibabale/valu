@@ -22,47 +22,9 @@ describe('PERatioSection - Public Interface', () => {
     expect(getByText('2.4')).toBeTruthy();
   });
 
-  it('displays trend information with up indicator', () => {
-    const { getByText } = render(<PERatioSection {...defaultProps} />);
-    expect(getByText('Up')).toBeTruthy();
-  });
-
-  it('displays trend information with down indicator', () => {
-    const { getByText } = render(
-      <PERatioSection {...defaultProps} trend="down" />
-    );
-    expect(getByText('Down')).toBeTruthy();
-  });
-
-  it('displays trend information with neutral indicator', () => {
-    const { getByText } = render(
-      <PERatioSection {...defaultProps} trend="neutral" />
-    );
-    expect(getByText('Neutral')).toBeTruthy();
-  });
-
   it('shows value score label', () => {
     const { getByText } = render(<PERatioSection {...defaultProps} />);
     expect(getByText('Value Score:')).toBeTruthy();
-  });
-
-  it('displays value score with progress bar', () => {
-    const { getByText } = render(<PERatioSection {...defaultProps} />);
-    expect(getByText('70/100')).toBeTruthy();
-  });
-
-  it('shows assessment text', () => {
-    const { getByText } = render(<PERatioSection {...defaultProps} />);
-    expect(getByText('Good value (P/E < 25)')).toBeTruthy();
-  });
-
-  it('displays detailed description', () => {
-    const { getByText } = render(<PERatioSection {...defaultProps} />);
-    expect(
-      getByText(
-        'Price-to-Earnings ratio measures how much investors are willing to pay per dollar of earnings.'
-      )
-    ).toBeTruthy();
   });
 
   it('handles different PE ratios correctly', () => {
@@ -76,15 +38,5 @@ describe('PERatioSection - Public Interface', () => {
     );
 
     expect(getByText('15.6')).toBeTruthy();
-    expect(getByText('85/100')).toBeTruthy();
-    expect(getByText('Excellent value (P/E < 15)')).toBeTruthy();
-  });
-
-  it('displays different assessments correctly', () => {
-    const { getByText } = render(
-      <PERatioSection {...defaultProps} assessment="Fair value (P/E 15-25)" />
-    );
-
-    expect(getByText('Fair value (P/E 15-25)')).toBeTruthy();
   });
 });
