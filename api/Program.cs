@@ -36,20 +36,13 @@ app.UseCors("AllowReactNative");
 app.Use(async (context, next) =>
 {
     var startTime = DateTime.UtcNow;
-    var originalBodyStream = context.Response.Body;
-
-    using var memoryStream = new MemoryStream();
-    context.Response.Body = memoryStream;
+    var method = context.Request.Method;
+    var path = context.Request.Path + context.Request.QueryString;
 
     await next();
 
-    memoryStream.Position = 0;
-    await memoryStream.CopyToAsync(originalBodyStream);
-
     var duration = DateTime.UtcNow - startTime;
     var statusCode = context.Response.StatusCode;
-    var method = context.Request.Method;
-    var path = context.Request.Path + context.Request.QueryString;
 
     // Color-coded logging based on status code
     var color = statusCode switch
@@ -131,6 +124,17 @@ app.MapGet("/api/value-score/{companyId:guid}", async (Guid companyId, IValueSco
 
 app.MapGet("/api/value-score/top", async (IValueScoreService service, int count = 10) =>
 {
+    // Validate count parameter to prevent excessive resource usage
+    if (count <= 0)
+    {
+        return Results.BadRequest(new { Error = "Count must be greater than 0" });
+    }
+    
+    if (count > 100)
+    {
+        return Results.BadRequest(new { Error = "Count cannot exceed 100" });
+    }
+    
     var topStocks = await service.GetTopValueStocksAsync(count);
     return Results.Ok(new { TopStocks = topStocks });
 });

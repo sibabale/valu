@@ -1,11 +1,12 @@
 using Valu.Api.Models;
+using System.Collections.Concurrent;
 
 namespace Valu.Api.Services;
 
 public class ValueScoreService : IValueScoreService
 {
     private readonly ICompanyService _companyService;
-    private readonly Dictionary<Guid, ValueScore> _cachedScores = new();
+    private readonly ConcurrentDictionary<Guid, ValueScore> _cachedScores = new();
 
     public ValueScoreService(ICompanyService companyService)
     {

@@ -51,7 +51,7 @@ public class CompanyService : ICompanyService
     public async Task<IEnumerable<Company>> GetAllAsync()
     {
         await Task.Delay(100); // Simulate async operation
-        return _companies;
+        return _companies.AsReadOnly();
     }
 
     public async Task<Company?> GetByIdAsync(Guid id)
@@ -69,18 +69,36 @@ public class CompanyService : ICompanyService
     public async Task<SearchCompaniesResponse> SearchAsync(string query, int page = 1, int pageSize = 20)
     {
         await Task.Delay(100);
-        
-        var filtered = _companies.Where(c => 
-            c.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-            c.Symbol.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-            c.Sector.Contains(query, StringComparison.OrdinalIgnoreCase)
-        ).ToList();
+        var q = (query ?? string.Empty).Trim();
 
-        var totalCount = filtered.Count;
-        var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
-        var paged = filtered.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        var effectivePage = page < 1 ? 1 : page;
+        const int MaxPageSize = 100;
+        var effectivePageSize = pageSize <= 0
+            ? 20
+            : (pageSize > MaxPageSize ? MaxPageSize : pageSize);
 
-        return new SearchCompaniesResponse(page, pageSize, totalPages, totalCount, paged);
+        var source = string.IsNullOrEmpty(q)
+            ? _companies.AsEnumerable()
+            : _companies.Where(c =>
+                c.Name.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                c.Symbol.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                c.Sector.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+                c.Industry.Contains(q, StringComparison.OrdinalIgnoreCase));
+
+        var totalCount = source.Count();
+        var totalPages = (int)Math.Ceiling((double)totalCount / effectivePageSize);
+        var paged = source
+            .Skip((effectivePage - 1) * effectivePageSize)
+            .Take(effectivePageSize)
+            .ToList();
+
+        return new SearchCompaniesResponse(
+            effectivePage,
+            effectivePageSize,
+            totalPages,
+            totalCount,
+            paged
+        );
     }
 
     public async Task<IEnumerable<Company>> GetPopularStocksAsync()
