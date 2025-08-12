@@ -20,7 +20,6 @@ export const HomePage: React.FC = () => {
   // Animation values for cascading sequence
   const headerAnim = useRef(new Animated.Value(1)).current; // Start at 1 (normal size)
   const searchAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
-  const listAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
 
   // Fetch companies from API
   useEffect(() => {
@@ -38,10 +37,7 @@ export const HomePage: React.FC = () => {
         const companies = await response.json();
         setCompaniesData(companies);
         setFilteredCompanies(companies);
-        
-        console.log('HomePage: Fetched companies count:', companies.length);
       } catch (err) {
-        console.error('HomePage: Error fetching companies:', err);
         setError('Failed to load companies');
         setCompaniesData([]);
         setFilteredCompanies([]);
@@ -74,8 +70,6 @@ export const HomePage: React.FC = () => {
 
   // Fetch companies from API
   useEffect(() => {
-    console.log('HomePage: Initializing with companies count:', companiesData.length);
-    
     // Start cascading animations after a brief delay to ensure state is set
     const timer = setTimeout(() => {
       
@@ -89,18 +83,11 @@ export const HomePage: React.FC = () => {
           duration: 500,
           useNativeDriver: true,
         }),
-        // List fades in with 0.4s total delay
-        Animated.delay(200),
-        Animated.timing(listAnim, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
       ]).start();
     }, 100); // Small delay to ensure state is set
 
     return () => clearTimeout(timer);
-  }, [companiesData.length, searchAnim, listAnim]); // Run when companies data changes
+  }, [companiesData.length, searchAnim]); // Run when companies data changes
 
   // Handle search filtering separately
   useEffect(() => {

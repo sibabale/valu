@@ -90,7 +90,6 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   };
 
   const clearRecent = () => {
-    console.log('Component: Dispatching clearRecentSearches');
     dispatch(clearRecentSearches());
   };
 
