@@ -33,7 +33,7 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
           <LogoText>{firstLetter}</LogoText>
         </LogoContainer>
         <CompanyName>{company.name}</CompanyName>
-        <TickerSymbol>{company.ticker}</TickerSymbol>
+        <TickerSymbol>{company.symbol}</TickerSymbol>
       </Header>
 
       <PriceContainer>

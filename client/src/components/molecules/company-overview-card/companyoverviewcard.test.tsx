@@ -5,7 +5,7 @@ import { CompanyOverviewCard } from './companyoverviewcard';
 describe('CompanyOverviewCard - Public Interface', () => {
   const mockCompany = {
     name: 'Apple Inc.',
-    ticker: 'AAPL',
+    symbol: 'AAPL',
     logo: '🍎',
     logoColor: '#000000',
     price: 150.0,
@@ -21,7 +21,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
     expect(getByText('Apple Inc.')).toBeTruthy();
   });
 
-  it('shows company ticker symbol', () => {
+  it('shows company symbol', () => {
     const { getByText } = render(<CompanyOverviewCard company={mockCompany} />);
     expect(getByText('AAPL')).toBeTruthy();
   });
@@ -59,7 +59,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
     const differentCompany = {
       ...mockCompany,
       name: 'Alphabet Inc.',
-      ticker: 'GOOGL',
+      symbol: 'GOOGL',
       logo: 'G',
       logoColor: '#4285F4',
       price: 2750.0,

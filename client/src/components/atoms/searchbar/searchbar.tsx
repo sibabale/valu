@@ -81,7 +81,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     // Otherwise, check against actual company data
     return companiesData.some(
       company =>
-        company.ticker.toUpperCase() === trimmedQuery ||
+        company.symbol?.toUpperCase() === trimmedQuery ||
         company.name.toUpperCase().includes(trimmedQuery)
     );
   };

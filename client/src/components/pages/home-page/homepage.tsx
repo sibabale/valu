@@ -133,9 +133,15 @@ export const HomePage: React.FC = () => {
   useEffect(() => {
     if (companiesData.length > 0) {
       const filtered = companiesData.filter(
-        (company: Company) =>
-          company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          company.ticker.toLowerCase().includes(searchQuery.toLowerCase())
+        (company: Company) => {
+          const name = company.name?.toLowerCase() || '';
+          const symbol = company.symbol?.toLowerCase() || '';
+          const sector = company.sector?.toLowerCase() || '';
+          const industry = company.industry?.toLowerCase() || '';
+          const query = searchQuery.toLowerCase();
+
+          return name.includes(query) || symbol.includes(query) || sector.includes(query) || industry.includes(query);
+        }
       );
       setFilteredCompanies(filtered);
     }

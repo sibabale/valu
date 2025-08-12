@@ -3,7 +3,7 @@ import { RatioType } from '../../../utils/descriptions';
 export interface CompanyOverviewCardProps {
   company: {
     name: string;
-    ticker: string;
+    symbol: string; // Changed from ticker to symbol
     logo: string;
     logoColor: string;
     price: number;

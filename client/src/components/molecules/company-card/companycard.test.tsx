@@ -6,12 +6,17 @@ import { Company } from '../../../types/company.interface';
 const mockCompany: Company = {
   id: '1',
   name: 'Alphabet Inc.',
-  ticker: 'GOOGL',
-  logo: 'G',
+  symbol: 'GOOGL',
+  sector: 'Technology',
+  industry: 'Software',
+  marketCap: 2000000000000,
   price: 150.0,
+  change: 2.5,
+  changePercent: 1.67,
+  description: 'Alphabet Inc. is a technology company.',
   recommendation: 'Buy +',
-  recommendationColor: '#4CAF50',
-  logoColor: '#4285F4',
+  score: 75,
+  ratios: [],
 };
 
 describe('CompanyCard', () => {
@@ -38,9 +43,9 @@ describe('CompanyCard', () => {
     const differentCompany: Company = {
       ...mockCompany,
       name: 'Apple Inc.',
-      ticker: 'AAPL',
+      symbol: 'AAPL',
       recommendation: 'Hold',
-      recommendationColor: '#FF9800',
+      score: 60,
     };
 
     const { getByText } = render(<CompanyCard company={differentCompany} />);

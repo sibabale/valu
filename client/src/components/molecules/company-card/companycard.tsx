@@ -28,7 +28,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
         </LogoContainer>
         <CompanyInfo>
           <CompanyName>{company.name}</CompanyName>
-          <TickerSymbol>{company.ticker}</TickerSymbol>
+          <TickerSymbol>{company.symbol}</TickerSymbol>
         </CompanyInfo>
       </LeftSection>
 

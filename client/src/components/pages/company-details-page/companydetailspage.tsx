@@ -102,7 +102,7 @@ export const CompanyDetailsPage: React.FC = () => {
               <CompanyOverviewCard
                 company={{
                   name: companyData.name,
-                  ticker: companyData.ticker,
+                  symbol: companyData.symbol,
                   logo: companyData.name.charAt(0).toUpperCase(),
                   logoColor: '#808080',
                   price: companyData.price,
