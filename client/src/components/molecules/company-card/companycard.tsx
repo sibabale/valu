@@ -11,22 +11,7 @@ import {
   RightSection,
   Price,
 } from './companycard.styles';
-import { Button } from '../../atoms/button/button';
-
-const getRecommendationButton = (recommendation: string) => {
-  switch (recommendation) {
-    case 'Buy':
-      return 'secondary';
-    case 'Buy +':
-      return 'success';
-    case 'Hold':
-      return 'warning';
-    case 'Avoid':
-      return 'danger';
-    default:
-      return 'primary';
-  }
-};
+import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
 
 export const CompanyCard: React.FC<CompanyCardProps> = ({
   company,
@@ -50,12 +35,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
       <RightSection>
         <Price>${company.price.toFixed(2)}</Price>
 
-        <Button
-          size="xx-small"
-          variant={getRecommendationButton(company.recommendation)}
-        >
-          {company.recommendation}
-        </Button>
+        <RecommendationLabel recommendation={company.recommendation} />
       </RightSection>
     </CardContainer>
   );

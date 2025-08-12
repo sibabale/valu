@@ -9,11 +9,11 @@ export const RecommendationLabel: React.FC<RecommendationLabelProps> = ({
   const getVariant = (recommendation: string) => {
     switch (recommendation) {
       case 'Buy':
-        return 'primary';
-      case 'Buy +':
-        return 'success';
-      case 'Hold':
         return 'secondary';
+      case 'Buy +':
+        return 'success ';
+      case 'Hold':
+        return 'warning';
       case 'Avoid':
         return 'danger';
       default:
