@@ -103,6 +103,7 @@ export const CompanyDetailsPage: React.FC = () => {
                   recommendation: companyData.recommendation,
                   score: companyData.score,
                   description: companyData.description,
+                  ratios: companyData.ratios,
                 }}
               />
 
