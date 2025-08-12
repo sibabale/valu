@@ -22,12 +22,14 @@ const getVariantColors = (variant: Variant) => {
 };
 
 export const Container = styled.View<VariantProps>`
-  background-color: ${({ variant }: VariantProps) => getVariantColors(variant).bg};
+  background-color: ${({ variant }: VariantProps) =>
+    getVariantColors(variant).bg};
   border-radius: 5px;
   padding: 4px 8px;
   align-items: center;
   border-width: 1px;
-  border-color: ${({ variant }: VariantProps) => getVariantColors(variant).border};
+  border-color: ${({ variant }: VariantProps) =>
+    getVariantColors(variant).border};
 `;
 
 export const Text = styled.Text<VariantProps>`

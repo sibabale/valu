@@ -17,4 +17,4 @@ export const Header: React.FC<HeaderProps> = ({
       </Pressable>
     </HeaderContainer>
   );
-}; 
+};

@@ -95,11 +95,13 @@ src/
 ### Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Start the development server:
+
    ```bash
    npm start
    ```
@@ -127,4 +129,4 @@ The project maintains high code quality through:
 2. Ensure all tests pass: `npm test`
 3. Fix any linting issues: `npm run lint:fix`
 4. Verify type safety: `npm run type-check`
-5. Commit your changes (pre-commit hooks will run automatically) 
+5. Commit your changes (pre-commit hooks will run automatically)

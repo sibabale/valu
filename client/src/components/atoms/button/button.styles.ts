@@ -36,7 +36,8 @@ const getSizeStyles = (size: ButtonProps['size']) => {
 };
 
 export const StyledButton = styled.TouchableOpacity<ButtonProps>`
-  background-color: ${({ variant }: ButtonProps) => getVariantColors(variant).bg};
+  background-color: ${({ variant }: ButtonProps) =>
+    getVariantColors(variant).bg};
   padding: ${({ size }: ButtonProps) => getSizeStyles(size).padding};
   border-radius: 8px;
   align-items: center;

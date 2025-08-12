@@ -7,9 +7,10 @@ export interface CompanyOverviewCardProps {
     price: number;
     marketCap: string;
     recommendation: string;
-    score?: number; // Made optional since we'll calculate it
+    score: number; // Required, calculated by backend
     description: string;
     ratios?: Array<{
+      key: string; // Stable keys: 'pe', 'pb', 'roe', 'profitMargin'
       name: string;
       value: number;
       description: string;

@@ -19,4 +19,4 @@ module.exports = {
       statements: 50,
     },
   },
-}; 
+};

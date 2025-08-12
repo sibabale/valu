@@ -1,2 +1,2 @@
 export { ValueMetricCard } from './valuemetriccard';
-export type { ValueMetricCardProps } from './valuemetriccard.interface'; 
+export type { ValueMetricCardProps } from './valuemetriccard.interface';

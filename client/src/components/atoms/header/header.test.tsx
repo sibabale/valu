@@ -13,7 +13,7 @@ describe('Header', () => {
     const { getByTestId } = render(
       <Header title="VALU" onInfoPress={onInfoPress} />
     );
-    
+
     fireEvent.press(getByTestId('info-button'));
     expect(onInfoPress).toHaveBeenCalledTimes(1);
   });
@@ -25,4 +25,4 @@ describe('Header', () => {
     );
     expect(getByTestId('info-button')).toBeTruthy();
   });
-}); 
+});

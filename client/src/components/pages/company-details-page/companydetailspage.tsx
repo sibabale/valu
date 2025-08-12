@@ -15,24 +15,24 @@ import { CompanyOverviewCard } from '../../molecules/company-overview-card/compa
 import { ValueMetricCard } from '../../molecules/value-metric-card/valuemetriccard';
 import { MetricCardWrapper } from '../../molecules/value-metric-card/valuemetriccard.styles';
 import { FinancialRatioCard } from '../../molecules/financial-ratio-card/financialratiocard';
-import { 
-  getPERatioAssessment, 
-  getPBRatioAssessment, 
-  getROEAssessment, 
-  getProfitMarginAssessment 
+import {
+  getPERatioAssessment,
+  getPBRatioAssessment,
+  getROEAssessment,
+  getProfitMarginAssessment,
 } from '../../../utils/assessment';
 import { getRatioDescription } from '../../../utils/descriptions';
-import { 
-  calculatePERatioScore, 
-  calculatePBRatioScore, 
-  calculateROEScore, 
-  calculateProfitMarginScore 
+import {
+  calculatePERatioScore,
+  calculatePBRatioScore,
+  calculateROEScore,
+  calculateProfitMarginScore,
 } from '../../../utils/metricScoring';
 
 export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  
+
   // Get company data from route params
   const companyData = (route.params as any)?.company;
 
@@ -59,7 +59,10 @@ export const CompanyDetailsPage: React.FC = () => {
     }
   };
 
-  const getMetricAssessment = (metricName: string, value: number): { assessment: string; color: string } => {
+  const getMetricAssessment = (
+    metricName: string,
+    value: number
+  ): { assessment: string; color: string } => {
     switch (metricName) {
       case 'P/E Ratio':
         return getPERatioAssessment(value);
@@ -75,7 +78,10 @@ export const CompanyDetailsPage: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right', 'bottom']}>
+    <SafeAreaView
+      style={{ flex: 1 }}
+      edges={['top', 'left', 'right', 'bottom']}
+    >
       <PageContainer>
         <HeaderContainer>
           <BackButton onPress={handleBackPress}>
@@ -97,7 +103,7 @@ export const CompanyDetailsPage: React.FC = () => {
                   name: companyData.name,
                   ticker: companyData.ticker,
                   logo: companyData.name.charAt(0).toUpperCase(),
-                  logoColor: "#808080",
+                  logoColor: '#808080',
                   price: companyData.price,
                   marketCap: companyData.marketCap,
                   recommendation: companyData.recommendation,
@@ -107,36 +113,43 @@ export const CompanyDetailsPage: React.FC = () => {
                 }}
               />
 
-              {companyData.ratios && companyData.ratios.map((ratio: any, index: number) => {
-                const assessmentData = getMetricAssessment(ratio.name, ratio.value);
-                return (
-                  <MetricCardWrapper key={index}>
-                    <ValueMetricCard
-                      title={ratio.name}
-                      value={ratio.value}
-                      score={getMetricScore(ratio.name, ratio.value)}
-                      assessment={assessmentData.assessment}
-                      description={getRatioDescription(ratio.name)}
-                      color={assessmentData.color}
-                    />
-                  </MetricCardWrapper>
-                );
-              })}
+              {companyData.ratios &&
+                companyData.ratios.map((ratio: any, index: number) => {
+                  const assessmentData = getMetricAssessment(
+                    ratio.name,
+                    ratio.value
+                  );
+                  return (
+                    <MetricCardWrapper key={index}>
+                      <ValueMetricCard
+                        title={ratio.name}
+                        value={ratio.value}
+                        score={getMetricScore(ratio.name, ratio.value)}
+                        assessment={assessmentData.assessment}
+                        description={getRatioDescription(ratio.name)}
+                        color={assessmentData.color}
+                      />
+                    </MetricCardWrapper>
+                  );
+                })}
 
-              {companyData.financialRatios && companyData.financialRatios.length > 0 && (
-                <>
-                  <SectionTitle>Additional Financial Ratios</SectionTitle>
-                  {companyData.financialRatios.map((ratio: any, index: number) => (
-                    <FinancialRatioCard
-                      key={index}
-                      title={ratio.title}
-                      value={ratio.value}
-                      trend={ratio.trend}
-                      description={ratio.description}
-                    />
-                  ))}
-                </>
-              )}
+              {companyData.financialRatios &&
+                companyData.financialRatios.length > 0 && (
+                  <>
+                    <SectionTitle>Additional Financial Ratios</SectionTitle>
+                    {companyData.financialRatios.map(
+                      (ratio: any, index: number) => (
+                        <FinancialRatioCard
+                          key={index}
+                          title={ratio.title}
+                          value={ratio.value}
+                          trend={ratio.trend}
+                          description={ratio.description}
+                        />
+                      )
+                    )}
+                  </>
+                )}
             </>
           )}
         </ContentContainer>

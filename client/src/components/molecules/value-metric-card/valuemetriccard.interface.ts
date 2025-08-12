@@ -5,4 +5,4 @@ export interface ValueMetricCardProps {
   assessment: string;
   description: string;
   color?: string;
-} 
+}

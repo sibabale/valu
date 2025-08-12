@@ -82,5 +82,6 @@ export const RecommendationButton = styled.View<ColorProps>`
 export const RecommendationText = styled.Text<ColorProps>`
   font-size: 12px;
   font-family: 'Space Grotesk Medium';
-  color: ${({ color }: ColorProps) => (color === '#FFC107' ? '#000000' : '#FFFFFF')};
+  color: ${({ color }: ColorProps) =>
+    color === '#FFC107' ? '#000000' : '#FFFFFF'};
 `;

@@ -10,19 +10,22 @@ export const CardContainer = styled.View`
 
 export const ScoreSection = styled.View`
   margin-bottom: 16px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 `;
 
 export const ScoreLabel = styled.Text`
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
   color: #333333;
-  margin-bottom: 8px;
+  font-family: "Space Grotesk";
 `;
 
 export const ProgressContainer = styled.View`
   flex-direction: row;
   align-items: center;
   gap: 12px;
+  width: 100px;
 `;
 
 export const ProgressBar = styled.View<{ progress: number }>`
@@ -46,16 +49,15 @@ export const ProgressBarFill = styled.View<{ progress: number }>`
 `;
 
 export const ScoreValue = styled.Text`
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
   color: #333333;
   min-width: 50px;
   text-align: right;
+  font-family: "Space Grotesk";
 `;
 
 export const Assessment = styled.Text<{ color?: string }>`
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 12px;
   margin-bottom: 8px;
   color: ${(props: { color?: string }) => {
     switch (props.color) {
@@ -71,10 +73,11 @@ export const Assessment = styled.Text<{ color?: string }>`
         return '#333333';
     }
   }};
+  font-family: "Space Grotesk";
 `;
 
 export const Description = styled.Text`
   font-size: 14px;
   color: #666666;
   line-height: 20px;
-`; 
+`;

@@ -8,7 +8,7 @@ const mockCompany: Company = {
   name: 'Alphabet Inc.',
   ticker: 'GOOGL',
   logo: 'G',
-  price: 150.00,
+  price: 150.0,
   recommendation: 'Buy +',
   recommendationColor: '#4CAF50',
   logoColor: '#4285F4',
@@ -17,7 +17,7 @@ const mockCompany: Company = {
 describe('CompanyCard', () => {
   it('renders company information correctly', () => {
     const { getByText } = render(<CompanyCard company={mockCompany} />);
-    
+
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
     expect(getByText('$150.00')).toBeTruthy();
@@ -29,7 +29,7 @@ describe('CompanyCard', () => {
     const { getByText } = render(
       <CompanyCard company={mockCompany} onPress={onPress} />
     );
-    
+
     fireEvent.press(getByText('Alphabet Inc.'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -44,9 +44,9 @@ describe('CompanyCard', () => {
     };
 
     const { getByText } = render(<CompanyCard company={differentCompany} />);
-    
+
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('AAPL')).toBeTruthy();
     expect(getByText('Hold')).toBeTruthy();
   });
-}); 
+});

@@ -11,7 +11,7 @@ export const HeaderContainer = styled.View`
   align-items: center;
   padding: ${theme.spacing.md}px ${theme.spacing.lg}px;
   border-bottom-width: 1px;
-  border-bottom-color: #E0E0E0;
+  border-bottom-color: #e0e0e0;
   background-color: white;
 `;
 
@@ -45,7 +45,7 @@ export const Subtitle = styled.Text`
 `;
 
 export const ScoreCard = styled.View`
-  background-color: #F8F9FA;
+  background-color: #f8f9fa;
   border-radius: ${theme.borderRadius.md}px;
   padding: ${theme.spacing.md}px;
   margin-bottom: ${theme.spacing.md}px;
@@ -79,7 +79,7 @@ export const DisclaimerSection = styled.View`
   margin-top: ${theme.spacing.lg}px;
   padding-top: ${theme.spacing.md}px;
   border-top-width: 1px;
-  border-top-color: #E0E0E0;
+  border-top-color: #e0e0e0;
 `;
 
 export const DisclaimerTitle = styled.Text`
@@ -96,4 +96,4 @@ export const DisclaimerText = styled.Text`
   font-family: ${theme.fonts.regular};
   line-height: 20px;
   margin-bottom: ${theme.spacing.sm}px;
-`; 
+`;

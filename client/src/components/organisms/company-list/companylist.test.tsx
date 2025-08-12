@@ -9,7 +9,7 @@ const mockCompanies: Company[] = [
     name: 'Alphabet Inc.',
     ticker: 'GOOGL',
     logo: 'G',
-    price: 150.00,
+    price: 150.0,
     recommendation: 'Buy +',
     recommendationColor: '#4CAF50',
     logoColor: '#4285F4',
@@ -19,7 +19,7 @@ const mockCompanies: Company[] = [
     name: 'Apple Inc.',
     ticker: 'AAPL',
     logo: '🍎',
-    price: 150.00,
+    price: 150.0,
     recommendation: 'Buy',
     recommendationColor: '#FFC107',
     logoColor: '#000000',
@@ -29,7 +29,7 @@ const mockCompanies: Company[] = [
 describe('CompanyList', () => {
   it('renders company cards correctly', () => {
     const { getByText } = render(<CompanyList companies={mockCompanies} />);
-    
+
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
@@ -41,7 +41,7 @@ describe('CompanyList', () => {
     const { getByText } = render(
       <CompanyList companies={mockCompanies} onCompanyPress={onCompanyPress} />
     );
-    
+
     fireEvent.press(getByText('Alphabet Inc.'));
     expect(onCompanyPress).toHaveBeenCalledWith(mockCompanies[0]);
   });
@@ -50,4 +50,4 @@ describe('CompanyList', () => {
     const { getByText } = render(<CompanyList companies={[]} />);
     expect(getByText('No companies found')).toBeTruthy();
   });
-}); 
+});

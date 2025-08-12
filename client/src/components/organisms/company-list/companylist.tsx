@@ -39,16 +39,19 @@ export const CompanyList: React.FC<CompanyListProps> = ({
     <ListContainer>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ 
-          paddingTop: 16, 
-          paddingBottom: Math.max(16, bottomInset + 16), 
-          paddingHorizontal: 20 
+        contentContainerStyle={{
+          paddingTop: 16,
+          paddingBottom: Math.max(16, bottomInset + 16),
+          paddingHorizontal: 20,
         }}
       >
-        {companies.map((company) => {
+        {companies.map(company => {
           return (
             <View key={company.id} style={{ marginBottom: 8 }}>
-              <CompanyCard company={company} onPress={() => onCompanyPress?.(company)} />
+              <CompanyCard
+                company={company}
+                onPress={() => onCompanyPress?.(company)}
+              />
             </View>
           );
         })}

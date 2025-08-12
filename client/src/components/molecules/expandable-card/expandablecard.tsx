@@ -1,5 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { LayoutAnimation, Platform, UIManager, Animated, Easing } from 'react-native';
+import {
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  Animated,
+  Easing,
+} from 'react-native';
 import { ExpandableCardProps } from './expandablecard.interface';
 import {
   Container,
@@ -14,7 +20,10 @@ import {
 } from './expandablecard.styles';
 import ChevronUpIcon from '../../atoms/icons/chevron-up';
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+if (
+  Platform.OS === 'android' &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
@@ -27,7 +36,9 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
   onToggle,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const rotationValue = useRef(new Animated.Value(defaultExpanded ? 1 : 0)).current;
+  const rotationValue = useRef(
+    new Animated.Value(defaultExpanded ? 1 : 0)
+  ).current;
 
   const toggleExpanded = () => {
     const customLayoutAnimation = {
@@ -41,9 +52,9 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
         property: LayoutAnimation.Properties.opacity,
       },
     };
-    
+
     LayoutAnimation.configureNext(customLayoutAnimation);
-    
+
     Animated.timing(rotationValue, {
       toValue: isExpanded ? 0 : 1,
       duration: 300,
@@ -79,7 +90,7 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
           </Animated.View>
         </HeaderRight>
       </Header>
-      
+
       {isExpanded && (
         <Content>
           <ContentWrapper>{children}</ContentWrapper>

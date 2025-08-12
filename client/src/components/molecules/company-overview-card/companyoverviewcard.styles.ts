@@ -76,7 +76,7 @@ export const Price = styled.Text`
 `;
 
 export const RecommendationContainer = styled.View`
-  background-color: #FFF3CD;
+  background-color: #fff3cd;
   border-radius: 16px;
   padding: 6px 12px;
   align-items: center;
@@ -129,7 +129,7 @@ export const MarketCapValue = styled.Text`
 
 export const Divider = styled.View`
   height: 1px;
-  background-color: #F6F3F4;
+  background-color: #f6f3f4;
   width: 100%;
   margin: 8px 0;
 `;

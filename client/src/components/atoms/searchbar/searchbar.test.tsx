@@ -55,10 +55,10 @@ describe('Searchbar', () => {
   it('calls onSearchChange when typing', () => {
     const onSearchChange = jest.fn();
     const { getByPlaceholderText } = renderWithProvider({ onSearchChange });
-    
+
     const input = getByPlaceholderText('Search stocks...');
     fireEvent.changeText(input, 'AAPL');
-    
+
     expect(onSearchChange).toHaveBeenCalledWith('AAPL');
   });
 
@@ -76,14 +76,14 @@ describe('Searchbar', () => {
 
   it('uses custom popular stocks when provided', () => {
     const customPopularStocks = ['CUSTOM1', 'CUSTOM2'];
-    const { getByPlaceholderText, getByText } = renderWithProvider({ 
-      popularStocks: customPopularStocks 
+    const { getByPlaceholderText, getByText } = renderWithProvider({
+      popularStocks: customPopularStocks,
     });
-    
+
     // Focus the input to show dropdown
     const input = getByPlaceholderText('Search stocks...');
     fireEvent(input, 'focus');
-    
+
     // Check if custom stocks are rendered in the dropdown
     // Note: This test might need to be adjusted based on how the dropdown is rendered
     expect(getByText('CUSTOM1')).toBeTruthy();
@@ -92,11 +92,11 @@ describe('Searchbar', () => {
 
   it('falls back to Redux popular stocks when custom ones are not provided', () => {
     const { getByPlaceholderText, getByText } = renderWithProvider();
-    
+
     // Focus the input to show dropdown
     const input = getByPlaceholderText('Search stocks...');
     fireEvent(input, 'focus');
-    
+
     // Check if Redux stocks are rendered in the dropdown
     // The dropdown should show all Redux popular stocks
     expect(getByText('TSLA')).toBeTruthy();
@@ -108,34 +108,37 @@ describe('Searchbar', () => {
   });
 
   it('does not show recent searches section when empty', () => {
-    const { queryByText } = renderWithProvider({}, {
-      recentSearches: []
-    });
-    
+    const { queryByText } = renderWithProvider(
+      {},
+      {
+        recentSearches: [],
+      }
+    );
+
     // Focus the input to show dropdown
     const input = queryByText('Search stocks...');
     if (input) {
       fireEvent(input, 'focus');
     }
-    
+
     expect(queryByText('Recent')).toBeFalsy();
   });
 
   it('only adds valid tickers to recent searches', () => {
     const onSearchChange = jest.fn();
     const { getByPlaceholderText } = renderWithProvider({ onSearchChange });
-    
+
     const searchInput = getByPlaceholderText('Search stocks...');
-    
+
     // Type a valid ticker
     fireEvent.changeText(searchInput, 'GOOGL');
     expect(onSearchChange).toHaveBeenCalledWith('GOOGL');
-    
+
     // Type an invalid ticker
     fireEvent.changeText(searchInput, 'INVALID');
     expect(onSearchChange).toHaveBeenCalledWith('INVALID');
-    
+
     // The mock store should not have been updated with invalid searches
     // We can verify this by checking that the component still renders correctly
   });
-}); 
+});

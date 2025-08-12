@@ -11,7 +11,7 @@ export const RecommendationLabel: React.FC<RecommendationLabelProps> = ({
       case 'Buy':
         return 'secondary';
       case 'Buy +':
-        return 'success ';
+        return 'success';
       case 'Hold':
         return 'warning';
       case 'Avoid':

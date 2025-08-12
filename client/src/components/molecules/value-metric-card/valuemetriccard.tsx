@@ -23,10 +23,7 @@ export const ValueMetricCard: React.FC<ValueMetricCardProps> = ({
 }) => {
   return (
     <CardContainer>
-      <ExpandableCard
-        title={title}
-        value={value?.toString() || 'N/A'}
-      >
+      <ExpandableCard title={title} value={value?.toString() || 'N/A'}>
         <ScoreSection>
           <ScoreLabel>Value Score:</ScoreLabel>
           <ProgressContainer>
@@ -42,4 +39,4 @@ export const ValueMetricCard: React.FC<ValueMetricCardProps> = ({
       </ExpandableCard>
     </CardContainer>
   );
-}; 
+};
