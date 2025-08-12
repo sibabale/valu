@@ -39,6 +39,10 @@ export const LogoText = styled.Text`
   color: #ffffff;
 `;
 
+export const MarketCap = styled.View`
+`;
+
+
 export const CompanyName = styled.Text`
   font-size: 18px;
   font-family: 'Space Grotesk Bold';
@@ -62,6 +66,7 @@ export const PriceContainer = styled.View`
 export const PriceSection = styled.View`
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
 `;
 
 export const ScoreSection = styled.View`
@@ -121,10 +126,10 @@ export const MarketCapLabel = styled.Text`
 `;
 
 export const MarketCapValue = styled.Text`
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 700;
   font-family: 'Space Grotesk Medium';
   color: #1a1a1a;
-  margin-bottom: 16px;
 `;
 
 export const Divider = styled.View`

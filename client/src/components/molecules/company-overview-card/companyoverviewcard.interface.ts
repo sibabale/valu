@@ -7,7 +7,7 @@ export interface CompanyOverviewCardProps {
     logo: string;
     logoColor: string;
     price: number;
-    marketCap: string;
+    marketCap: number;
     recommendation: string;
     score: number; // Required, calculated by backend
     description: string;

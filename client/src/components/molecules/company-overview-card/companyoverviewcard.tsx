@@ -1,12 +1,14 @@
 import React from 'react';
 import { CompanyOverviewCardProps } from './companyoverviewcard.interface';
 import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
+import { formatMarketCap } from '../../../utils/formatting';
 import {
   CardContainer,
   Header,
   LogoContainer,
   LogoText,
   CompanyName,
+  MarketCap,
   TickerSymbol,
   PriceContainer,
   PriceSection,
@@ -39,9 +41,12 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
       <PriceContainer>
         <PriceSection>
           {company.price > 0 && <Price>${company.price.toFixed(2)}</Price>}
+          <MarketCap>
           <MarketCapLabel>
-            Market Cap: <MarketCapValue>{company.marketCap}</MarketCapValue>
+            Market Cap:
           </MarketCapLabel>
+          <MarketCapValue>{formatMarketCap(company.marketCap)}</MarketCapValue>
+        </MarketCap>
         </PriceSection>
         <ScoreSection>
           <RecommendationLabel recommendation={company.recommendation} />

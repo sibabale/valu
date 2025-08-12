@@ -9,7 +9,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
     logo: '🍎',
     logoColor: '#000000',
     price: 150.0,
-    marketCap: '$1780.0B',
+    marketCap: 1780000000000, // $1.78T
     recommendation: 'Hold',
     score: 73,
     description:
@@ -33,7 +33,8 @@ describe('CompanyOverviewCard - Public Interface', () => {
 
   it('shows market capitalization', () => {
     const { getByText } = render(<CompanyOverviewCard company={mockCompany} />);
-    expect(getByText('Market Cap: $1780.0B')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.8T')).toBeTruthy();
   });
 
   it('displays investment recommendation', () => {
@@ -63,7 +64,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
       logo: 'G',
       logoColor: '#4285F4',
       price: 2750.0,
-      marketCap: '$1850.0B',
+      marketCap: 1850000000000, // $1.85T
       recommendation: 'Buy',
       score: 85,
       description:
@@ -77,7 +78,8 @@ describe('CompanyOverviewCard - Public Interface', () => {
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
     expect(getByText('$2750.00')).toBeTruthy();
-    expect(getByText('Market Cap: $1850.0B')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.9T')).toBeTruthy();
     expect(getByText('Buy')).toBeTruthy();
     expect(getByText('85/100')).toBeTruthy();
   });
@@ -97,6 +99,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
     expect(queryByText('$0.00')).toBeFalsy();
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('AAPL')).toBeTruthy();
-    expect(getByText('Market Cap: $1780.0B')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.8T')).toBeTruthy();
   });
 });
