@@ -10,6 +10,7 @@ public interface ICacheBuildingService
 public class CacheBuildingService : ICacheBuildingService
 {
     private readonly IAlphaVantageService _alphaVantageService;
+    private readonly IRecommendationService _recommendationService;
     private readonly SimpleCache _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
@@ -17,11 +18,13 @@ public class CacheBuildingService : ICacheBuildingService
     private readonly string[] _initialCompanies = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"];
 
     public CacheBuildingService(
-        IAlphaVantageService alphaVantageService, 
+        IAlphaVantageService alphaVantageService,
+        IRecommendationService recommendationService,
         SimpleCache cache,
         ILogger<CacheBuildingService> logger)
     {
         _alphaVantageService = alphaVantageService;
+        _recommendationService = recommendationService;
         _cache = cache;
         _logger = logger;
     }
@@ -35,6 +38,7 @@ public class CacheBuildingService : ICacheBuildingService
         {
             try
             {
+                // Get Alpha Vantage data
                 var overview = await _alphaVantageService.GetCompanyOverviewAsync(symbol, cancellationToken);
                 if (overview == null)
                 {
@@ -42,7 +46,15 @@ public class CacheBuildingService : ICacheBuildingService
                     continue;
                 }
 
-                // Convert to Company object
+                // Calculate recommendation using financial metrics
+                var recommendation = _recommendationService.CalculateRecommendation(
+                    overview.PERatio,
+                    overview.PriceToBookRatio,
+                    overview.ReturnOnEquityTTM,
+                    overview.ProfitMargin
+                );
+
+                // Create Company object with calculated recommendation
                 var company = new Company(
                     Id: Guid.NewGuid(),
                     Name: overview.Name,
@@ -53,7 +65,8 @@ public class CacheBuildingService : ICacheBuildingService
                     Price: 0m, // Not available in OVERVIEW
                     Change: 0m, // Not available in OVERVIEW
                     ChangePercent: 0m, // Not available in OVERVIEW
-                    Description: overview.Description
+                    Description: overview.Description,
+                    Recommendation: recommendation
                 );
 
                 // Cache for 1 day

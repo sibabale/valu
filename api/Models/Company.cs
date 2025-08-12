@@ -10,7 +10,8 @@ public record Company(
     decimal Price,
     decimal Change,
     decimal ChangePercent,
-    string Description
+    string Description,
+    string Recommendation
 );
 
 public record CompanyDetails(

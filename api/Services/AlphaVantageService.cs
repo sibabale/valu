@@ -25,12 +25,17 @@ public class AlphaVantageService : IAlphaVantageService
         var url = $"{_options.BaseUrl}?function=OVERVIEW&symbol={symbol}&apikey={_options.ApiKey}";
         var response = await _httpClient.GetStringAsync(url, cancellationToken);
         
+        Console.WriteLine($"Alpha Vantage Response for {symbol}: {response}");
+        
         using var jsonDoc = JsonDocument.Parse(response);
         var root = jsonDoc.RootElement;
         
         // Check if we got valid data (not error message)
         if (!root.TryGetProperty("Symbol", out var symbolElement))
+        {
+            Console.WriteLine($"No Symbol property found for {symbol}. Response keys: {string.Join(", ", root.EnumerateObject().Select(p => p.Name))}");
             return null;
+        }
             
         return new AlphaVantageOverview(
             Symbol: GetStringValue(root, "Symbol"),

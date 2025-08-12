@@ -8,12 +8,14 @@ public class CompanyService : ICompanyService
     private readonly IAlphaVantageService _alphaVantageService;
     private readonly SimpleCache _cache;
     private readonly ILogger<CompanyService> _logger;
+    private readonly IRecommendationService _recommendationService;
 
-    public CompanyService(IAlphaVantageService alphaVantageService, SimpleCache cache, ILogger<CompanyService> logger)
+    public CompanyService(IAlphaVantageService alphaVantageService, SimpleCache cache, ILogger<CompanyService> logger, IRecommendationService recommendationService)
     {
         _alphaVantageService = alphaVantageService;
         _cache = cache;
         _logger = logger;
+        _recommendationService = recommendationService;
     }
 
     public Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -204,6 +206,14 @@ public class CompanyService : ICompanyService
         var hashBytes = md5.ComputeHash(symbolBytes);
         var deterministicGuid = new Guid(hashBytes);
         
+        // Calculate recommendation using actual financial metrics
+        var recommendation = _recommendationService.CalculateRecommendation(
+            overview.PERatio,
+            overview.PriceToBookRatio,
+            overview.ReturnOnEquityTTM,
+            overview.ProfitMargin
+        );
+        
         var company = new Company(
             Id: deterministicGuid,
             Name: overview.Name,
@@ -214,7 +224,8 @@ public class CompanyService : ICompanyService
             Price: 0m, // Price not available in OVERVIEW, will be updated later if needed
             Change: 0m, // Change not available in OVERVIEW
             ChangePercent: 0m, // Change percent not available in OVERVIEW
-            Description: overview.Description
+            Description: overview.Description,
+            Recommendation: recommendation
         );
         
         return company;

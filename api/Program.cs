@@ -6,6 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddLogging();
 
 // Add Alpha Vantage services
 builder.Services.AddHttpClient();
@@ -20,7 +22,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactNative", policy =>
     {
-        policy.WithOrigins("http://localhost:19006", "http://localhost:19000") // Expo dev server
+        policy.AllowAnyOrigin() // Allow all origins for development
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -104,11 +106,11 @@ app.MapGet("/api/companies/search", async (
     return Results.Ok(results);
 });
 
-app.MapGet("/api/companies/popular", async (ICompanyService service) =>
-{
-    var popular = await service.GetPopularStocksAsync();
-    return Results.Ok(new { Stocks = popular });
-});
+// app.MapGet("/api/companies/popular", async (ICompanyService service) =>
+// {
+//     var popular = await service.GetPopularStocksAsync();
+//     return Results.Ok(new { Stocks = popular });
+// });
 
 // Value Score endpoints
 app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IValueScoreService valueScoreService) =>
