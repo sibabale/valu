@@ -33,7 +33,7 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
       </LeftSection>
 
       <RightSection>
-        <Price>${company.price.toFixed(2)}</Price>
+        {company.price > 0 && <Price>${company.price.toFixed(2)}</Price>}
 
         <RecommendationLabel recommendation={company.recommendation} />
       </RightSection>

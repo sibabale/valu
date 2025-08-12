@@ -87,4 +87,16 @@ describe('CompanyOverviewCard - Public Interface', () => {
     const { getByText } = render(<CompanyOverviewCard company={buyCompany} />);
     expect(getByText('Buy')).toBeTruthy();
   });
+
+  it('hides price when it is zero', () => {
+    const zeroPriceCompany = { ...mockCompany, price: 0 };
+    const { queryByText, getByText } = render(
+      <CompanyOverviewCard company={zeroPriceCompany} />
+    );
+
+    expect(queryByText('$0.00')).toBeFalsy();
+    expect(getByText('Apple Inc.')).toBeTruthy();
+    expect(getByText('AAPL')).toBeTruthy();
+    expect(getByText('Market Cap: $1780.0B')).toBeTruthy();
+  });
 });

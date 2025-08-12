@@ -38,7 +38,7 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
 
       <PriceContainer>
         <PriceSection>
-          <Price>${company.price.toFixed(2)}</Price>
+          {company.price > 0 && <Price>${company.price.toFixed(2)}</Price>}
           <MarketCapLabel>
             Market Cap: <MarketCapValue>{company.marketCap}</MarketCapValue>
           </MarketCapLabel>

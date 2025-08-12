@@ -54,4 +54,17 @@ describe('CompanyCard', () => {
     expect(getByText('AAPL')).toBeTruthy();
     expect(getByText('Hold')).toBeTruthy();
   });
+
+  it('hides price when it is zero', () => {
+    const zeroPriceCompany: Company = {
+      ...mockCompany,
+      price: 0,
+    };
+
+    const { queryByText, getByText } = render(<CompanyCard company={zeroPriceCompany} />);
+
+    expect(queryByText('$0.00')).toBeFalsy();
+    expect(getByText('Alphabet Inc.')).toBeTruthy();
+    expect(getByText('GOOGL')).toBeTruthy();
+  });
 });
