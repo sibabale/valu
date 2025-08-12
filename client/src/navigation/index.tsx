@@ -7,6 +7,7 @@ import {
   HomePage,
   ValueScorePage,
   CompanyDetailsPage,
+  PrivacyPolicyPage,
 } from '../components/pages';
 
 const Stack = createStackNavigator();
@@ -22,6 +23,7 @@ const AppNavigator = () => {
         <Stack.Screen name="Home" component={HomePage} />
         <Stack.Screen name="CompanyDetails" component={CompanyDetailsPage} />
         <Stack.Screen name="ValueScore" component={ValueScorePage} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

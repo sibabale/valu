@@ -26,7 +26,6 @@ export const HomePage: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   // Animation values for cascading sequence
-  const headerAnim = useRef(new Animated.Value(1)).current; // Start at 1 (normal size)
   const searchAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
 
   // Fetch companies from API
@@ -90,23 +89,10 @@ export const HomePage: React.FC = () => {
     };
   }, []);
 
-  // Handle header press animation (like hover effect)
+  // Handle header press - navigate to privacy policy
   const handleHeaderPress = () => {
-    // Scale up on press
-    Animated.sequence([
-      Animated.timing(headerAnim, {
-        toValue: 1.05,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(headerAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Info modal logic would go here
+    // Navigate to privacy policy page
+    (navigation as any).navigate('PrivacyPolicy');
   };
 
   // Fetch companies from API
@@ -157,18 +143,7 @@ export const HomePage: React.FC = () => {
       <PageContainer>
         {/* Header Section */}
         <PaddedContent>
-          <Animated.View
-            style={{
-              opacity: 1, // Always visible
-              transform: [
-                {
-                  scale: headerAnim, // Scale from 1 to 1.05 on press
-                },
-              ],
-            }}
-          >
-            <Header title="VALU" onInfoPress={handleHeaderPress} />
-          </Animated.View>
+          <Header title="VALU" onInfoPress={handleHeaderPress} />
         </PaddedContent>
 
         {/* Search Section - Separate container with higher z-index */}
