@@ -214,6 +214,15 @@ public class CompanyService : ICompanyService
             overview.ProfitMargin
         );
         
+        // Create ratios array from Alpha Vantage data
+        var ratios = new List<FinancialRatio>
+        {
+            new("P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+            new("P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+            new("ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+            new("Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+        };
+        
         var company = new Company(
             Id: deterministicGuid,
             Name: overview.Name,
@@ -225,7 +234,8 @@ public class CompanyService : ICompanyService
             Change: 0m, // Change not available in OVERVIEW
             ChangePercent: 0m, // Change percent not available in OVERVIEW
             Description: overview.Description,
-            Recommendation: recommendation
+            Recommendation: recommendation,
+            Ratios: ratios
         );
         
         return company;

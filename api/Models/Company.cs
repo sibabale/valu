@@ -11,7 +11,8 @@ public record Company(
     decimal Change,
     decimal ChangePercent,
     string Description,
-    string Recommendation
+    string Recommendation,
+    List<FinancialRatio> Ratios
 );
 
 public record CompanyDetails(
