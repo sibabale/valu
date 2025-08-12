@@ -15,6 +15,7 @@ import { CompanyOverviewCard } from '../../molecules/company-overview-card/compa
 import { PERatioSection } from '../../molecules/pe-ratio-section/peratiosection';
 import { FinancialRatioCard } from '../../molecules/financial-ratio-card/financialratiocard';
 import peRatioMock from '../../../data/pe-ratio-mock.json';
+import { getPERatioAssessment } from '../../../utils/assessment';
 
 export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
@@ -67,8 +68,8 @@ export const CompanyDetailsPage: React.FC = () => {
               <PERatioSection
                 peRatio={peRatioMock.peRatio}
                 valueScore={peRatioMock.valueScore}
-                trend={peRatioMock.trend as 'up' | 'down' | 'neutral'}
-                assessment={peRatioMock.assessment}
+                trend="up"
+                assessment={getPERatioAssessment(peRatioMock.peRatio)}
                 description={peRatioMock.description}
               />
 

@@ -36,6 +36,7 @@ export const LogoContainer = styled.View<LogoContainerProps>`
 
 export const LogoText = styled.Text`
   font-size: 24px;
+  color: #ffffff;
 `;
 
 export const CompanyName = styled.Text`
