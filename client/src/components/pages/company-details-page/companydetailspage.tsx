@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   PageContainer,
@@ -12,10 +12,22 @@ import {
 } from './companydetailspage.styles';
 import { Ionicons } from '@expo/vector-icons';
 import { CompanyOverviewCard } from '../../molecules/company-overview-card/companyoverviewcard';
-import { PERatioSection } from '../../molecules/pe-ratio-section/peratiosection';
+import { ValueMetricCard } from '../../molecules/value-metric-card/valuemetriccard';
+import { MetricCardWrapper } from '../../molecules/value-metric-card/valuemetriccard.styles';
 import { FinancialRatioCard } from '../../molecules/financial-ratio-card/financialratiocard';
-import peRatioMock from '../../../data/pe-ratio-mock.json';
-import { getPERatioAssessment } from '../../../utils/assessment';
+import { 
+  getPERatioAssessment, 
+  getPBRatioAssessment, 
+  getROEAssessment, 
+  getProfitMarginAssessment 
+} from '../../../utils/assessment';
+import { getRatioDescription } from '../../../utils/descriptions';
+import { 
+  calculatePERatioScore, 
+  calculatePBRatioScore, 
+  calculateROEScore, 
+  calculateProfitMarginScore 
+} from '../../../utils/metricScoring';
 
 export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
@@ -30,11 +42,40 @@ export const CompanyDetailsPage: React.FC = () => {
 
   const handleInfoPress = () => {
     navigation.navigate('ValueScore' as never);
-    console.log('Info button pressed');
+  };
+
+  const getMetricScore = (metricName: string, value: number): number => {
+    switch (metricName) {
+      case 'P/E Ratio':
+        return calculatePERatioScore(value);
+      case 'P/B Ratio':
+        return calculatePBRatioScore(value);
+      case 'ROE':
+        return calculateROEScore(value);
+      case 'Profit Margin':
+        return calculateProfitMarginScore(value);
+      default:
+        return 0;
+    }
+  };
+
+  const getMetricAssessment = (metricName: string, value: number): { assessment: string; color: string } => {
+    switch (metricName) {
+      case 'P/E Ratio':
+        return getPERatioAssessment(value);
+      case 'P/B Ratio':
+        return getPBRatioAssessment(value);
+      case 'ROE':
+        return getROEAssessment(value);
+      case 'Profit Margin':
+        return getProfitMarginAssessment(value);
+      default:
+        return { assessment: '', color: '' };
+    }
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'left', 'right', 'bottom']}>
       <PageContainer>
         <HeaderContainer>
           <BackButton onPress={handleBackPress}>
@@ -65,13 +106,21 @@ export const CompanyDetailsPage: React.FC = () => {
                 }}
               />
 
-              <PERatioSection
-                peRatio={peRatioMock.peRatio}
-                valueScore={peRatioMock.valueScore}
-                trend="up"
-                assessment={getPERatioAssessment(peRatioMock.peRatio)}
-                description={peRatioMock.description}
-              />
+              {companyData.ratios && companyData.ratios.map((ratio: any, index: number) => {
+                const assessmentData = getMetricAssessment(ratio.name, ratio.value);
+                return (
+                  <MetricCardWrapper key={index}>
+                    <ValueMetricCard
+                      title={ratio.name}
+                      value={ratio.value}
+                      score={getMetricScore(ratio.name, ratio.value)}
+                      assessment={assessmentData.assessment}
+                      description={getRatioDescription(ratio.name)}
+                      color={assessmentData.color}
+                    />
+                  </MetricCardWrapper>
+                );
+              })}
 
               {companyData.financialRatios && companyData.financialRatios.length > 0 && (
                 <>

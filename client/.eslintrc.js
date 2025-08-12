@@ -23,7 +23,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     
     // General rules
-    'no-console': 'warn',
+    'no-console': 'error',
     'no-debugger': 'error',
     'prefer-const': 'error',
     'no-var': 'error',
