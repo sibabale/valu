@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableOpacity, ScrollView, Animated, View } from 'react-native';
+import { TouchableOpacity, ScrollView, Animated, View, Keyboard } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import TrendUpIcon from '../icons/trend-up';
@@ -12,7 +12,9 @@ import {
 } from '../../../store/slices/searchSlice';
 import { SearchbarProps } from './searchbar.interface';
 
-// Initialize as empty array
+// Note: companiesData is currently hardcoded as empty array
+// The isValidTicker function includes a fallback for when this data is not available
+// TODO: Consider passing companiesData as a prop from parent components
 const companiesData: any[] = [];
 
 import {
@@ -68,6 +70,15 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   // Validate if a search query matches a valid ticker
   const isValidTicker = (query: string): boolean => {
     const trimmedQuery = query.trim().toUpperCase();
+
+    // If companiesData is empty, use a simple regex fallback for basic ticker validation
+    if (companiesData.length === 0) {
+      // Basic ticker validation: 1-5 uppercase letters
+      const tickerRegex = /^[A-Z]{1,5}$/;
+      return tickerRegex.test(trimmedQuery);
+    }
+
+    // Otherwise, check against actual company data
     return companiesData.some(
       company =>
         company.ticker.toUpperCase() === trimmedQuery ||
@@ -199,12 +210,13 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                     </SectionHeader>
 
                     <TagsContainer>
-                      {recentSearches.map((search, index) => (
+                      {recentSearches.map((search) => (
                         <TagButton
-                          key={index}
+                          key={search}
                           onPressIn={handleDropdownPressIn}
                           onPress={() => {
                             handleSearch(search);
+                            Keyboard.dismiss();
                             setIsFocused(false);
                           }}
                         >
@@ -229,12 +241,14 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                     </SectionHeader>
 
                     <TagsContainer>
-                      {stocksToShow.map((stock, index) => (
+                      {stocksToShow.map((stock) => (
                         <TagButton
-                          key={index}
+                          key={stock}
                           onPressIn={handleDropdownPressIn}
                           onPress={() => {
                             handleSearch(stock);
+                            dispatch(addRecentSearch(stock));
+                            Keyboard.dismiss();
                             setIsFocused(false);
                           }}
                         >

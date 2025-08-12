@@ -21,16 +21,19 @@ export const ValueMetricCard: React.FC<ValueMetricCardProps> = ({
   description,
   color,
 }) => {
+  // Normalize score: coerce to number, handle NaN, clamp to 0-100 range
+  const normalizedScore = Math.max(0, Math.min(100, Number(score) || 0));
+
   return (
     <CardContainer>
-      <ExpandableCard title={title} value={value?.toString() || 'N/A'}>
+      <ExpandableCard title={title} value={value || 'N/A'}>
         <ScoreSection>
           <ScoreLabel>Value Score:</ScoreLabel>
           <ProgressContainer>
-            <ProgressBar progress={score || 0}>
-              <ProgressBarFill progress={score || 0} />
+            <ProgressBar progress={normalizedScore}>
+              <ProgressBarFill progress={normalizedScore} />
             </ProgressBar>
-            <ScoreValue>{score || 0}/100</ScoreValue>
+            <ScoreValue>{normalizedScore}/100</ScoreValue>
           </ProgressContainer>
         </ScoreSection>
 

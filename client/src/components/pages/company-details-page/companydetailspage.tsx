@@ -7,7 +7,7 @@ import {
   HeaderContainer,
   BackButton,
   Title,
-  InfoButton,
+  // InfoButton, // Commented out with info icon
   SectionTitle,
 } from './companydetailspage.styles';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +22,7 @@ import {
   getProfitMarginAssessment,
 } from '../../../utils/assessment';
 import { getRatioDescription } from '../../../utils/descriptions';
+import { formatFinancialValue } from '../../../utils/formatting';
 import {
   calculatePERatioScore,
   calculatePBRatioScore,
@@ -40,19 +41,19 @@ export const CompanyDetailsPage: React.FC = () => {
     navigation.goBack();
   };
 
-  const handleInfoPress = () => {
-    navigation.navigate('ValueScore' as never);
-  };
+  // const handleInfoPress = () => {
+  //   navigation.navigate('ValueScore' as never);
+  // };
 
-  const getMetricScore = (metricName: string, value: number): number => {
-    switch (metricName) {
-      case 'P/E Ratio':
+  const getMetricScore = (metricKey: string, value: number): number => {
+    switch (metricKey) {
+      case 'pe':
         return calculatePERatioScore(value);
-      case 'P/B Ratio':
+      case 'pb':
         return calculatePBRatioScore(value);
-      case 'ROE':
+      case 'roe':
         return calculateROEScore(value);
-      case 'Profit Margin':
+      case 'profitMargin':
         return calculateProfitMarginScore(value);
       default:
         return 0;
@@ -88,9 +89,9 @@ export const CompanyDetailsPage: React.FC = () => {
             <Ionicons name="arrow-back" size={24} color="#333333" />
           </BackButton>
           <Title>VALU</Title>
-          <InfoButton onPress={handleInfoPress}>
+          {/* <InfoButton onPress={handleInfoPress}>
             <Ionicons name="information-circle" size={24} color="#333333" />
-          </InfoButton>
+          </InfoButton> */}
         </HeaderContainer>
 
         <ContentContainer>
@@ -123,10 +124,10 @@ export const CompanyDetailsPage: React.FC = () => {
                     <MetricCardWrapper key={index}>
                       <ValueMetricCard
                         title={ratio.name}
-                        value={ratio.value}
-                        score={getMetricScore(ratio.name, ratio.value)}
+                        value={formatFinancialValue(ratio.key, ratio.value)}
+                        score={getMetricScore(ratio.key, ratio.value)}
                         assessment={assessmentData.assessment}
-                        description={getRatioDescription(ratio.name)}
+                        description={getRatioDescription(ratio.key)}
                         color={assessmentData.color}
                       />
                     </MetricCardWrapper>

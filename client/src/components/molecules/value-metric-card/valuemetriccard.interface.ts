@@ -1,6 +1,6 @@
 export interface ValueMetricCardProps {
   title: string;
-  value: number;
+  value: string;
   score: number;
   assessment: string;
   description: string;

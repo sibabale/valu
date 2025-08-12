@@ -20,7 +20,7 @@ jest.mock('../expandable-card/expandablecard', () => ({
 describe('ValueMetricCard', () => {
   const defaultProps = {
     title: 'P/E Ratio',
-    value: 15.5,
+    value: '15.5',
     score: 75,
     assessment: 'Good value (P/E < 25)',
     description:

@@ -54,16 +54,24 @@ public class CacheBuildingService : ICacheBuildingService
                     overview.ProfitMargin
                 );
 
+                // Calculate score directly using the same logic as ValueScoreService
+                var peScore = (overview.PERatio ?? 0m) < 15m ? 100 : (overview.PERatio ?? 0m) < 25m ? 75 : (overview.PERatio ?? 0m) < 35m ? 50 : 25;
+                var pbScore = (overview.PriceToBookRatio ?? 0m) < 1.5m ? 100 : (overview.PriceToBookRatio ?? 0m) < 3m ? 75 : (overview.PriceToBookRatio ?? 0m) < 5m ? 50 : 25;
+                var roeScore = (overview.ReturnOnEquityTTM ?? 0m) * 100 > 20m ? 100 : (overview.ReturnOnEquityTTM ?? 0m) * 100 > 15m ? 75 : (overview.ReturnOnEquityTTM ?? 0m) * 100 > 10m ? 50 : 25;
+                var profitMarginScore = (overview.ProfitMargin ?? 0m) * 100 > 25m ? 100 : (overview.ProfitMargin ?? 0m) * 100 > 15m ? 75 : (overview.ProfitMargin ?? 0m) * 100 > 10m ? 50 : 25;
+                
+                var totalScore = (peScore * 0.3m + pbScore * 0.25m + roeScore * 0.25m + profitMarginScore * 0.2m);
+
                 // Create ratios array from Alpha Vantage data
                 var ratios = new List<FinancialRatio>
                 {
-                    new("P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
-                    new("P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
-                    new("ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
-                    new("Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+                    new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+                    new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+                    new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+                    new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
                 };
 
-                // Create Company object with calculated recommendation
+                // Create Company object with calculated score
                 var company = new Company(
                     Id: Guid.NewGuid(),
                     Name: overview.Name,
@@ -76,6 +84,7 @@ public class CacheBuildingService : ICacheBuildingService
                     ChangePercent: 0m, // Not available in OVERVIEW
                     Description: overview.Description,
                     Recommendation: recommendation,
+                    Score: totalScore,
                     Ratios: ratios
                 );
 

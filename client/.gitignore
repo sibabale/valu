@@ -68,3 +68,6 @@ pids
 
 # Yarn Integrity file
 .yarn-integrity
+
+# env
+.env

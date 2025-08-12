@@ -141,4 +141,31 @@ describe('Searchbar', () => {
     // The mock store should not have been updated with invalid searches
     // We can verify this by checking that the component still renders correctly
   });
+
+  it('accepts valid ticker format when companiesData is empty (fallback validation)', () => {
+    const onSearchChange = jest.fn();
+    const { getByPlaceholderText } = renderWithProvider({ onSearchChange });
+
+    const searchInput = getByPlaceholderText('Search stocks...');
+
+    // Test valid ticker formats (1-5 uppercase letters)
+    fireEvent.changeText(searchInput, 'AAPL');
+    expect(onSearchChange).toHaveBeenCalledWith('AAPL');
+
+    fireEvent.changeText(searchInput, 'GOOGL');
+    expect(onSearchChange).toHaveBeenCalledWith('GOOGL');
+
+    fireEvent.changeText(searchInput, 'TSLA');
+    expect(onSearchChange).toHaveBeenCalledWith('TSLA');
+
+    // Test invalid formats
+    fireEvent.changeText(searchInput, 'INVALID123');
+    expect(onSearchChange).toHaveBeenCalledWith('INVALID123');
+
+    fireEvent.changeText(searchInput, 'a');
+    expect(onSearchChange).toHaveBeenCalledWith('a');
+
+    fireEvent.changeText(searchInput, 'TOOLONG');
+    expect(onSearchChange).toHaveBeenCalledWith('TOOLONG');
+  });
 });

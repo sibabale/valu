@@ -24,7 +24,7 @@ export const ScoreLabel = styled.Text`
 export const ProgressContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  margin-left: 12px;
   width: 100px;
 `;
 

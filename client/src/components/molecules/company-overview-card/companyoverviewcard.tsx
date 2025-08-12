@@ -47,7 +47,7 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
           <RecommendationLabel recommendation={company.recommendation} />
           <ScoreContainer>
             <ScoreLabel>Score: </ScoreLabel>
-            {company.score && <ScoreValue>{company.score}/100</ScoreValue>}
+            <ScoreValue>{company.score}/100</ScoreValue>
           </ScoreContainer>
         </ScoreSection>
       </PriceContainer>
