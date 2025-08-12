@@ -2,8 +2,6 @@ export const appleDetails = {
   id: "1",
   name: "Apple Inc.",
   ticker: "AAPL",
-  logo: "🍎",
-  logoColor: "#000000",
   price: 150.0,
   marketCap: "$1780.0B",
   recommendation: "Hold",

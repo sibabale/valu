@@ -11,14 +11,47 @@ import { Company } from '../../../types/company.interface';
 export const HomePage: React.FC = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
+  const [companiesData, setCompaniesData] = useState<Company[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
-  const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
 
   // Animation values for cascading sequence
   const headerAnim = useRef(new Animated.Value(1)).current; // Start at 1 (normal size)
   const searchAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
   const listAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
+
+  // Fetch companies from API
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('https://b01068571f2b.ngrok-free.app/api/companies');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const companies = await response.json();
+        setCompaniesData(companies);
+        setFilteredCompanies(companies);
+        
+        console.log('HomePage: Fetched companies count:', companies.length);
+      } catch (err) {
+        console.error('HomePage: Error fetching companies:', err);
+        setError('Failed to load companies');
+        setCompaniesData([]);
+        setFilteredCompanies([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
 
   // Handle header press animation (like hover effect)
   const handleHeaderPress = () => {
@@ -41,41 +74,7 @@ export const HomePage: React.FC = () => {
 
   // Fetch companies from API
   useEffect(() => {
-    console.log('HomePage: Fetching companies');
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch('https://b01068571f2b.ngrok-free.app/api/companies');
-        console.log('-----HomePage: Response-----', response);
-        if (response.ok) {
-          const apiCompanies = await response.json();
-          // Transform API data to match our Company interface
-          const transformedCompanies = apiCompanies.map((apiCompany: any) => {
-            console.log(apiCompany.recommendation);
-            
-            return {
-            id: apiCompany.id,
-            name: apiCompany.name,
-            ticker: apiCompany.symbol,
-            logo: apiCompany.symbol.charAt(0).toUpperCase(),
-            price: apiCompany.price || 0,
-            recommendation: apiCompany.recommendation,
-            logoColor: '#4285F4',
-          };
-        });
-
-          console.log('-----transformedCompanies-----', transformedCompanies.map((company: any) => company.recommendation));
-          setCompanies(transformedCompanies);
-          setFilteredCompanies(transformedCompanies);
-        }
-      } catch (error) {
-        console.error('Failed to fetch companies:', error);
-        // Fallback to empty array
-        setCompanies([]);
-        setFilteredCompanies([]);
-      }
-    };
-
-    fetchCompanies();
+    console.log('HomePage: Initializing with companies count:', companiesData.length);
     
     // Start cascading animations after a brief delay to ensure state is set
     const timer = setTimeout(() => {
@@ -101,18 +100,18 @@ export const HomePage: React.FC = () => {
     }, 100); // Small delay to ensure state is set
 
     return () => clearTimeout(timer);
-  }, []); // Only run once on mount
+  }, [companiesData.length, searchAnim, listAnim]); // Run when companies data changes
 
   // Handle search filtering separately
   useEffect(() => {
-    if (companies.length > 0) {
-      const filtered = companies.filter((company: Company) =>
+    if (companiesData.length > 0) {
+      const filtered = companiesData.filter((company: Company) =>
         company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         company.ticker.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setFilteredCompanies(filtered);
     }
-  }, [searchQuery, companies]);
+  }, [searchQuery, companiesData]);
 
   const handleCompanyPress = (company: Company) => {
     // Navigate to company details screen with the company data
@@ -170,6 +169,8 @@ export const HomePage: React.FC = () => {
             companies={filteredCompanies}
             onCompanyPress={handleCompanyPress}
             bottomInset={insets.bottom}
+            isLoading={isLoading}
+            error={error}
           />
         </ContentContainer>
       </PageContainer>

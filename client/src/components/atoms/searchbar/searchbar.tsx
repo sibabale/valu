@@ -8,7 +8,10 @@ import SearchIcon from '../icons/search';
 import CloseIcon from '../icons/close';
 import { addRecentSearch, clearRecentSearches } from '../../../store/slices/searchSlice';
 import { SearchbarProps } from './searchbar.interface';
-import companiesData from '../../../data/companies.json';
+
+// Initialize as empty array
+const companiesData: any[] = [];
+
 import {
   Container,
   SearchContainer,

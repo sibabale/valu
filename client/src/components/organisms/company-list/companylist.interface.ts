@@ -4,4 +4,6 @@ export interface CompanyListProps {
   companies: Company[];
   onCompanyPress?: (company: Company) => void;
   bottomInset?: number;
+  isLoading?: boolean;
+  error?: string | null;
 }

@@ -27,16 +27,19 @@ const getRecommendationButton = (recommendation: string) => {
       return 'primary';
   }
 };
+
 export const CompanyCard: React.FC<CompanyCardProps> = ({
   company,
   onPress,
   ...props
 }) => {
+  const firstLetter = company.name.charAt(0).toUpperCase();
+
   return (
     <CardContainer onPress={onPress} activeOpacity={0.8} {...props}>
       <LeftSection>
-        <LogoContainer color={company.logoColor}>
-          <LogoText>{company.logo}</LogoText>
+        <LogoContainer color="#808080">
+          <LogoText>{firstLetter}</LogoText>
         </LogoContainer>
         <CompanyInfo>
           <CompanyName>{company.name}</CompanyName>

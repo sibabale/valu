@@ -24,11 +24,13 @@ import {
 export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
   company,
 }) => {
+  const firstLetter = company.name.charAt(0).toUpperCase();
+
   return (
     <CardContainer>
       <Header>
-        <LogoContainer color={company.logoColor}>
-          <LogoText>{company.logo}</LogoText>
+        <LogoContainer color="#808080">
+          <LogoText>{firstLetter}</LogoText>
         </LogoContainer>
         <CompanyName>{company.name}</CompanyName>
         <TickerSymbol>{company.ticker}</TickerSymbol>
