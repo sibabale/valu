@@ -117,4 +117,17 @@ public class ValueScoreService : IValueScoreService
             _ => "F"
         };
     }
+
+    public (int peScore, int pbScore, int roeScore, int profitMarginScore, decimal totalScore) CalculateSimpleScore(AlphaVantageOverview overview)
+    {
+        // Calculate score using the same logic as the individual methods but with null handling
+        var peScore = (overview.PERatio ?? 0m) < 15m ? 100 : (overview.PERatio ?? 0m) < 25m ? 75 : (overview.PERatio ?? 0m) < 35m ? 50 : 25;
+        var pbScore = (overview.PriceToBookRatio ?? 0m) < 1.5m ? 100 : (overview.PriceToBookRatio ?? 0m) < 3m ? 75 : (overview.PriceToBookRatio ?? 0m) < 5m ? 50 : 25;
+        var roeScore = (overview.ReturnOnEquityTTM ?? 0m) * 100 > 20m ? 100 : (overview.ReturnOnEquityTTM ?? 0m) * 100 > 15m ? 75 : (overview.ReturnOnEquityTTM ?? 0m) * 100 > 10m ? 50 : 25;
+        var profitMarginScore = (overview.ProfitMargin ?? 0m) * 100 > 25m ? 100 : (overview.ProfitMargin ?? 0m) * 100 > 15m ? 75 : (overview.ProfitMargin ?? 0m) * 100 > 10m ? 50 : 25;
+        
+        var totalScore = (peScore * 0.3m + pbScore * 0.25m + roeScore * 0.25m + profitMarginScore * 0.2m);
+        
+        return (peScore, pbScore, roeScore, profitMarginScore, totalScore);
+    }
 } 
