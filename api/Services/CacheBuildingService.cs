@@ -13,7 +13,7 @@ public class CacheBuildingService : ICacheBuildingService
     private readonly IAlphaVantageService _alphaVantageService;
     private readonly IRecommendationService _recommendationService;
     private readonly IValueScoreService _valueScoreService;
-    private readonly SimpleCache _cache;
+    private readonly ICacheService _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
     // Initial 5 companies for MVP
@@ -23,7 +23,7 @@ public class CacheBuildingService : ICacheBuildingService
         IAlphaVantageService alphaVantageService,
         IRecommendationService recommendationService,
         IValueScoreService valueScoreService,
-        SimpleCache cache,
+        ICacheService cache,
         ILogger<CacheBuildingService> logger)
     {
         _alphaVantageService = alphaVantageService;
@@ -88,8 +88,8 @@ public class CacheBuildingService : ICacheBuildingService
                 );
 
                 // Cache for 1 day
-                var cacheKey = $"company_symbol_{symbol}";
-                _cache.Set(cacheKey, company, TimeSpan.FromDays(1));
+                var cacheKey = $"company:{symbol}";
+                await _cache.SetAsync(cacheKey, company, TimeSpan.FromDays(1));
                 
                 successCount++;
 
