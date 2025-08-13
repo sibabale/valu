@@ -71,3 +71,5 @@ pids
 
 # env
 .env
+# React Native Android build files
+client/android/
