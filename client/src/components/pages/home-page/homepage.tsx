@@ -173,6 +173,7 @@ export const HomePage: React.FC = () => {
             <Searchbar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
+              companiesData={companiesData}
             />
           </PaddedContent>
         </Animated.View>

@@ -32,6 +32,7 @@ describe('Searchbar', () => {
     searchQuery: '',
     onSearchChange: jest.fn(),
     popularStocks: ['TSLA', 'MSFT'],
+    companiesData: [],
   };
 
   const renderWithProvider = (props = {}, initialState = {}) => {
@@ -142,30 +143,72 @@ describe('Searchbar', () => {
     // We can verify this by checking that the component still renders correctly
   });
 
-  it('accepts valid ticker format when companiesData is empty (fallback validation)', () => {
+  it('validates ticker format when companiesData is empty (fallback validation)', () => {
     const onSearchChange = jest.fn();
-    const { getByPlaceholderText } = renderWithProvider({ onSearchChange });
+    const store = createMockStore();
+    const { getByPlaceholderText } = render(
+      <Provider store={store}>
+        <Searchbar {...defaultProps} onSearchChange={onSearchChange} />
+      </Provider>
+    );
 
     const searchInput = getByPlaceholderText('Search stocks...');
 
     // Test valid ticker formats (1-5 uppercase letters)
     fireEvent.changeText(searchInput, 'AAPL');
+    fireEvent(searchInput, 'blur');
     expect(onSearchChange).toHaveBeenCalledWith('AAPL');
-
-    fireEvent.changeText(searchInput, 'GOOGL');
-    expect(onSearchChange).toHaveBeenCalledWith('GOOGL');
-
-    fireEvent.changeText(searchInput, 'TSLA');
-    expect(onSearchChange).toHaveBeenCalledWith('TSLA');
+    // Check if AAPL was added to recent searches
+    const state = store.getState();
+    expect(state.search.recentSearches).toContain('AAPL');
 
     // Test invalid formats
+    store.dispatch({ type: 'search/clearRecentSearches' });
     fireEvent.changeText(searchInput, 'INVALID123');
+    fireEvent(searchInput, 'blur');
     expect(onSearchChange).toHaveBeenCalledWith('INVALID123');
+    // Check that invalid ticker was NOT added to recent searches
+    const newState = store.getState();
+    expect(newState.search.recentSearches).not.toContain('INVALID123');
+  });
 
-    fireEvent.changeText(searchInput, 'a');
-    expect(onSearchChange).toHaveBeenCalledWith('a');
+  it('accepts companiesData prop and uses it for validation', () => {
+    const onSearchChange = jest.fn();
+    const mockCompaniesData = [
+      {
+        id: '1',
+        symbol: 'AAPL',
+        name: 'Apple Inc.',
+        sector: 'Technology',
+        industry: 'Consumer Electronics',
+        marketCap: 2000000000000,
+        price: 150,
+        change: 2.5,
+        changePercent: 1.67,
+        description: 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables and accessories worldwide.',
+        recommendation: 'Buy',
+        score: 85,
+        ratios: []
+      },
+    ];
+    const store = createMockStore();
+    const { getByPlaceholderText } = render(
+      <Provider store={store}>
+        <Searchbar
+          {...defaultProps}
+          onSearchChange={onSearchChange}
+          companiesData={mockCompaniesData}
+        />
+      </Provider>
+    );
 
-    fireEvent.changeText(searchInput, 'TOOLONG');
-    expect(onSearchChange).toHaveBeenCalledWith('TOOLONG');
+    const searchInput = getByPlaceholderText('Search stocks...');
+
+    // Test that the component renders with companiesData prop
+    expect(searchInput).toBeTruthy();
+
+    // Test that onSearchChange is called when typing
+    fireEvent.changeText(searchInput, 'AAPL');
+    expect(onSearchChange).toHaveBeenCalledWith('AAPL');
   });
 });

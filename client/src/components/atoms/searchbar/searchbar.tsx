@@ -12,11 +12,6 @@ import {
 } from '../../../store/slices/searchSlice';
 import { SearchbarProps } from './searchbar.interface';
 
-// Note: companiesData is currently hardcoded as empty array
-// The isValidTicker function includes a fallback for when this data is not available
-// TODO: Consider passing companiesData as a prop from parent components
-const companiesData: any[] = [];
-
 import {
   Container,
   SearchContainer,
@@ -39,6 +34,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   searchQuery,
   onSearchChange,
   popularStocks,
+  companiesData = [],
 }) => {
   const dispatch = useDispatch();
   const { recentSearches, popularStocks: reduxPopularStocks } = useSelector(

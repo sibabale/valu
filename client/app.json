@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "VALU",
-    "slug": "valu-app",
+    "slug": "valu",
     "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.valu.app"
+      "bundleIdentifier": "com.value.app"
     },
     "android": {
       "package": "com.valu.app",
@@ -33,7 +33,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "your-project-id-here"
+        "projectId": "ed7f88ef-34d9-4aaa-bed1-8d554f0e4456"
       }
     }
   }
