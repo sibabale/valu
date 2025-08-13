@@ -6,10 +6,13 @@
       }
     },
     "ios": {
-      "bundleIdentifier": "com.sibabale.valu",
+      "bundleIdentifier": "com.valu.app",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
+    },
+    "android": {
+      "package": "com.valu.app"
     }
   }
 }

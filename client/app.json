@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.value.app"
+      "bundleIdentifier": "com.valu.app"
     },
     "android": {
       "package": "com.valu.app",
