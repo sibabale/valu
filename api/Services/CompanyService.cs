@@ -9,13 +9,15 @@ public class CompanyService : ICompanyService
     private readonly SimpleCache _cache;
     private readonly ILogger<CompanyService> _logger;
     private readonly IRecommendationService _recommendationService;
+    private readonly IValueScoreService _valueScoreService;
 
-    public CompanyService(IAlphaVantageService alphaVantageService, SimpleCache cache, ILogger<CompanyService> logger, IRecommendationService recommendationService)
+    public CompanyService(IAlphaVantageService alphaVantageService, SimpleCache cache, ILogger<CompanyService> logger, IRecommendationService recommendationService, IValueScoreService valueScoreService)
     {
         _alphaVantageService = alphaVantageService;
         _cache = cache;
         _logger = logger;
         _recommendationService = recommendationService;
+        _valueScoreService = valueScoreService;
     }
 
     public Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -91,11 +93,14 @@ public class CompanyService : ICompanyService
         // Create simplified CompanyDetails with just the essential data
         var ratios = new List<FinancialRatio>
         {
-            new("P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
-            new("P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
-            new("ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
-            new("Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+            new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+            new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+            new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+            new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
         };
+
+        // Calculate score using the ValueScoreService
+        var (_, _, _, _, totalScore) = _valueScoreService.CalculateSimpleScore(overview);
         
         var details = new CompanyDetails(
             Id: company.Id,
@@ -108,6 +113,7 @@ public class CompanyService : ICompanyService
             Change: company.Change,
             ChangePercent: company.ChangePercent,
             Description: company.Description,
+            Score: totalScore,
             Financials: new FinancialMetrics(0, 0, 0, 0, 0, 0), // Not used
             Ratios: ratios
         );
@@ -214,6 +220,18 @@ public class CompanyService : ICompanyService
             overview.ProfitMargin
         );
         
+        // Create ratios array from Alpha Vantage data
+        var ratios = new List<FinancialRatio>
+        {
+            new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+            new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+            new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+            new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+        };
+
+        // Calculate score using the ValueScoreService
+        var (_, _, _, _, totalScore) = _valueScoreService.CalculateSimpleScore(overview);
+        
         var company = new Company(
             Id: deterministicGuid,
             Name: overview.Name,
@@ -225,7 +243,9 @@ public class CompanyService : ICompanyService
             Change: 0m, // Change not available in OVERVIEW
             ChangePercent: 0m, // Change percent not available in OVERVIEW
             Description: overview.Description,
-            Recommendation: recommendation
+            Recommendation: recommendation,
+            Score: totalScore,
+            Ratios: ratios
         );
         
         return company;

@@ -50,11 +50,6 @@ export default function App() {
     );
   }
 
-  // Test component to verify fonts are working
-  if (loaded) {
-    console.log('Testing fonts with inline styles...');
-  }
-
   return (
     <SafeAreaProvider>
       <Provider store={store}>

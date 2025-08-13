@@ -7,29 +7,39 @@ const mockCompanies: Company[] = [
   {
     id: '1',
     name: 'Alphabet Inc.',
-    ticker: 'GOOGL',
-    logo: 'G',
-    price: 150.00,
+    symbol: 'GOOGL',
+    sector: 'Technology',
+    industry: 'Software',
+    marketCap: 2000000000000,
+    price: 150.0,
+    change: 2.5,
+    changePercent: 1.67,
+    description: 'Alphabet Inc. is a technology company.',
     recommendation: 'Buy +',
-    recommendationColor: '#4CAF50',
-    logoColor: '#4285F4',
+    score: 75,
+    ratios: [],
   },
   {
     id: '2',
     name: 'Apple Inc.',
-    ticker: 'AAPL',
-    logo: '🍎',
-    price: 150.00,
+    symbol: 'AAPL',
+    sector: 'Technology',
+    industry: 'Hardware',
+    marketCap: 3000000000000,
+    price: 150.0,
+    change: 1.5,
+    changePercent: 1.0,
+    description: 'Apple Inc. is a technology company.',
     recommendation: 'Buy',
-    recommendationColor: '#FFC107',
-    logoColor: '#000000',
+    score: 80,
+    ratios: [],
   },
 ];
 
 describe('CompanyList', () => {
   it('renders company cards correctly', () => {
     const { getByText } = render(<CompanyList companies={mockCompanies} />);
-    
+
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
@@ -41,7 +51,7 @@ describe('CompanyList', () => {
     const { getByText } = render(
       <CompanyList companies={mockCompanies} onCompanyPress={onCompanyPress} />
     );
-    
+
     fireEvent.press(getByText('Alphabet Inc.'));
     expect(onCompanyPress).toHaveBeenCalledWith(mockCompanies[0]);
   });
@@ -50,4 +60,4 @@ describe('CompanyList', () => {
     const { getByText } = render(<CompanyList companies={[]} />);
     expect(getByText('No companies found')).toBeTruthy();
   });
-}); 
+});

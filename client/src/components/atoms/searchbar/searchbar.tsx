@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { TouchableOpacity, ScrollView, Animated, View } from 'react-native';
+import { TouchableOpacity, ScrollView, Animated, View, Keyboard } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../store';
 import TrendUpIcon from '../icons/trend-up';
 import HistoryIcon from '../icons/history';
 import SearchIcon from '../icons/search';
 import CloseIcon from '../icons/close';
-import { addRecentSearch, clearRecentSearches } from '../../../store/slices/searchSlice';
+import {
+  addRecentSearch,
+  clearRecentSearches,
+} from '../../../store/slices/searchSlice';
 import { SearchbarProps } from './searchbar.interface';
-import companiesData from '../../../data/companies.json';
+
 import {
   Container,
   SearchContainer,
@@ -31,11 +34,13 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   searchQuery,
   onSearchChange,
   popularStocks,
+  companiesData = [],
 }) => {
   const dispatch = useDispatch();
-  const { recentSearches, popularStocks: reduxPopularStocks } = useSelector((state: RootState) => state.search);
+  const { recentSearches, popularStocks: reduxPopularStocks } = useSelector(
+    (state: RootState) => state.search
+  );
   const stocksToShow = popularStocks || reduxPopularStocks;
-  
 
   const [isFocused, setIsFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -61,9 +66,19 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   // Validate if a search query matches a valid ticker
   const isValidTicker = (query: string): boolean => {
     const trimmedQuery = query.trim().toUpperCase();
-    return companiesData.some(company => 
-      company.ticker.toUpperCase() === trimmedQuery ||
-      company.name.toUpperCase().includes(trimmedQuery)
+
+    // If companiesData is empty, use a simple regex fallback for basic ticker validation
+    if (companiesData.length === 0) {
+      // Basic ticker validation: 1-5 uppercase letters
+      const tickerRegex = /^[A-Z]{1,5}$/;
+      return tickerRegex.test(trimmedQuery);
+    }
+
+    // Otherwise, check against actual company data
+    return companiesData.some(
+      company =>
+        company.symbol?.toUpperCase() === trimmedQuery ||
+        company.name.toUpperCase().includes(trimmedQuery)
     );
   };
 
@@ -87,7 +102,6 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   };
 
   const clearRecent = () => {
-    console.log('Component: Dispatching clearRecentSearches');
     dispatch(clearRecentSearches());
   };
 
@@ -123,10 +137,10 @@ export const Searchbar: React.FC<SearchbarProps> = ({
         <SearchContainer>
           <SearchIconContainer>
             <IconContainer>
-              <SearchIcon fill='#99a1af' height='20px' width='20px' />
+              <SearchIcon fill="#99a1af" height="20px" width="20px" />
             </IconContainer>
           </SearchIconContainer>
-          
+
           <SearchInput
             placeholder="Search stocks..."
             placeholderTextColor="#9ca3af"
@@ -142,95 +156,109 @@ export const Searchbar: React.FC<SearchbarProps> = ({
             }}
             isFocused={isFocused}
           />
-          
+
           {isFocused || searchQuery ? (
             <CloseButton testID="close-button" onPress={handleClearInput}>
-              <CloseIcon fill='#99a1af' height='20px' width='20px' />
+              <CloseIcon fill="#99a1af" height="20px" width="20px" />
             </CloseButton>
           ) : null}
         </SearchContainer>
       </Container>
 
-        {isFocused && !searchQuery && (
-          <Animated.View
-            ref={dropdownRef}
-            onTouchStart={handleDropdownPressIn}
-            onTouchEnd={handleDropdownPressOut}
-            style={{
-              opacity: fadeAnim,
-              transform: [{
+      {isFocused && !searchQuery && (
+        <Animated.View
+          ref={dropdownRef}
+          onTouchStart={handleDropdownPressIn}
+          onTouchEnd={handleDropdownPressOut}
+          style={{
+            opacity: fadeAnim,
+            transform: [
+              {
                 translateY: fadeAnim.interpolate({
                   inputRange: [0, 1],
                   outputRange: [-10, 0],
                 }),
-              }],
-            }}
-          >
-            <DropdownContainer>
-              <DropdownCard>
-                <DropdownContent>
-                  {recentSearches.length > 0 && (
-                    <ScrollView>
-                      <SectionHeader>
-                        <IconContainer>
-                          <HistoryIcon height='16px' width='16px' fill='#1E2939' />
-                        </IconContainer>
-                        <SectionTitle>Recent</SectionTitle>
-                        <TouchableOpacity 
-                          onPressIn={handleDropdownPressIn}
-                          onPress={clearRecent} 
-                          style={{ marginLeft: 'auto' }}>
-                          <ClearButtonText>Clear</ClearButtonText>
-                        </TouchableOpacity>
-                      </SectionHeader>
-                      
-                      <TagsContainer>
-                        {recentSearches.map((search, index) => (
-                          <TagButton
-                            key={index}
-                            onPressIn={handleDropdownPressIn}
-                            onPress={() => {
-                              handleSearch(search);
-                              setIsFocused(false);
-                            }}
-                          >
-                            <TagText>{search}</TagText>
-                          </TagButton>
-                        ))}
-                      </TagsContainer>
-                    </ScrollView>
-                  )}
+              },
+            ],
+          }}
+        >
+          <DropdownContainer>
+            <DropdownCard>
+              <DropdownContent>
+                {recentSearches.length > 0 && (
+                  <ScrollView>
+                    <SectionHeader>
+                      <IconContainer>
+                        <HistoryIcon
+                          height="16px"
+                          width="16px"
+                          fill="#1E2939"
+                        />
+                      </IconContainer>
+                      <SectionTitle>Recent</SectionTitle>
+                      <TouchableOpacity
+                        onPressIn={handleDropdownPressIn}
+                        onPress={clearRecent}
+                        style={{ marginLeft: 'auto' }}
+                      >
+                        <ClearButtonText>Clear</ClearButtonText>
+                      </TouchableOpacity>
+                    </SectionHeader>
 
-                  {stocksToShow && stocksToShow.length > 0 && (
-                    <ScrollView>
-                      <SectionHeader>
-                        <IconContainer>
-                          <TrendUpIcon height='16px' width='16px' fill='#1E2939' />
-                        </IconContainer>
-                        <SectionTitle>Popular</SectionTitle>
-                      </SectionHeader>
-                      
-                      <TagsContainer>
-                        {stocksToShow.map((stock, index) => (
-                          <TagButton
-                            key={index}
-                            onPressIn={handleDropdownPressIn}
-                            onPress={() => {
-                              handleSearch(stock);
-                              setIsFocused(false);
-                            }}
-                          >
-                            <TagText>{stock}</TagText>
-                          </TagButton>
-                        ))}
-                      </TagsContainer>
-                    </ScrollView>
-                  )}
-                </DropdownContent>
-              </DropdownCard>
-            </DropdownContainer>
-          </Animated.View>
-        )}
+                    <TagsContainer>
+                      {recentSearches.map((search) => (
+                        <TagButton
+                          key={search}
+                          onPressIn={handleDropdownPressIn}
+                          onPress={() => {
+                            handleSearch(search);
+                            Keyboard.dismiss();
+                            setIsFocused(false);
+                          }}
+                        >
+                          <TagText>{search}</TagText>
+                        </TagButton>
+                      ))}
+                    </TagsContainer>
+                  </ScrollView>
+                )}
+
+                {stocksToShow && stocksToShow.length > 0 && (
+                  <ScrollView>
+                    <SectionHeader>
+                      <IconContainer>
+                        <TrendUpIcon
+                          height="16px"
+                          width="16px"
+                          fill="#1E2939"
+                        />
+                      </IconContainer>
+                      <SectionTitle>Popular</SectionTitle>
+                    </SectionHeader>
+
+                    <TagsContainer>
+                      {stocksToShow.map((stock) => (
+                        <TagButton
+                          key={stock}
+                          onPressIn={handleDropdownPressIn}
+                          onPress={() => {
+                            handleSearch(stock);
+                            dispatch(addRecentSearch(stock));
+                            Keyboard.dismiss();
+                            setIsFocused(false);
+                          }}
+                        >
+                          <TagText>{stock}</TagText>
+                        </TagButton>
+                      ))}
+                    </TagsContainer>
+                  </ScrollView>
+                )}
+              </DropdownContent>
+            </DropdownCard>
+          </DropdownContainer>
+        </Animated.View>
+      )}
     </>
   );
 };

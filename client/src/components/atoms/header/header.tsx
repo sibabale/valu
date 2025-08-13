@@ -1,7 +1,7 @@
 import React from 'react';
+import { Pressable } from 'react-native';
 import { HeaderProps } from './header.interface';
 import { HeaderContainer, Title } from './header.styles';
-import { Pressable } from 'react-native';
 import InfoIcon from '../icons/info';
 
 export const Header: React.FC<HeaderProps> = ({
@@ -12,9 +12,11 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <HeaderContainer {...props}>
       <Title>{title}</Title>
-      <Pressable onPress={onInfoPress} testID="info-button">
-        <InfoIcon fill="#000000" />
-      </Pressable>
+      {onInfoPress && (
+        <Pressable onPress={onInfoPress} testID="info-button">
+          <InfoIcon fill="#000000" />
+        </Pressable>
+      )}
     </HeaderContainer>
   );
-}; 
+};

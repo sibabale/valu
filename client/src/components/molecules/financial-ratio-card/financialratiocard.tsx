@@ -58,7 +58,9 @@ export const FinancialRatioCard: React.FC<FinancialRatioCardProps> = ({
       <MainContent>
         <LeftSection>
           <Title>{title}</Title>
-          {!isExpanded && description && <Description>{description}</Description>}
+          {!isExpanded && description && (
+            <Description>{description}</Description>
+          )}
         </LeftSection>
 
         <RightSection>
@@ -75,7 +77,7 @@ export const FinancialRatioCard: React.FC<FinancialRatioCardProps> = ({
           </TrendContainer>
         </RightSection>
       </MainContent>
-      
+
       {isExpanded && (
         <ExpandedContent>
           <ExpandedDescription>{description}</ExpandedDescription>

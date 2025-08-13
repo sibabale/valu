@@ -6,18 +6,23 @@ import { Company } from '../../../types/company.interface';
 const mockCompany: Company = {
   id: '1',
   name: 'Alphabet Inc.',
-  ticker: 'GOOGL',
-  logo: 'G',
-  price: 150.00,
+  symbol: 'GOOGL',
+  sector: 'Technology',
+  industry: 'Software',
+  marketCap: 2000000000000,
+  price: 150.0,
+  change: 2.5,
+  changePercent: 1.67,
+  description: 'Alphabet Inc. is a technology company.',
   recommendation: 'Buy +',
-  recommendationColor: '#4CAF50',
-  logoColor: '#4285F4',
+  score: 75,
+  ratios: [],
 };
 
 describe('CompanyCard', () => {
   it('renders company information correctly', () => {
     const { getByText } = render(<CompanyCard company={mockCompany} />);
-    
+
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
     expect(getByText('$150.00')).toBeTruthy();
@@ -29,7 +34,7 @@ describe('CompanyCard', () => {
     const { getByText } = render(
       <CompanyCard company={mockCompany} onPress={onPress} />
     );
-    
+
     fireEvent.press(getByText('Alphabet Inc.'));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -38,15 +43,28 @@ describe('CompanyCard', () => {
     const differentCompany: Company = {
       ...mockCompany,
       name: 'Apple Inc.',
-      ticker: 'AAPL',
+      symbol: 'AAPL',
       recommendation: 'Hold',
-      recommendationColor: '#FF9800',
+      score: 60,
     };
 
     const { getByText } = render(<CompanyCard company={differentCompany} />);
-    
+
     expect(getByText('Apple Inc.')).toBeTruthy();
     expect(getByText('AAPL')).toBeTruthy();
     expect(getByText('Hold')).toBeTruthy();
   });
-}); 
+
+  it('hides price when it is zero', () => {
+    const zeroPriceCompany: Company = {
+      ...mockCompany,
+      price: 0,
+    };
+
+    const { queryByText, getByText } = render(<CompanyCard company={zeroPriceCompany} />);
+
+    expect(queryByText('$0.00')).toBeFalsy();
+    expect(getByText('Alphabet Inc.')).toBeTruthy();
+    expect(getByText('GOOGL')).toBeTruthy();
+  });
+});

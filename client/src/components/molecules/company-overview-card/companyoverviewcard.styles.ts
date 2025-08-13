@@ -36,7 +36,12 @@ export const LogoContainer = styled.View<LogoContainerProps>`
 
 export const LogoText = styled.Text`
   font-size: 24px;
+  color: #ffffff;
 `;
+
+export const MarketCap = styled.View`
+`;
+
 
 export const CompanyName = styled.Text`
   font-size: 18px;
@@ -61,6 +66,7 @@ export const PriceContainer = styled.View`
 export const PriceSection = styled.View`
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
 `;
 
 export const ScoreSection = styled.View`
@@ -75,7 +81,7 @@ export const Price = styled.Text`
 `;
 
 export const RecommendationContainer = styled.View`
-  background-color: #FFF3CD;
+  background-color: #fff3cd;
   border-radius: 16px;
   padding: 6px 12px;
   align-items: center;
@@ -120,15 +126,15 @@ export const MarketCapLabel = styled.Text`
 `;
 
 export const MarketCapValue = styled.Text`
-  font-size: 14px;
+  font-size: 18px;
+  font-weight: 700;
   font-family: 'Space Grotesk Medium';
   color: #1a1a1a;
-  margin-bottom: 16px;
 `;
 
 export const Divider = styled.View`
   height: 1px;
-  background-color: #F6F3F4;
+  background-color: #f6f3f4;
   width: 100%;
   margin: 8px 0;
 `;

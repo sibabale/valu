@@ -68,3 +68,8 @@ pids
 
 # Yarn Integrity file
 .yarn-integrity
+
+# env
+.env
+# React Native Android build files
+android/

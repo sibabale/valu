@@ -11,48 +11,31 @@ import {
   RightSection,
   Price,
 } from './companycard.styles';
-import { Button } from '../../atoms/button/button';
+import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
 
-const getRecommendationButton = (recommendation: string) => {
-  switch (recommendation) {
-    case 'Buy':
-      return 'secondary';
-    case 'Buy +':
-      return 'success';
-    case 'Hold':
-      return 'warning';
-    case 'Avoid':
-      return 'danger';
-    default:
-      return 'primary';
-  }
-};
 export const CompanyCard: React.FC<CompanyCardProps> = ({
   company,
   onPress,
   ...props
 }) => {
+  const firstLetter = company.name.charAt(0).toUpperCase();
+
   return (
     <CardContainer onPress={onPress} activeOpacity={0.8} {...props}>
       <LeftSection>
-        <LogoContainer color={company.logoColor}>
-          <LogoText>{company.logo}</LogoText>
+        <LogoContainer color="#808080">
+          <LogoText>{firstLetter}</LogoText>
         </LogoContainer>
         <CompanyInfo>
           <CompanyName>{company.name}</CompanyName>
-          <TickerSymbol>{company.ticker}</TickerSymbol>
+          <TickerSymbol>{company.symbol}</TickerSymbol>
         </CompanyInfo>
       </LeftSection>
 
       <RightSection>
-        <Price>${company.price.toFixed(2)}</Price>
+        {company.price > 0 && <Price>${company.price.toFixed(2)}</Price>}
 
-        <Button
-          size="xx-small"
-          variant={getRecommendationButton(company.recommendation)}
-        >
-          {company.recommendation}
-        </Button>
+        <RecommendationLabel recommendation={company.recommendation} />
       </RightSection>
     </CardContainer>
   );

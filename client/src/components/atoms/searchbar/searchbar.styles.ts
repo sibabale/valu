@@ -10,7 +10,7 @@ export const SearchContainer = styled.View`
   position: relative;
 `;
 
-export const SearchIconContainer = styled.View`    
+export const SearchIconContainer = styled.View`
   position: absolute;
   left: 16px;
   top: 50%;
@@ -28,7 +28,8 @@ export const IconContainer = styled.View`
 export const SearchInput = styled.TextInput<{ isFocused: boolean }>`
   height: 47px;
   border-radius: 24px;
-  border: ${(props: { isFocused: boolean }) => props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
+  border: ${(props: { isFocused: boolean }) =>
+    props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
   background-color: #ffffff;
   padding: 0 48px 0 48px;
   font-size: 18px;

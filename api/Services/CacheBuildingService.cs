@@ -1,4 +1,5 @@
 using Valu.Api.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Valu.Api.Services;
 
@@ -11,6 +12,7 @@ public class CacheBuildingService : ICacheBuildingService
 {
     private readonly IAlphaVantageService _alphaVantageService;
     private readonly IRecommendationService _recommendationService;
+    private readonly IValueScoreService _valueScoreService;
     private readonly SimpleCache _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
@@ -20,11 +22,13 @@ public class CacheBuildingService : ICacheBuildingService
     public CacheBuildingService(
         IAlphaVantageService alphaVantageService,
         IRecommendationService recommendationService,
+        IValueScoreService valueScoreService,
         SimpleCache cache,
         ILogger<CacheBuildingService> logger)
     {
         _alphaVantageService = alphaVantageService;
         _recommendationService = recommendationService;
+        _valueScoreService = valueScoreService;
         _cache = cache;
         _logger = logger;
     }
@@ -54,7 +58,19 @@ public class CacheBuildingService : ICacheBuildingService
                     overview.ProfitMargin
                 );
 
-                // Create Company object with calculated recommendation
+                // Calculate score using the ValueScoreService
+                var (_, _, _, _, totalScore) = _valueScoreService.CalculateSimpleScore(overview);
+
+                // Create ratios array from Alpha Vantage data
+                var ratios = new List<FinancialRatio>
+                {
+                    new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+                    new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+                    new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+                    new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+                };
+
+                // Create Company object with calculated score
                 var company = new Company(
                     Id: Guid.NewGuid(),
                     Name: overview.Name,
@@ -66,7 +82,9 @@ public class CacheBuildingService : ICacheBuildingService
                     Change: 0m, // Not available in OVERVIEW
                     ChangePercent: 0m, // Not available in OVERVIEW
                     Description: overview.Description,
-                    Recommendation: recommendation
+                    Recommendation: recommendation,
+                    Score: totalScore,
+                    Ratios: ratios
                 );
 
                 // Cache for 1 day
