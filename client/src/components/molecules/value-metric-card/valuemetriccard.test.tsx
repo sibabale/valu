@@ -74,4 +74,11 @@ describe('ValueMetricCard', () => {
     // Should not crash and should render the component
     expect(screen.getAllByText('Value Score:')).toBeTruthy();
   });
+
+  it('handles numeric values correctly', () => {
+    render(<ValueMetricCard {...defaultProps} value={15.5} />);
+
+    // Should convert number to string and display correctly
+    expect(screen.getByText('15.5')).toBeTruthy();
+  });
 });
