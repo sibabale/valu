@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
+import { usePostHog } from 'posthog-react-native';
 import { theme } from '../../../utils/theme';
 
 const PageContainer = styled.View`
@@ -15,7 +16,7 @@ const HeaderContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding: ${theme.spacing.lg}px ${theme.spacing.md}px;
-  background-color: ${theme.colors.background.secondary};
+  background-color: transparent;
   border-bottom-width: 1px;
   border-bottom-color: #f0f0f0;
   position: relative;
@@ -38,6 +39,7 @@ const Title = styled.Text`
 const ContentContainer = styled.ScrollView`
   flex: 1;
   padding: ${theme.spacing.md}px;
+  background-color: white;
 `;
 
 const SectionTitle = styled.Text`
@@ -76,8 +78,22 @@ const ItalicText = styled.Text`
 
 const PrivacyPolicyPage: React.FC = () => {
   const navigation = useNavigation();
+  const posthog = usePostHog();
+
+  useEffect(() => {
+    if (posthog) {
+      posthog.capture('privacy_policy_viewed', {
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [posthog]);
 
   const handleBackPress = () => {
+    if (posthog) {
+      posthog.capture('privacy_policy_back_navigation', {
+        timestamp: new Date().toISOString(),
+      });
+    }
     navigation.goBack();
   };
 
