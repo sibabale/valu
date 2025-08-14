@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { usePostHog } from 'posthog-react-native';
@@ -35,7 +35,7 @@ export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const posthog = usePostHog();
-
+  const pageLoadTimeRef = useRef<number>(0);
   // Get company data from route params
   const companyData = (route.params as any)?.company;
 
@@ -43,7 +43,7 @@ export const CompanyDetailsPage: React.FC = () => {
   useEffect(() => {
     if (companyData) {
       // Set page load time for tracking time spent
-      (window as any).pageLoadTime = Date.now();
+      pageLoadTimeRef.current = Date.now();
 
       if (posthog) {
         posthog.capture('company_details_viewed', {
@@ -80,7 +80,7 @@ export const CompanyDetailsPage: React.FC = () => {
       posthog.capture('company_details_back_navigation', {
         company_id: companyData.id,
         company_symbol: companyData.symbol,
-        time_spent_on_page: Date.now() - (window as any).pageLoadTime || 0,
+        time_spent_on_page: Date.now() - pageLoadTimeRef.current || 0,
         timestamp: new Date().toISOString(),
       });
     }

@@ -16,7 +16,7 @@ export const HeaderContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding: ${theme.spacing.lg}px ${theme.spacing.md}px;
-  background-color: ${theme.colors.background.secondary};
+  background-color: transparent;
   border-bottom-width: 1px;
   border-bottom-color: #f0f0f0;
   position: relative;
