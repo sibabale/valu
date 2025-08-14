@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { usePostHog } from 'posthog-react-native';
 import {
   PageContainer,
   ContentContainer,
@@ -33,13 +34,60 @@ import {
 export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const posthog = usePostHog();
 
   // Get company data from route params
   const companyData = (route.params as any)?.company;
 
+  // Track company details view when component mounts
+  useEffect(() => {
+    if (companyData) {
+      // Set page load time for tracking time spent
+      (window as any).pageLoadTime = Date.now();
+
+      if (posthog) {
+        posthog.capture('company_details_viewed', {
+          company_id: companyData.id,
+          company_name: companyData.name,
+          company_symbol: companyData.symbol,
+          recommendation: companyData.recommendation,
+          score: companyData.score,
+          has_ratios: companyData.ratios && companyData.ratios.length > 0,
+          ratios_count: companyData.ratios ? companyData.ratios.length : 0,
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+              // Track individual ratio views
+        if (companyData.ratios && posthog) {
+          companyData.ratios.forEach((ratio: any) => {
+            posthog.capture('financial_ratio_viewed', {
+              company_id: companyData.id,
+              company_symbol: companyData.symbol,
+              ratio_key: ratio.key,
+              ratio_name: ratio.name,
+              ratio_value: ratio.value,
+              timestamp: new Date().toISOString(),
+            });
+          });
+        }
+    }
+      }, [companyData, posthog]);
+
   const handleBackPress = () => {
+    // Track back navigation
+    if (companyData && posthog) {
+      posthog.capture('company_details_back_navigation', {
+        company_id: companyData.id,
+        company_symbol: companyData.symbol,
+        time_spent_on_page: Date.now() - (window as any).pageLoadTime || 0,
+        timestamp: new Date().toISOString(),
+      });
+    }
     navigation.goBack();
   };
+
+
 
   // const handleInfoPress = () => {
   //   navigation.navigate('ValueScore' as never);

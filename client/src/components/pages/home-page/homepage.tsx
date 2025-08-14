@@ -15,6 +15,7 @@ import { Searchbar } from '../../atoms/searchbar/searchbar';
 import { CompanyList } from '../../organisms/company-list/companylist';
 import { Company } from '../../../types/company.interface';
 import { API_ENDPOINTS } from '../../../utils/config';
+import { usePostHog } from 'posthog-react-native';
 
 export const HomePage: React.FC = () => {
   const navigation = useNavigation();
@@ -24,9 +25,20 @@ export const HomePage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
+  const posthog = usePostHog();
 
   // Animation values for cascading sequence
   const searchAnim = useRef(new Animated.Value(0)).current; // Start at 0 (invisible)
+
+  // Track app opened event when component mounts
+  useEffect(() => {
+    if (posthog) {
+      posthog.capture('app_opened', {
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+      });
+    }
+  }, [posthog]);
 
   // Fetch companies from API
   useEffect(() => {
@@ -39,7 +51,13 @@ export const HomePage: React.FC = () => {
 
         const response = await fetch(API_ENDPOINTS.companies, {
           signal: controller.signal,
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'User-Agent': 'ValuApp/1.0',
+          },
         });
+
 
         // Check if request was aborted
         if (controller.signal.aborted) {
@@ -52,6 +70,7 @@ export const HomePage: React.FC = () => {
 
         const companies = await response.json();
 
+
         // Check if request was aborted before setting state
         if (controller.signal.aborted) {
           return;
@@ -59,6 +78,14 @@ export const HomePage: React.FC = () => {
 
         setCompaniesData(companies);
         setFilteredCompanies(companies);
+
+        // Track successful companies load
+        if (posthog) {
+          posthog.capture('companies_loaded', {
+            count: companies.length,
+            timestamp: new Date().toISOString(),
+          });
+        }
       } catch (err) {
         // Check if the error is due to abort
         if (err instanceof DOMException && err.name === 'AbortError') {
@@ -73,6 +100,15 @@ export const HomePage: React.FC = () => {
         setError('Failed to load companies');
         setCompaniesData([]);
         setFilteredCompanies([]);
+
+        // Track error
+        if (posthog) {
+          posthog.capture('error_occurred', {
+            error: err instanceof Error ? err.message : 'Unknown error',
+            context: 'companies_fetch',
+            timestamp: new Date().toISOString(),
+          });
+        }
       } finally {
         // Only update loading state if not aborted
         if (!controller.signal.aborted) {
@@ -134,6 +170,18 @@ export const HomePage: React.FC = () => {
   }, [searchQuery, companiesData]);
 
   const handleCompanyPress = (company: Company) => {
+    // Track company viewed event
+    if (posthog) {
+      posthog.capture('company_viewed', {
+        company_id: company.id,
+        company_name: company.name,
+        company_symbol: company.symbol,
+        recommendation: company.recommendation,
+        score: company.score,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     // Navigate to company details screen with the company data
     (navigation as any).navigate('CompanyDetails', { company });
   };

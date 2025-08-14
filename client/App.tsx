@@ -14,6 +14,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
 import AppNavigator from './src/navigation';
 import * as SplashScreen from 'expo-splash-screen';
+import { PostHogProvider } from 'posthog-react-native';
+import { POSTHOG_CONFIG } from './src/utils/config';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -54,7 +56,15 @@ export default function App() {
     <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <AppNavigator />
+          <PostHogProvider
+            apiKey={POSTHOG_CONFIG.apiKey}
+            options={{
+              host: POSTHOG_CONFIG.host,
+              captureAppLifecycleEvents: true,
+            }}
+          >
+            <AppNavigator />
+          </PostHogProvider>
         </PersistGate>
       </Provider>
     </SafeAreaProvider>
