@@ -13,16 +13,20 @@ export const ContentContainer = styled.ScrollView`
 
 export const HeaderContainer = styled.View`
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: ${theme.spacing.lg}px ${theme.spacing.md}px;
-  background-color: ${theme.colors.background.secondary};
+  background-color: transparent;
   border-bottom-width: 1px;
   border-bottom-color: #f0f0f0;
+  position: relative;
 `;
 
 export const BackButton = styled.TouchableOpacity`
   padding: ${theme.spacing.sm}px;
+  position: absolute;
+  left: ${theme.spacing.md}px;
+  z-index: 1;
 `;
 
 export const Title = styled.Text`
@@ -34,6 +38,9 @@ export const Title = styled.Text`
 
 export const InfoButton = styled.TouchableOpacity`
   padding: ${theme.spacing.sm}px;
+  position: absolute;
+  right: ${theme.spacing.md}px;
+  z-index: 1;
 `;
 
 export const SectionTitle = styled.Text`

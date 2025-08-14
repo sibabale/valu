@@ -10,7 +10,10 @@ public record Company(
     decimal Price,
     decimal Change,
     decimal ChangePercent,
-    string Description
+    string Description,
+    string Recommendation,
+    decimal Score,
+    List<FinancialRatio> Ratios
 );
 
 public record CompanyDetails(
@@ -24,6 +27,7 @@ public record CompanyDetails(
     decimal Change,
     decimal ChangePercent,
     string Description,
+    decimal Score,
     FinancialMetrics Financials,
     List<FinancialRatio> Ratios
 );
@@ -38,6 +42,7 @@ public record FinancialMetrics(
 );
 
 public record FinancialRatio(
+    string Key,
     string Name,
     decimal Value,
     string Description

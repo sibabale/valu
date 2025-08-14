@@ -1,12 +1,22 @@
 export interface Company {
   id: string;
   name: string;
-  ticker: string;
-  logo: string;
+  symbol: string; // Changed from ticker to symbol to match API
+  sector: string;
+  industry: string;
+  marketCap: number;
   price: number;
+  change: number;
+  changePercent: number;
+  description: string;
   recommendation: string;
-  recommendationColor: string;
-  logoColor: string;
+  score: number;
+  ratios: Array<{
+    key: string;
+    name: string;
+    value: number;
+    description: string;
+  }>;
 }
 
 export interface CompanyCardProps {

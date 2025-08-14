@@ -1,12 +1,14 @@
 import React from 'react';
 import { CompanyOverviewCardProps } from './companyoverviewcard.interface';
 import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
+import { formatMarketCap } from '../../../utils/formatting';
 import {
   CardContainer,
   Header,
   LogoContainer,
   LogoText,
   CompanyName,
+  MarketCap,
   TickerSymbol,
   PriceContainer,
   PriceSection,
@@ -24,20 +26,27 @@ import {
 export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
   company,
 }) => {
+  const firstLetter = company.name.charAt(0).toUpperCase();
+
   return (
     <CardContainer>
       <Header>
-        <LogoContainer color={company.logoColor}>
-          <LogoText>{company.logo}</LogoText>
+        <LogoContainer color="#808080">
+          <LogoText>{firstLetter}</LogoText>
         </LogoContainer>
         <CompanyName>{company.name}</CompanyName>
-        <TickerSymbol>{company.ticker}</TickerSymbol>
+        <TickerSymbol>{company.symbol}</TickerSymbol>
       </Header>
 
       <PriceContainer>
         <PriceSection>
-          <Price>${company.price.toFixed(2)}</Price>
-          <MarketCapLabel>Market Cap: <MarketCapValue>{company.marketCap}</MarketCapValue></MarketCapLabel>
+          {company.price > 0 && <Price>${company.price.toFixed(2)}</Price>}
+          <MarketCap>
+          <MarketCapLabel>
+            Market Cap:
+          </MarketCapLabel>
+          <MarketCapValue>{formatMarketCap(company.marketCap)}</MarketCapValue>
+        </MarketCap>
         </PriceSection>
         <ScoreSection>
           <RecommendationLabel recommendation={company.recommendation} />
@@ -50,9 +59,7 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
 
       <Divider />
 
-      <Description>
-        {company.description}
-      </Description>
+      <Description>{company.description}</Description>
     </CardContainer>
   );
 };

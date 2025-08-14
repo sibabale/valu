@@ -5,11 +5,11 @@ import { CompanyOverviewCard } from './companyoverviewcard';
 describe('CompanyOverviewCard - Public Interface', () => {
   const mockCompany = {
     name: 'Apple Inc.',
-    ticker: 'AAPL',
+    symbol: 'AAPL',
     logo: '🍎',
     logoColor: '#000000',
     price: 150.0,
-    marketCap: '$1780.0B',
+    marketCap: 1780000000000, // $1.78T
     recommendation: 'Hold',
     score: 73,
     description:
@@ -21,7 +21,7 @@ describe('CompanyOverviewCard - Public Interface', () => {
     expect(getByText('Apple Inc.')).toBeTruthy();
   });
 
-  it('shows company ticker symbol', () => {
+  it('shows company symbol', () => {
     const { getByText } = render(<CompanyOverviewCard company={mockCompany} />);
     expect(getByText('AAPL')).toBeTruthy();
   });
@@ -33,7 +33,8 @@ describe('CompanyOverviewCard - Public Interface', () => {
 
   it('shows market capitalization', () => {
     const { getByText } = render(<CompanyOverviewCard company={mockCompany} />);
-    expect(getByText('Market Cap: $1780.0B')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.8T')).toBeTruthy();
   });
 
   it('displays investment recommendation', () => {
@@ -59,11 +60,11 @@ describe('CompanyOverviewCard - Public Interface', () => {
     const differentCompany = {
       ...mockCompany,
       name: 'Alphabet Inc.',
-      ticker: 'GOOGL',
+      symbol: 'GOOGL',
       logo: 'G',
       logoColor: '#4285F4',
       price: 2750.0,
-      marketCap: '$1850.0B',
+      marketCap: 1850000000000, // $1.85T
       recommendation: 'Buy',
       score: 85,
       description:
@@ -77,7 +78,8 @@ describe('CompanyOverviewCard - Public Interface', () => {
     expect(getByText('Alphabet Inc.')).toBeTruthy();
     expect(getByText('GOOGL')).toBeTruthy();
     expect(getByText('$2750.00')).toBeTruthy();
-    expect(getByText('Market Cap: $1850.0B')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.9T')).toBeTruthy();
     expect(getByText('Buy')).toBeTruthy();
     expect(getByText('85/100')).toBeTruthy();
   });
@@ -86,5 +88,18 @@ describe('CompanyOverviewCard - Public Interface', () => {
     const buyCompany = { ...mockCompany, recommendation: 'Buy' };
     const { getByText } = render(<CompanyOverviewCard company={buyCompany} />);
     expect(getByText('Buy')).toBeTruthy();
+  });
+
+  it('hides price when it is zero', () => {
+    const zeroPriceCompany = { ...mockCompany, price: 0 };
+    const { queryByText, getByText } = render(
+      <CompanyOverviewCard company={zeroPriceCompany} />
+    );
+
+    expect(queryByText('$0.00')).toBeFalsy();
+    expect(getByText('Apple Inc.')).toBeTruthy();
+    expect(getByText('AAPL')).toBeTruthy();
+    expect(getByText('Market Cap:')).toBeTruthy();
+    expect(getByText('$1.8T')).toBeTruthy();
   });
 });

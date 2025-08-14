@@ -6,13 +6,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddLogging();
 
 // Add Alpha Vantage services
 builder.Services.AddHttpClient();
 builder.Services.Configure<AlphaVantageOptions>(
     builder.Configuration.GetSection("AlphaVantage"));
 builder.Services.AddSingleton<IAlphaVantageService, AlphaVantageService>();
-builder.Services.AddSingleton<SimpleCache>();
+// Redis Cache Service
+builder.Services.AddSingleton<ICacheService, RedisCacheService>();
 builder.Services.AddScoped<ICacheBuildingService, CacheBuildingService>();
 
 // Add CORS for React Native client
@@ -20,21 +23,23 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactNative", policy =>
     {
-        policy.WithOrigins("http://localhost:19006", "http://localhost:19000") // Expo dev server
+        policy.AllowAnyOrigin() // Allow all origins for development
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
 });
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 // Use CORS
@@ -104,12 +109,6 @@ app.MapGet("/api/companies/search", async (
     return Results.Ok(results);
 });
 
-app.MapGet("/api/companies/popular", async (ICompanyService service) =>
-{
-    var popular = await service.GetPopularStocksAsync();
-    return Results.Ok(new { Stocks = popular });
-});
-
 // Value Score endpoints
 app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IValueScoreService valueScoreService) =>
 {
@@ -132,7 +131,7 @@ app.MapGet("/api/value-score/top", async (int count, IValueScoreService valueSco
     return Results.Ok(result);
 });
 
-// Cache building endpoint (for testing)
+// Cache building endpoint
 app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingService) =>
 {
     try
@@ -149,5 +148,6 @@ app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingServic
         );
     }
 });
+
 
 app.Run();

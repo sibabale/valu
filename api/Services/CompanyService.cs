@@ -6,39 +6,41 @@ namespace Valu.Api.Services;
 public class CompanyService : ICompanyService
 {
     private readonly IAlphaVantageService _alphaVantageService;
-    private readonly SimpleCache _cache;
+    private readonly ICacheService _cache;
     private readonly ILogger<CompanyService> _logger;
+    private readonly IRecommendationService _recommendationService;
 
-    public CompanyService(IAlphaVantageService alphaVantageService, SimpleCache cache, ILogger<CompanyService> logger)
+    public CompanyService(IAlphaVantageService alphaVantageService, ICacheService cache, ILogger<CompanyService> logger, IRecommendationService recommendationService)
     {
         _alphaVantageService = alphaVantageService;
         _cache = cache;
         _logger = logger;
+        _recommendationService = recommendationService;
     }
 
-    public Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         // Return all cached companies
         var allCompanies = new List<Company>();
-        var cacheKeys = _cache.GetAllKeys()?.Where(k => k.StartsWith("company_symbol_")) ?? Enumerable.Empty<string>();
+        var cacheKeys = await _cache.GetAllKeysAsync("company:*");
         
         foreach (var key in cacheKeys)
         {
-            var company = _cache.Get<Company>(key);
+            var company = await _cache.GetAsync<Company>(key);
             if (company != null)
             {
                 allCompanies.Add(company);
             }
         }
         
-        return Task.FromResult<IEnumerable<Company>>(allCompanies);
+        return allCompanies;
     }
 
     public async Task<Company?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         // Direct lookup by ID - O(1) complexity
-        var cacheKey = $"company_id_{id}";
-        var company = _cache.Get<Company>(cacheKey);
+        var cacheKey = $"company_id:{id}";
+        var company = await _cache.GetAsync<Company>(cacheKey);
         
         if (company != null)
         {
@@ -53,7 +55,7 @@ public class CompanyService : ICompanyService
         // If found, cache it with ID-based key for future direct lookup
         if (foundCompany != null)
         {
-            _cache.Set(cacheKey, foundCompany, TimeSpan.FromDays(1));
+            await _cache.SetAsync(cacheKey, foundCompany, TimeSpan.FromDays(1));
         }
         
         return foundCompany;
@@ -62,8 +64,8 @@ public class CompanyService : ICompanyService
     public async Task<CompanyDetails?> GetDetailsAsync(Guid id, CancellationToken cancellationToken = default)
     {
         // Check cache first for company details
-        var detailsCacheKey = $"company_details_{id}";
-        var cachedDetails = _cache.Get<CompanyDetails>(detailsCacheKey);
+        var detailsCacheKey = $"company_details:{id}";
+        var cachedDetails = await _cache.GetAsync<CompanyDetails>(detailsCacheKey);
         if (cachedDetails != null)
         {
             _logger.LogDebug("Returning cached company details for ID: {CompanyId}", id);
@@ -89,11 +91,14 @@ public class CompanyService : ICompanyService
         // Create simplified CompanyDetails with just the essential data
         var ratios = new List<FinancialRatio>
         {
-            new("P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
-            new("P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
-            new("ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
-            new("Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+            new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+            new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+            new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+            new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
         };
+
+        // Use company's existing score instead of recalculating
+        var totalScore = company.Score;
         
         var details = new CompanyDetails(
             Id: company.Id,
@@ -106,13 +111,14 @@ public class CompanyService : ICompanyService
             Change: company.Change,
             ChangePercent: company.ChangePercent,
             Description: company.Description,
+            Score: totalScore,
             Financials: new FinancialMetrics(0, 0, 0, 0, 0, 0), // Not used
             Ratios: ratios
         );
         
         // Cache the company details with appropriate expiration
         // Financial data can be cached for a longer period since it doesn't change frequently
-        _cache.Set(detailsCacheKey, details, TimeSpan.FromHours(6));
+        await _cache.SetAsync(detailsCacheKey, details, TimeSpan.FromHours(6));
         _logger.LogDebug("Cached company details for ID: {CompanyId} with 6-hour expiration", id);
         
         return details;
@@ -204,6 +210,26 @@ public class CompanyService : ICompanyService
         var hashBytes = md5.ComputeHash(symbolBytes);
         var deterministicGuid = new Guid(hashBytes);
         
+        // Calculate recommendation using actual financial metrics
+        var recommendation = _recommendationService.CalculateRecommendation(
+            overview.PERatio,
+            overview.PriceToBookRatio,
+            overview.ReturnOnEquityTTM,
+            overview.ProfitMargin
+        );
+        
+        // Create ratios array from Alpha Vantage data
+        var ratios = new List<FinancialRatio>
+        {
+            new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+            new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+            new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+            new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+        };
+
+        // Simple score calculation based on key metrics
+        var totalScore = CalculateSimpleScore(overview);
+        
         var company = new Company(
             Id: deterministicGuid,
             Name: overview.Name,
@@ -214,10 +240,53 @@ public class CompanyService : ICompanyService
             Price: 0m, // Price not available in OVERVIEW, will be updated later if needed
             Change: 0m, // Change not available in OVERVIEW
             ChangePercent: 0m, // Change percent not available in OVERVIEW
-            Description: overview.Description
+            Description: overview.Description,
+            Recommendation: recommendation,
+            Score: totalScore,
+            Ratios: ratios
         );
         
         return company;
+    }
+
+    private decimal CalculateSimpleScore(AlphaVantageOverview overview)
+    {
+        decimal score = 50; // Base score
+
+        // P/E ratio scoring (lower is better, but not too low)
+        if (overview.PERatio.HasValue && overview.PERatio > 0)
+        {
+            if (overview.PERatio <= 15) score += 15;
+            else if (overview.PERatio <= 25) score += 10;
+            else if (overview.PERatio <= 35) score += 5;
+        }
+
+        // ROE scoring (higher is better)
+        if (overview.ReturnOnEquityTTM.HasValue)
+        {
+            var roe = overview.ReturnOnEquityTTM.Value * 100;
+            if (roe >= 15) score += 15;
+            else if (roe >= 10) score += 10;
+            else if (roe >= 5) score += 5;
+        }
+
+        // Profit margin scoring (higher is better)
+        if (overview.ProfitMargin.HasValue)
+        {
+            var margin = overview.ProfitMargin.Value * 100;
+            if (margin >= 20) score += 10;
+            else if (margin >= 10) score += 7;
+            else if (margin >= 5) score += 3;
+        }
+
+        // P/B ratio scoring (lower is better)
+        if (overview.PriceToBookRatio.HasValue && overview.PriceToBookRatio > 0)
+        {
+            if (overview.PriceToBookRatio <= 1.5m) score += 10;
+            else if (overview.PriceToBookRatio <= 3m) score += 5;
+        }
+
+        return Math.Min(100, Math.Max(0, score));
     }
 
     private async Task<Company?> GetCompanyFromAlphaVantageAsync(string symbol, CancellationToken cancellationToken)
@@ -225,9 +294,9 @@ public class CompanyService : ICompanyService
         try
         {
             // Check cache first using symbol-based key
-            var symbolCacheKey = $"company_symbol_{symbol}";
+            var symbolCacheKey = $"company:{symbol}";
             
-            var cached = _cache.Get<Company>(symbolCacheKey);
+            var cached = await _cache.GetAsync<Company>(symbolCacheKey);
             if (cached != null)
             {
                 return cached;
@@ -245,11 +314,11 @@ public class CompanyService : ICompanyService
             var company = ConvertToCompany(overview);
             
             // Cache with symbol-based key
-            _cache.Set(symbolCacheKey, company, TimeSpan.FromDays(1));
+            await _cache.SetAsync(symbolCacheKey, company, TimeSpan.FromDays(1));
             
             // Cache with ID-based key for direct lookup
-            var idCacheKey = $"company_id_{company.Id}";
-            _cache.Set(idCacheKey, company, TimeSpan.FromDays(1));
+            var idCacheKey = $"company_id:{company.Id}";
+            await _cache.SetAsync(idCacheKey, company, TimeSpan.FromDays(1));
 
             return company;
         }

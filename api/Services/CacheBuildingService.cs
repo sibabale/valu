@@ -1,4 +1,5 @@
 using Valu.Api.Models;
+using Microsoft.Extensions.Logging;
 
 namespace Valu.Api.Services;
 
@@ -10,18 +11,24 @@ public interface ICacheBuildingService
 public class CacheBuildingService : ICacheBuildingService
 {
     private readonly IAlphaVantageService _alphaVantageService;
-    private readonly SimpleCache _cache;
+    private readonly IRecommendationService _recommendationService;
+    private readonly IValueScoreService _valueScoreService;
+    private readonly ICacheService _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
     // Initial 5 companies for MVP
     private readonly string[] _initialCompanies = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA"];
 
     public CacheBuildingService(
-        IAlphaVantageService alphaVantageService, 
-        SimpleCache cache,
+        IAlphaVantageService alphaVantageService,
+        IRecommendationService recommendationService,
+        IValueScoreService valueScoreService,
+        ICacheService cache,
         ILogger<CacheBuildingService> logger)
     {
         _alphaVantageService = alphaVantageService;
+        _recommendationService = recommendationService;
+        _valueScoreService = valueScoreService;
         _cache = cache;
         _logger = logger;
     }
@@ -35,6 +42,7 @@ public class CacheBuildingService : ICacheBuildingService
         {
             try
             {
+                // Get Alpha Vantage data
                 var overview = await _alphaVantageService.GetCompanyOverviewAsync(symbol, cancellationToken);
                 if (overview == null)
                 {
@@ -42,7 +50,27 @@ public class CacheBuildingService : ICacheBuildingService
                     continue;
                 }
 
-                // Convert to Company object
+                // Calculate recommendation using financial metrics
+                var recommendation = _recommendationService.CalculateRecommendation(
+                    overview.PERatio,
+                    overview.PriceToBookRatio,
+                    overview.ReturnOnEquityTTM,
+                    overview.ProfitMargin
+                );
+
+                // Calculate score using the ValueScoreService
+                var (_, _, _, _, totalScore) = _valueScoreService.CalculateSimpleScore(overview);
+
+                // Create ratios array from Alpha Vantage data
+                var ratios = new List<FinancialRatio>
+                {
+                    new("pe", "P/E Ratio", overview.PERatio ?? 0m, "Price-to-Earnings ratio"),
+                    new("pb", "P/B Ratio", overview.PriceToBookRatio ?? 0m, "Price-to-Book ratio"),
+                    new("roe", "ROE", (overview.ReturnOnEquityTTM ?? 0m) * 100, "Return on Equity (TTM)"),
+                    new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
+                };
+
+                // Create Company object with calculated score
                 var company = new Company(
                     Id: Guid.NewGuid(),
                     Name: overview.Name,
@@ -53,12 +81,15 @@ public class CacheBuildingService : ICacheBuildingService
                     Price: 0m, // Not available in OVERVIEW
                     Change: 0m, // Not available in OVERVIEW
                     ChangePercent: 0m, // Not available in OVERVIEW
-                    Description: overview.Description
+                    Description: overview.Description,
+                    Recommendation: recommendation,
+                    Score: totalScore,
+                    Ratios: ratios
                 );
 
                 // Cache for 1 day
-                var cacheKey = $"company_symbol_{symbol}";
-                _cache.Set(cacheKey, company, TimeSpan.FromDays(1));
+                var cacheKey = $"company:{symbol}";
+                await _cache.SetAsync(cacheKey, company, TimeSpan.FromDays(1));
                 
                 successCount++;
 

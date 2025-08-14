@@ -24,8 +24,7 @@ const searchSlice = createSlice({
         state.recentSearches = state.recentSearches.slice(0, 5);
       }
     },
-    clearRecentSearches: (state) => {
-      console.log('Redux: Clearing recent searches');
+    clearRecentSearches: state => {
       state.recentSearches = [];
     },
     setPopularStocks: (state, action: PayloadAction<string[]>) => {
@@ -37,11 +36,11 @@ const searchSlice = createSlice({
   },
 });
 
-export const { 
-  addRecentSearch, 
-  clearRecentSearches, 
-  setPopularStocks, 
-  loadRecentSearches 
+export const {
+  addRecentSearch,
+  clearRecentSearches,
+  setPopularStocks,
+  loadRecentSearches,
 } = searchSlice.actions;
 
-export default searchSlice.reducer; 
+export default searchSlice.reducer;
