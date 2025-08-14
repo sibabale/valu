@@ -5,4 +5,5 @@ export interface SearchbarProps {
   onSearchChange: (query: string) => void;
   popularStocks?: string[];
   companiesData?: Company[];
+  disabled?: boolean;
 }

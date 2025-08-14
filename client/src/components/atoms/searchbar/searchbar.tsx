@@ -31,11 +31,14 @@ import {
 } from './searchbar.styles';
 
 export const Searchbar: React.FC<SearchbarProps> = ({
+  disabled,
   searchQuery,
-  onSearchChange,
   popularStocks,
+  onSearchChange,
   companiesData = [],
 }) => {
+
+  
   const dispatch = useDispatch();
   const { recentSearches, popularStocks: reduxPopularStocks } = useSelector(
     (state: RootState) => state.search
@@ -91,12 +94,14 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   };
 
   const handleSearch = (query: string) => {
+    if (disabled) return;
     onSearchChange(query);
     // Don't automatically add to recent searches on every keystroke
     // Only add when a valid company is selected
   };
 
   const handleClearInput = () => {
+    if (disabled) return;
     onSearchChange('');
     setIsFocused(false);
   };
@@ -106,6 +111,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   };
 
   const handleFocus = () => {
+    if (disabled) return;
     setIsFocused(true);
   };
 
@@ -143,21 +149,23 @@ export const Searchbar: React.FC<SearchbarProps> = ({
 
           <SearchInput
             placeholder="Search stocks..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor={disabled ? "#d1d5db" : "#9ca3af"}
             value={searchQuery}
             onChangeText={handleSearch}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onSubmitEditing={() => {
+              if (disabled) return;
               // Add to recent searches when user submits the search
               if (searchQuery.trim()) {
                 addToRecent(searchQuery.trim());
               }
             }}
             isFocused={isFocused}
+            editable={!disabled}
           />
 
-          {isFocused || searchQuery ? (
+          {(isFocused || searchQuery) && !disabled ? (
             <CloseButton testID="close-button" onPress={handleClearInput}>
               <CloseIcon fill="#99a1af" height="20px" width="20px" />
             </CloseButton>
@@ -165,7 +173,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
         </SearchContainer>
       </Container>
 
-      {isFocused && !searchQuery && (
+      {isFocused && !searchQuery && !disabled && (
         <Animated.View
           ref={dropdownRef}
           onTouchStart={handleDropdownPressIn}

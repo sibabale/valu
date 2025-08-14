@@ -96,6 +96,7 @@ export const HomePage: React.FC = () => {
         if (controller.signal.aborted) {
           return;
         }
+        
 
         setError('Failed to load companies');
         setCompaniesData([]);
@@ -222,6 +223,7 @@ export const HomePage: React.FC = () => {
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               companiesData={companiesData}
+              disabled={isLoading || !!error || !companiesData.length}
             />
           </PaddedContent>
         </Animated.View>

@@ -25,16 +25,16 @@ export const IconContainer = styled.View`
   align-items: center;
 `;
 
-export const SearchInput = styled.TextInput<{ isFocused: boolean }>`
+export const SearchInput = styled.TextInput<{ isFocused: boolean; disabled?: boolean }>`
   height: 47px;
   border-radius: 24px;
-  border: ${(props: { isFocused: boolean }) =>
-    props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
-  background-color: #ffffff;
+  border: ${(props: { isFocused: boolean; disabled?: boolean }) =>
+    props.disabled ? '1px solid #e5e7eb' : props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
+  background-color: ${(props: { disabled?: boolean }) => props.disabled ? '#f9fafb' : '#ffffff'};
   padding: 0 48px 0 48px;
   font-size: 18px;
   font-family: 'Space Grotesk';
-  color: #1f2937;
+  color: ${(props: { disabled?: boolean }) => props.disabled ? '#9ca3af' : '#1f2937'};
 `;
 
 export const CloseButton = styled(TouchableOpacity)`
