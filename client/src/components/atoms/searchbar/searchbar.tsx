@@ -38,7 +38,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   companiesData = [],
 }) => {
 
-  
+
   const dispatch = useDispatch();
   const { recentSearches, popularStocks: reduxPopularStocks } = useSelector(
     (state: RootState) => state.search
