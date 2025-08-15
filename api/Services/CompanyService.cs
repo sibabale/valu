@@ -1,5 +1,6 @@
 using Valu.Api.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 
 namespace Valu.Api.Services;
 
@@ -9,13 +10,15 @@ public class CompanyService : ICompanyService
     private readonly ICacheService _cache;
     private readonly ILogger<CompanyService> _logger;
     private readonly IRecommendationService _recommendationService;
+    private readonly string _brandfetchClientId;
 
-    public CompanyService(IAlphaVantageService alphaVantageService, ICacheService cache, ILogger<CompanyService> logger, IRecommendationService recommendationService)
+    public CompanyService(IAlphaVantageService alphaVantageService, ICacheService cache, ILogger<CompanyService> logger, IRecommendationService recommendationService, IConfiguration configuration)
     {
         _alphaVantageService = alphaVantageService;
         _cache = cache;
         _logger = logger;
         _recommendationService = recommendationService;
+        _brandfetchClientId = configuration["Brandfetch:ClientId"] ?? string.Empty;
     }
 
     public async Task<IEnumerable<Company>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -100,6 +103,17 @@ public class CompanyService : ICompanyService
         // Use company's existing score instead of recalculating
         var totalScore = company.Score;
         
+        // Extract domain and generate logo URL
+        string? logoUrl = null;
+        if (!string.IsNullOrEmpty(overview.OfficialSite))
+        {
+            var domain = ExtractDomain(overview.OfficialSite);
+            if (!string.IsNullOrEmpty(domain) && !string.IsNullOrEmpty(_brandfetchClientId))
+            {
+                logoUrl = $"https://cdn.brandfetch.io/{domain}/w/400/h/400?c={_brandfetchClientId}";
+            }
+        }
+        
         var details = new CompanyDetails(
             Id: company.Id,
             Name: company.Name,
@@ -113,7 +127,9 @@ public class CompanyService : ICompanyService
             Description: company.Description,
             Score: totalScore,
             Financials: new FinancialMetrics(0, 0, 0, 0, 0, 0), // Not used
-            Ratios: ratios
+            Ratios: ratios,
+            OfficialSite: overview.OfficialSite,
+            LogoUrl: logoUrl
         );
         
         // Cache the company details with appropriate expiration
@@ -230,6 +246,17 @@ public class CompanyService : ICompanyService
         // Simple score calculation based on key metrics
         var totalScore = CalculateSimpleScore(overview);
         
+        // Extract domain and generate logo URL
+        string? logoUrl = null;
+        if (!string.IsNullOrEmpty(overview.OfficialSite))
+        {
+            var domain = ExtractDomain(overview.OfficialSite);
+            if (!string.IsNullOrEmpty(domain) && !string.IsNullOrEmpty(_brandfetchClientId))
+            {
+                logoUrl = $"https://cdn.brandfetch.io/{domain}/w/400/h/400?c={_brandfetchClientId}";
+            }
+        }
+        
         var company = new Company(
             Id: deterministicGuid,
             Name: overview.Name,
@@ -243,7 +270,9 @@ public class CompanyService : ICompanyService
             Description: overview.Description,
             Recommendation: recommendation,
             Score: totalScore,
-            Ratios: ratios
+            Ratios: ratios,
+            OfficialSite: overview.OfficialSite,
+            LogoUrl: logoUrl
         );
         
         return company;
@@ -287,6 +316,36 @@ public class CompanyService : ICompanyService
         }
 
         return Math.Min(100, Math.Max(0, score));
+    }
+
+    private string? ExtractDomain(string officialSite)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(officialSite))
+                return null;
+
+            // Remove protocol if present
+            var url = officialSite.Trim();
+            if (url.StartsWith("http://"))
+                url = url.Substring(7);
+            else if (url.StartsWith("https://"))
+                url = url.Substring(8);
+
+            // Remove www. if present
+            if (url.StartsWith("www."))
+                url = url.Substring(4);
+
+            // Remove path and query parameters
+            var domain = url.Split('/')[0].Split('?')[0];
+
+            return domain;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to extract domain from OfficialSite: {OfficialSite}", officialSite);
+            return null;
+        }
     }
 
     private async Task<Company?> GetCompanyFromAlphaVantageAsync(string symbol, CancellationToken cancellationToken)

@@ -55,7 +55,8 @@ public class AlphaVantageService : IAlphaVantageService
             BookValue: GetDecimalValue(root, "BookValue"),
             DividendYield: GetDecimalValue(root, "DividendYield"),
             QuarterlyEarningsGrowthYOY: GetDecimalValue(root, "QuarterlyEarningsGrowthYOY"),
-            AnalystTargetPrice: GetDecimalValue(root, "AnalystTargetPrice")
+            AnalystTargetPrice: GetDecimalValue(root, "AnalystTargetPrice"),
+            OfficialSite: GetStringValue(root, "OfficialSite")
         );
     }
 

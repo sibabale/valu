@@ -70,6 +70,17 @@ public class CacheBuildingService : ICacheBuildingService
                     new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
                 };
 
+                // Extract domain and generate logo URL
+                string? logoUrl = null;
+                if (!string.IsNullOrEmpty(overview.OfficialSite))
+                {
+                    var domain = ExtractDomain(overview.OfficialSite);
+                    if (!string.IsNullOrEmpty(domain))
+                    {
+                        logoUrl = $"https://cdn.brandfetch.io/{domain}/w/400/h/400?c=1iduleAyYy1ycpyef1P";
+                    }
+                }
+
                 // Create Company object with calculated score
                 var company = new Company(
                     Id: Guid.NewGuid(),
@@ -84,7 +95,9 @@ public class CacheBuildingService : ICacheBuildingService
                     Description: overview.Description,
                     Recommendation: recommendation,
                     Score: totalScore,
-                    Ratios: ratios
+                    Ratios: ratios,
+                    OfficialSite: overview.OfficialSite,
+                    LogoUrl: logoUrl
                 );
 
                 // Cache for 1 day
@@ -111,5 +124,35 @@ public class CacheBuildingService : ICacheBuildingService
         }
 
         _logger.LogInformation("Cache building completed. Successes: {SuccessCount}, Failures: {FailureCount}", successCount, failureCount);
+    }
+
+    private string? ExtractDomain(string officialSite)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(officialSite))
+                return null;
+
+            // Remove protocol if present
+            var url = officialSite.Trim();
+            if (url.StartsWith("http://"))
+                url = url.Substring(7);
+            else if (url.StartsWith("https://"))
+                url = url.Substring(8);
+
+            // Remove www. if present
+            if (url.StartsWith("www."))
+                url = url.Substring(4);
+
+            // Remove path and query parameters
+            var domain = url.Split('/')[0].Split('?')[0];
+
+            return domain;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to extract domain from OfficialSite: {OfficialSite}", officialSite);
+            return null;
+        }
     }
 } 
