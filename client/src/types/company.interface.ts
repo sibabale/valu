@@ -17,6 +17,8 @@ export interface Company {
     value: number;
     description: string;
   }>;
+  officialSite?: string;
+  logoUrl?: string;
 }
 
 export interface CompanyCardProps {
