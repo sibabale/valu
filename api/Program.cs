@@ -149,5 +149,92 @@ app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingServic
     }
 });
 
+// Test domain extraction endpoint
+app.MapGet("/api/test/domain-extraction", () =>
+{
+    var testUrls = new[]
+    {
+        "https://www.apple.com",
+        "http://www.microsoft.com",
+        "https://google.com",
+        "https://www.amazon.com/something?param=value",
+        "tesla.com",
+        "https://www.alphabet.com/path/to/page",
+        ""
+    };
+
+    var results = new List<object>();
+    
+    foreach (var url in testUrls)
+    {
+        var domain = ExtractDomain(url);
+        results.Add(new { 
+            OriginalUrl = url, 
+            ExtractedDomain = domain,
+            LogoUrl = !string.IsNullOrEmpty(domain) ? $"https://cdn.brandfetch.io/{domain}/w/400/h/400?c=1iduleAyYy1ycpyef1P" : null
+        });
+    }
+    
+    return Results.Ok(results);
+});
+
+// Test Alpha Vantage raw response
+app.MapGet("/api/test/alphavantage-raw/{symbol}", async (string symbol, IAlphaVantageService alphaVantageService) =>
+{
+    try
+    {
+        var overview = await alphaVantageService.GetCompanyOverviewAsync(symbol);
+        if (overview == null)
+        {
+            return Results.NotFound($"No data found for symbol {symbol}");
+        }
+        
+        return Results.Ok(new
+        {
+            Symbol = overview.Symbol,
+            Name = overview.Name,
+            OfficialSite = overview.OfficialSite,
+            HasOfficialSite = !string.IsNullOrEmpty(overview.OfficialSite),
+            AllProperties = overview.GetType().GetProperties().Select(p => new { 
+                PropertyName = p.Name, 
+                Value = p.GetValue(overview)?.ToString() ?? "null" 
+            })
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+string? ExtractDomain(string officialSite)
+{
+    try
+    {
+        if (string.IsNullOrWhiteSpace(officialSite))
+            return null;
+
+        // Remove protocol if present
+        var url = officialSite.Trim();
+        if (url.StartsWith("http://"))
+            url = url.Substring(7);
+        else if (url.StartsWith("https://"))
+            url = url.Substring(8);
+
+        // Remove www. if present
+        if (url.StartsWith("www."))
+            url = url.Substring(4);
+
+        // Remove path and query parameters
+        var domain = url.Split('/')[0].Split('?')[0];
+
+        return domain;
+    }
+    catch (Exception ex)
+    {
+        return $"ERROR: {ex.Message}";
+    }
+}
+
 
 app.Run();
