@@ -57,15 +57,15 @@ export const CompanyList: React.FC<CompanyListProps> = ({
   // Simple loading animation
   useEffect(() => {
     if (isLoading) {
-      const messages = [
-        'Finding hidden gems...',
-        'Digging for diamonds...',
-        'Hunting for bargains...',
-        'Uncovering treasures...',
-        'Seeking undervalued stars...',
-        'Mining for gold...',
-        'Discovering value...',
-        'Scouting for deals...'
+      const messages: string[] = [
+        "Checking moats...",
+        "Weighing businesses...",
+        "Measuring value...",
+        "Pricing power...",
+        "Counting cash...",
+        "Scouting bargains...",
+        "Reading filings...",
+        "Studying history..."
       ];
 
       const currentMessage = messages[messageIndex];
