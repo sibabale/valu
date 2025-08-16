@@ -48,6 +48,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const dropdownRef = useRef<View>(null);
+  const searchInputRef = useRef<any>(null);
   const isDropdownInteraction = useRef(false);
 
   useEffect(() => {
@@ -138,6 +139,11 @@ export const Searchbar: React.FC<SearchbarProps> = ({
 
     onSearchChange('');
     setIsFocused(false);
+
+    // Defocus the input field
+    if (searchInputRef.current) {
+      searchInputRef.current.blur();
+    }
   };
 
   const clearRecent = () => {
@@ -220,6 +226,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
           </SearchIconContainer>
 
           <SearchInput
+            ref={searchInputRef}
             placeholder="Search stocks..."
             placeholderTextColor={disabled ? "#d1d5db" : "#9ca3af"}
             value={searchQuery}
