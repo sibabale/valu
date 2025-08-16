@@ -126,11 +126,7 @@ export const HomePage: React.FC = () => {
     };
   }, []);
 
-  // Handle header press - navigate to privacy policy
-  const handleHeaderPress = () => {
-    // Navigate to privacy policy page
-    (navigation as any).navigate('PrivacyPolicy');
-  };
+
 
   // Fetch companies from API
   useEffect(() => {
@@ -182,8 +178,6 @@ export const HomePage: React.FC = () => {
         timestamp: new Date().toISOString(),
       });
     }
-
-    // Navigate to company details screen with the company data
     (navigation as any).navigate('CompanyDetails', { company });
   };
 
@@ -192,7 +186,10 @@ export const HomePage: React.FC = () => {
       <PageContainer>
         {/* Header Section */}
         <PaddedContent>
-          <Header title="VALU" onInfoPress={handleHeaderPress} />
+          <Header
+            title="VALU"
+            onPress={() => navigation.navigate('PrivacyPolicy' as never)}
+          />
         </PaddedContent>
 
         {/* Search Section - Separate container with higher z-index */}

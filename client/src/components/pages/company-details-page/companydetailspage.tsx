@@ -70,31 +70,9 @@ export const CompanyDetailsPage: React.FC = () => {
       }, [companyData, posthog]);
 
   const handleBackPress = () => {
-    // Track back navigation
-    if (companyData && posthog) {
-      posthog.capture('company_details_back_navigation', {
-        company_id: companyData.id,
-        company_symbol: companyData.symbol,
-        time_spent_on_page: Date.now() - pageLoadTimeRef.current || 0,
-        timestamp: new Date().toISOString(),
-      });
-    }
     navigation.goBack();
   };
 
-
-
-  const handleInfoPress = () => {
-    // Track help button press
-    if (companyData && posthog) {
-      posthog.capture('help_button_pressed', {
-        company_id: companyData.id,
-        company_symbol: companyData.symbol,
-        timestamp: new Date().toISOString(),
-      });
-    }
-    navigation.navigate('ValueScore' as never);
-  };
 
   const getMetricScore = (metricKey: string, value: number): number => {
     switch (metricKey) {
@@ -148,7 +126,7 @@ export const CompanyDetailsPage: React.FC = () => {
             <Ionicons name="arrow-back" size={24} color="#333333" />
           </BackButton>
           <Title>VALU</Title>
-          <InfoButton onPress={handleInfoPress}>
+      <InfoButton onPress={() => navigation.navigate('ValueScore' as never)}>
             <HelpIcon fill="#333333" />
           </InfoButton>
         </HeaderContainer>
