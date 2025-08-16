@@ -67,30 +67,42 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     }
   }, [isFocused, searchQuery, fadeAnim]);
 
-  // Validate if a search query matches a valid ticker
-  const isValidTicker = (query: string): boolean => {
-    const trimmedQuery = query.trim().toUpperCase();
+  // Resolve search term to ticker symbol
+  const resolveToTickerSymbol = (query: string): string | null => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return null;
 
-    // If companiesData is empty, use a simple regex fallback for basic ticker validation
+    // If companiesData is empty, use simple regex validation
     if (companiesData.length === 0) {
-      // Basic ticker validation: 1-5 uppercase letters
       const tickerRegex = /^[A-Z]{1,5}$/;
-      return tickerRegex.test(trimmedQuery);
+      return tickerRegex.test(trimmedQuery.toUpperCase()) ? trimmedQuery.toUpperCase() : null;
     }
 
-    // Otherwise, check against actual company data
-    return companiesData.some(
-      company =>
-        company.symbol?.toUpperCase() === trimmedQuery ||
-        company.name.toUpperCase().includes(trimmedQuery)
+    // Find exact ticker symbol match first
+    const exactSymbolMatch = companiesData.find(
+      company => company.symbol?.toUpperCase() === trimmedQuery.toUpperCase()
     );
+    if (exactSymbolMatch) {
+      return exactSymbolMatch.symbol?.toUpperCase() || null;
+    }
+
+    // Find company name match
+    const nameMatches = companiesData.filter(
+      company => company.name.toUpperCase().includes(trimmedQuery.toUpperCase())
+    );
+
+    // Only return if there's exactly one match
+    if (nameMatches.length === 1) {
+      return nameMatches[0].symbol?.toUpperCase() || null;
+    }
+
+    return null;
   };
 
   const addToRecent = (query: string) => {
-    if (!query.trim()) return;
-    // Only add to recent searches if it's a valid ticker/company
-    if (isValidTicker(query)) {
-      dispatch(addRecentSearch(query.trim()));
+    const tickerSymbol = resolveToTickerSymbol(query);
+    if (tickerSymbol) {
+      dispatch(addRecentSearch(tickerSymbol));
     }
   };
 
@@ -312,7 +324,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                             setIsFocused(false);
                           }}
                         >
-                          <TagText>{search}</TagText>
+                          <TagText>{search.toUpperCase()}</TagText>
                         </TagButton>
                       ))}
                     </TagsContainer>
