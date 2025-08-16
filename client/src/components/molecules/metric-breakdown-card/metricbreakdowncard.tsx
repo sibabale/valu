@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import CheckmarkCircleIcon from '../../atoms/icons/check-circle';
 import {
   Container,
   Header,
@@ -57,7 +57,7 @@ export const MetricBreakdownCard: React.FC<MetricBreakdownCardProps> = ({
                         <ScoreCircle color={range.color}>
               <ScoreText>{range.score}</ScoreText>
               <Checkmark color={range.color}>
-                <Ionicons name="checkmark" size={10} color="white" />
+                <CheckmarkCircleIcon color={range.color} />
               </Checkmark>
             </ScoreCircle>
 
