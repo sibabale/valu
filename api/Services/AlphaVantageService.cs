@@ -9,131 +9,104 @@ public class AlphaVantageService : IAlphaVantageService
 {
     private readonly HttpClient _httpClient;
     private readonly AlphaVantageOptions _options;
-    private readonly Queue<DateTime> _apiCalls = new();
-    private readonly object _rateLimitLock = new();
+    private readonly SemaphoreSlim _rateLimitSemaphore;
 
     public AlphaVantageService(HttpClient httpClient, IOptions<AlphaVantageOptions> options)
     {
         _httpClient = httpClient;
         _options = options.Value;
+        _rateLimitSemaphore = new SemaphoreSlim(_options.RateLimitPerMinute, _options.RateLimitPerMinute);
     }
 
     public async Task<AlphaVantageOverview?> GetCompanyOverviewAsync(string symbol, CancellationToken cancellationToken = default)
     {
-        await WaitForRateLimitAsync(cancellationToken);
-        
-        var url = $"{_options.BaseUrl}?function=OVERVIEW&symbol={symbol}&apikey={_options.ApiKey}";
-        var response = await _httpClient.GetStringAsync(url, cancellationToken);
-        
-        Console.WriteLine($"Alpha Vantage Response for {symbol}: {response}");
-        
-        using var jsonDoc = JsonDocument.Parse(response);
-        var root = jsonDoc.RootElement;
-        
-        // Check if we got valid data (not error message)
-        if (!root.TryGetProperty("Symbol", out var symbolElement))
+        await _rateLimitSemaphore.WaitAsync(cancellationToken);
+        try
         {
-            Console.WriteLine($"No Symbol property found for {symbol}. Response keys: {string.Join(", ", root.EnumerateObject().Select(p => p.Name))}");
-            return null;
-        }
+            var url = $"{_options.BaseUrl}?function=OVERVIEW&symbol={symbol}&apikey={_options.ApiKey}";
+            var response = await _httpClient.GetStringAsync(url, cancellationToken);
             
-        return new AlphaVantageOverview(
-            Symbol: GetStringValue(root, "Symbol"),
-            Name: GetStringValue(root, "Name"),
-            Description: GetStringValue(root, "Description"),
-            Exchange: GetStringValue(root, "Exchange"),
-            Currency: GetStringValue(root, "Currency"),
-            Country: GetStringValue(root, "Country"),
-            Sector: GetStringValue(root, "Sector"),
-            Industry: GetStringValue(root, "Industry"),
-            MarketCapitalization: GetDecimalValue(root, "MarketCapitalization"),
-            PERatio: GetDecimalValue(root, "PERatio"),
-            PriceToBookRatio: GetDecimalValue(root, "PriceToBookRatio"),
-            ReturnOnEquityTTM: GetDecimalValue(root, "ReturnOnEquityTTM"),
-            ProfitMargin: GetDecimalValue(root, "ProfitMargin"),
-            EPS: GetDecimalValue(root, "EPS"),
-            BookValue: GetDecimalValue(root, "BookValue"),
-            DividendYield: GetDecimalValue(root, "DividendYield"),
-            QuarterlyEarningsGrowthYOY: GetDecimalValue(root, "QuarterlyEarningsGrowthYOY"),
-            AnalystTargetPrice: GetDecimalValue(root, "AnalystTargetPrice"),
-            OfficialSite: GetStringValue(root, "OfficialSite")
-        );
+            Console.WriteLine($"Alpha Vantage Response for {symbol}: {response}");
+        
+            using var jsonDoc = JsonDocument.Parse(response);
+            var root = jsonDoc.RootElement;
+            
+            // Check if we got valid data (not error message)
+            if (!root.TryGetProperty("Symbol", out var symbolElement))
+            {
+                Console.WriteLine($"No Symbol property found for {symbol}. Response keys: {string.Join(", ", root.EnumerateObject().Select(p => p.Name))}");
+                return null;
+            }
+                
+            return new AlphaVantageOverview(
+                Symbol: GetStringValue(root, "Symbol"),
+                Name: GetStringValue(root, "Name"),
+                Description: GetStringValue(root, "Description"),
+                Exchange: GetStringValue(root, "Exchange"),
+                Currency: GetStringValue(root, "Currency"),
+                Country: GetStringValue(root, "Country"),
+                Sector: GetStringValue(root, "Sector"),
+                Industry: GetStringValue(root, "Industry"),
+                MarketCapitalization: GetDecimalValue(root, "MarketCapitalization"),
+                PERatio: GetDecimalValue(root, "PERatio"),
+                PriceToBookRatio: GetDecimalValue(root, "PriceToBookRatio"),
+                ReturnOnEquityTTM: GetDecimalValue(root, "ReturnOnEquityTTM"),
+                ProfitMargin: GetDecimalValue(root, "ProfitMargin"),
+                EPS: GetDecimalValue(root, "EPS"),
+                BookValue: GetDecimalValue(root, "BookValue"),
+                DividendYield: GetDecimalValue(root, "DividendYield"),
+                QuarterlyEarningsGrowthYOY: GetDecimalValue(root, "QuarterlyEarningsGrowthYOY"),
+                AnalystTargetPrice: GetDecimalValue(root, "AnalystTargetPrice"),
+                OfficialSite: GetStringValue(root, "OfficialSite")
+            );
+        }
+        finally
+        {
+            // Release semaphore after 12 seconds (60 seconds / 5 requests = 12 seconds per request)
+            _ = Task.Delay(TimeSpan.FromSeconds(12), cancellationToken)
+                  .ContinueWith(_ => _rateLimitSemaphore.Release(), TaskContinuationOptions.ExecuteSynchronously);
+        }
     }
 
     public async Task<IEnumerable<AlphaVantageSearchResult>> SearchCompaniesAsync(string query, CancellationToken cancellationToken = default)
     {
-        await WaitForRateLimitAsync(cancellationToken);
-        
-        var url = $"{_options.BaseUrl}?function=SYMBOL_SEARCH&keywords={Uri.EscapeDataString(query)}&apikey={_options.ApiKey}";
-        var response = await _httpClient.GetStringAsync(url, cancellationToken);
-        
-        using var jsonDoc = JsonDocument.Parse(response);
-        var root = jsonDoc.RootElement;
-        
-        if (!root.TryGetProperty("bestMatches", out var matchesElement))
-            return Enumerable.Empty<AlphaVantageSearchResult>();
-            
-        var results = new List<AlphaVantageSearchResult>();
-        
-        foreach (var match in matchesElement.EnumerateArray())
+        await _rateLimitSemaphore.WaitAsync(cancellationToken);
+        try
         {
-            var result = new AlphaVantageSearchResult(
-                Symbol: GetStringValue(match, "1. symbol"),
-                Name: GetStringValue(match, "2. name"),
-                Type: GetStringValue(match, "3. type"),
-                Region: GetStringValue(match, "4. region"),
-                MarketOpen: GetStringValue(match, "5. marketOpen"),
-                MarketClose: GetStringValue(match, "6. marketClose"),
-                Timezone: GetStringValue(match, "7. timezone"),
-                Currency: GetStringValue(match, "8. currency"),
-                MatchScore: GetStringValue(match, "9. matchScore")
-            );
-            results.Add(result);
+            var url = $"{_options.BaseUrl}?function=SYMBOL_SEARCH&keywords={Uri.EscapeDataString(query)}&apikey={_options.ApiKey}";
+            var response = await _httpClient.GetStringAsync(url, cancellationToken);
+        
+            using var jsonDoc = JsonDocument.Parse(response);
+            var root = jsonDoc.RootElement;
+            
+            if (!root.TryGetProperty("bestMatches", out var matchesElement))
+                return Enumerable.Empty<AlphaVantageSearchResult>();
+                
+            var results = new List<AlphaVantageSearchResult>();
+            
+            foreach (var match in matchesElement.EnumerateArray())
+            {
+                var result = new AlphaVantageSearchResult(
+                    Symbol: GetStringValue(match, "1. symbol"),
+                    Name: GetStringValue(match, "2. name"),
+                    Type: GetStringValue(match, "3. type"),
+                    Region: GetStringValue(match, "4. region"),
+                    MarketOpen: GetStringValue(match, "5. marketOpen"),
+                    MarketClose: GetStringValue(match, "6. marketClose"),
+                    Timezone: GetStringValue(match, "7. timezone"),
+                    Currency: GetStringValue(match, "8. currency"),
+                    MatchScore: GetStringValue(match, "9. matchScore")
+                );
+                results.Add(result);
+            }
+            
+            return results;
         }
-        
-        return results;
-    }
-
-    private async Task WaitForRateLimitAsync(CancellationToken cancellationToken = default)
-    {
-        TimeSpan waitTime = TimeSpan.Zero;
-        
-        lock (_rateLimitLock)
+        finally
         {
-            // Remove old calls (older than 1 minute)
-            while (_apiCalls.Count > 0 && DateTime.UtcNow - _apiCalls.Peek() > TimeSpan.FromMinutes(1))
-            {
-                _apiCalls.Dequeue();
-            }
-            
-            // If we've made too many calls, calculate wait time
-            if (_apiCalls.Count >= _options.RateLimitPerMinute)
-            {
-                var oldestCall = _apiCalls.Peek();
-                waitTime = TimeSpan.FromMinutes(1) - (DateTime.UtcNow - oldestCall);
-                if (waitTime <= TimeSpan.Zero)
-                {
-                    waitTime = TimeSpan.Zero;
-                }
-            }
-            
-            // Only enqueue if we're not waiting (will enqueue after wait if needed)
-            if (waitTime == TimeSpan.Zero)
-            {
-                _apiCalls.Enqueue(DateTime.UtcNow);
-            }
-        }
-        
-        // Wait outside the lock to avoid blocking other requests
-        if (waitTime > TimeSpan.Zero)
-        {
-            await Task.Delay(waitTime, cancellationToken);
-            
-            // Re-acquire lock to enqueue the call after waiting
-            lock (_rateLimitLock)
-            {
-                _apiCalls.Enqueue(DateTime.UtcNow);
-            }
+            // Release semaphore after 12 seconds
+            _ = Task.Delay(TimeSpan.FromSeconds(12), cancellationToken)
+                  .ContinueWith(_ => _rateLimitSemaphore.Release(), TaskContinuationOptions.ExecuteSynchronously);
         }
     }
 
