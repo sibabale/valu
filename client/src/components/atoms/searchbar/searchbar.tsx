@@ -49,6 +49,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   const [fadeAnim] = useState(new Animated.Value(0));
   const [spinInAnim] = useState(new Animated.Value(0));
   const [spinOutAnim] = useState(new Animated.Value(1));
+  const [scaleAnim] = useState(new Animated.Value(1));
   const [showXIcon, setShowXIcon] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<View>(null);
@@ -57,11 +58,14 @@ export const Searchbar: React.FC<SearchbarProps> = ({
 
   useEffect(() => {
     if (isFocused && !searchQuery) {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
+      // Delay dropdown appearance to midway through scale animation
+      setTimeout(() => {
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+      }, 250); // Delay by 250ms (midway through 500ms scale animation)
     } else {
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -74,13 +78,16 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   // Animate X icon when input is focused
   useEffect(() => {
     if (isFocused) {
-      // Animate in - reset out animation and animate in
-      spinOutAnim.setValue(0);
-      Animated.timing(spinInAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
+      // Delay X icon animation to quarter way through scale animation
+      setTimeout(() => {
+        // Animate in - reset out animation and animate in
+        spinOutAnim.setValue(0);
+        Animated.timing(spinInAnim, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }).start();
+      }, 200); // Delay by 200ms (quarter way through 800ms scale animation)
     } else {
       // Animate out - reset in animation and animate out
       spinInAnim.setValue(0);
@@ -199,6 +206,20 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     if (disabled) return;
     setIsFocused(true);
 
+    // Bounce animation when focused
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 1.05,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     // Track search focus
     if (posthog) {
       posthog.capture('search_focused', {
@@ -255,54 +276,60 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   return (
     <>
       <Container>
-        <SearchContainer isFocused={isFocused} disabled={disabled}>
-          <SearchIconContainer>
-            <SearchIcon fill="#99a1af" height="20px" width="20px" />
-          </SearchIconContainer>
+        <Animated.View
+          style={{
+            transform: [{ scale: scaleAnim }],
+          }}
+        >
+          <SearchContainer isFocused={isFocused} disabled={disabled}>
+            <SearchIconContainer>
+              <SearchIcon fill="#99a1af" height="20px" width="20px" />
+            </SearchIconContainer>
 
-          <SearchInput
-            ref={searchInputRef}
-            placeholder="Search stocks..."
-            placeholderTextColor={disabled ? "#d1d5db" : "#9ca3af"}
-            value={searchQuery}
-            onChangeText={handleSearch}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onSubmitEditing={() => {
-              if (disabled) return;
-              // Add to recent searches when user submits the search
-              if (searchQuery.trim()) {
-                addToRecent(searchQuery.trim());
-              }
-            }}
+            <SearchInput
+              ref={searchInputRef}
+              placeholder="Search stocks..."
+              placeholderTextColor={disabled ? "#d1d5db" : "#9ca3af"}
+              value={searchQuery}
+              onChangeText={handleSearch}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onSubmitEditing={() => {
+                if (disabled) return;
+                // Add to recent searches when user submits the search
+                if (searchQuery.trim()) {
+                  addToRecent(searchQuery.trim());
+                }
+              }}
 
-            editable={!disabled}
-          />
+              editable={!disabled}
+            />
 
-          <Animated.View
-            style={{
-              opacity: Animated.subtract(1, spinOutAnim),
-              transform: [
-                {
-                  rotate: Animated.add(
-                    spinInAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0deg', '90deg'],
-                    }),
-                    spinOutAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['90deg', '0deg'],
-                    })
-                  ),
-                },
-              ],
-            }}
-          >
-            <CloseButton testID="close-button" onPress={handleClearInput}>
-              <CloseIcon fill="#99a1af" height="20px" width="20px" />
-            </CloseButton>
-          </Animated.View>
-        </SearchContainer>
+            <Animated.View
+              style={{
+                opacity: Animated.subtract(1, spinOutAnim),
+                transform: [
+                  {
+                    rotate: Animated.add(
+                      spinInAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '90deg'],
+                      }),
+                      spinOutAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['90deg', '0deg'],
+                      })
+                    ),
+                  },
+                ],
+              }}
+            >
+              <CloseButton testID="close-button" onPress={handleClearInput}>
+                <CloseIcon fill="#99a1af" height="20px" width="20px" />
+              </CloseButton>
+            </Animated.View>
+          </SearchContainer>
+        </Animated.View>
       </Container>
 
       <Animated.View
