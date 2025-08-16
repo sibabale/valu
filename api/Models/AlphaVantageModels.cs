@@ -41,7 +41,9 @@ public record AlphaVantageOverview(
     decimal? QuarterlyEarningsGrowthYOY,
     [property: JsonPropertyName("AnalystTargetPrice")]
     [property: JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-    decimal? AnalystTargetPrice
+    decimal? AnalystTargetPrice,
+    [property: JsonPropertyName("Website")]
+    string? OfficialSite
 );
 
 public record AlphaVantageSearchResult(

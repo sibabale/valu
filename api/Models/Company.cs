@@ -13,7 +13,9 @@ public record Company(
     string Description,
     string Recommendation,
     decimal Score,
-    List<FinancialRatio> Ratios
+    List<FinancialRatio> Ratios,
+    string? OfficialSite,
+    string? LogoUrl
 );
 
 public record CompanyDetails(
@@ -29,7 +31,9 @@ public record CompanyDetails(
     string Description,
     decimal Score,
     FinancialMetrics Financials,
-    List<FinancialRatio> Ratios
+    List<FinancialRatio> Ratios,
+    string? OfficialSite,
+    string? LogoUrl
 );
 
 public record FinancialMetrics(

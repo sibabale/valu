@@ -132,12 +132,23 @@ app.MapGet("/api/value-score/top", async (int count, IValueScoreService valueSco
 });
 
 // Cache building endpoint
-app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingService) =>
+app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingService, CancellationToken cancellationToken) =>
 {
     try
     {
-        await cacheBuildingService.BuildInitialCacheAsync();
+        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+        
+        await cacheBuildingService.BuildInitialCacheAsync(linkedCts.Token);
         return Results.Ok(new { Message = "Cache building completed!", Timestamp = DateTime.UtcNow });
+    }
+    catch (OperationCanceledException)
+    {
+        return Results.Problem(
+            title: "Cache building was cancelled or timed out",
+            detail: "The operation was cancelled or exceeded the 10-minute timeout",
+            statusCode: 408
+        );
     }
     catch (Exception ex)
     {
@@ -148,6 +159,113 @@ app.MapPost("/api/cache/build", async (ICacheBuildingService cacheBuildingServic
         );
     }
 });
+
+// Cache status endpoint
+app.MapGet("/api/cache/status", async (ICacheService cacheService) =>
+{
+    try
+    {
+        var companyKeys = await cacheService.GetAllKeysAsync("company:*");
+        var companiesInCache = companyKeys.ToList();
+        var totalCount = companiesInCache.Count;
+        
+        var symbols = companiesInCache
+            .Select(key => key.Replace("company:", ""))
+            .OrderBy(symbol => symbol)
+            .ToList();
+        
+        return Results.Ok(new 
+        { 
+            TotalCompanies = totalCount,
+            Companies = symbols,
+            CacheKeys = companiesInCache,
+            Timestamp = DateTime.UtcNow,
+            Expected = 20
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: "Failed to get cache status",
+            detail: ex.Message,
+            statusCode: 500
+        );
+    }
+});
+
+// Single company cache test endpoint
+app.MapPost("/api/cache/build-single/{symbol}", async (string symbol, ICacheBuildingService cacheBuildingService, IAlphaVantageService alphaVantageService, ICacheService cacheService, IRecommendationService recommendationService, IValueScoreService valueScoreService) =>
+{
+    try
+    {
+        var startTime = DateTime.UtcNow;
+        
+        // Get Alpha Vantage data
+        var overview = await alphaVantageService.GetCompanyOverviewAsync(symbol.ToUpper());
+        if (overview == null)
+        {
+            return Results.NotFound($"No data found for symbol: {symbol}");
+        }
+
+        // Calculate recommendation and score (same logic as main service)
+        var recommendation = recommendationService.CalculateRecommendation(
+            overview.PERatio,
+            overview.PriceToBookRatio,
+            overview.ReturnOnEquityTTM,
+            overview.ProfitMargin
+        );
+
+        var (_, _, _, _, totalScore) = valueScoreService.CalculateSimpleScore(overview);
+
+        // Create Company object
+        var company = new Company(
+            Id: Guid.NewGuid(),
+            Name: overview.Name,
+            Symbol: overview.Symbol,
+            Sector: overview.Sector,
+            Industry: overview.Industry,
+            MarketCap: overview.MarketCapitalization ?? 0m,
+            Price: 0m,
+            Change: 0m,
+            ChangePercent: 0m,
+            Description: overview.Description,
+            Recommendation: recommendation,
+            Score: totalScore,
+            Ratios: new List<FinancialRatio>(),
+            OfficialSite: overview.OfficialSite,
+            LogoUrl: null
+        );
+
+        // Cache the company
+        var cacheKey = $"company:{symbol.ToUpper()}";
+        await cacheService.SetAsync(cacheKey, company, TimeSpan.FromDays(1));
+        
+        var duration = DateTime.UtcNow - startTime;
+        
+        // Verify it was cached
+        var cached = await cacheService.ContainsAsync(cacheKey);
+        
+        return Results.Ok(new 
+        { 
+            Message = $"Successfully processed {symbol}",
+            Symbol = symbol.ToUpper(),
+            Duration = duration.TotalMilliseconds,
+            Cached = cached,
+            Company = company,
+            Timestamp = DateTime.UtcNow 
+        });
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(
+            title: $"Failed to process {symbol}",
+            detail: ex.Message,
+            statusCode: 500
+        );
+    }
+});
+
+
 
 
 app.Run();

@@ -6,14 +6,13 @@ describe('CompanyOverviewCard - Public Interface', () => {
   const mockCompany = {
     name: 'Apple Inc.',
     symbol: 'AAPL',
-    logo: '🍎',
-    logoColor: '#000000',
     price: 150.0,
     marketCap: 1780000000000, // $1.78T
     recommendation: 'Hold',
     score: 73,
     description:
       'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide.',
+    logoUrl: 'https://cdn.brandfetch.io/apple.com/w/400/h/400?c=test',
   };
 
   it('displays company name to users', () => {
@@ -61,14 +60,13 @@ describe('CompanyOverviewCard - Public Interface', () => {
       ...mockCompany,
       name: 'Alphabet Inc.',
       symbol: 'GOOGL',
-      logo: 'G',
-      logoColor: '#4285F4',
       price: 2750.0,
       marketCap: 1850000000000, // $1.85T
       recommendation: 'Buy',
       score: 85,
       description:
         'Alphabet Inc. provides online advertising services in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America.',
+      logoUrl: 'https://cdn.brandfetch.io/google.com/w/400/h/400?c=test',
     };
 
     const { getByText } = render(
