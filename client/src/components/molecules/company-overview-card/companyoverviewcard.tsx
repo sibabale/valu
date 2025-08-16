@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { CompanyOverviewCardProps } from './companyoverviewcard.interface';
 import { RecommendationLabel } from '../../atoms/recommendation-label/recommendationlabel';
 import { formatMarketCap } from '../../../utils/formatting';
@@ -28,11 +29,24 @@ export const CompanyOverviewCard: React.FC<CompanyOverviewCardProps> = ({
 }) => {
   const firstLetter = company.name.charAt(0).toUpperCase();
 
+  const renderLogo = () => {
+    if (company.logoUrl) {
+      return (
+        <Image
+          source={{ uri: company.logoUrl }}
+          style={{ width: 50, height: 50, borderRadius: 5 }}
+          resizeMode="contain"
+        />
+      );
+    }
+    return <LogoText>{firstLetter}</LogoText>;
+  };
+
   return (
     <CardContainer>
       <Header>
         <LogoContainer color="#808080">
-          <LogoText>{firstLetter}</LogoText>
+          {renderLogo()}
         </LogoContainer>
         <CompanyName>{company.name}</CompanyName>
         <TickerSymbol>{company.symbol}</TickerSymbol>

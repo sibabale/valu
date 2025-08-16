@@ -3,13 +3,12 @@ export interface CompanyDetailsPageProps {
     id: string;
     name: string;
     ticker: string;
-    logo: string;
-    logoColor: string;
     price: number;
     marketCap: string;
     recommendation: string;
     score: number;
     description: string;
+    logoUrl?: string;
     peRatio: number;
     peRatioTrend: 'up' | 'down' | 'neutral';
     peRatioScore: number;

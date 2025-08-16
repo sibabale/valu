@@ -1,4 +1,5 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { CompanyCardProps } from './companycard.interface';
 import {
   CardContainer,
@@ -20,11 +21,24 @@ export const CompanyCard: React.FC<CompanyCardProps> = ({
 }) => {
   const firstLetter = company.name.charAt(0).toUpperCase();
 
+  const renderLogo = () => {
+    if (company.logoUrl) {
+      return (
+        <Image
+          source={{ uri: company.logoUrl }}
+          style={{ width: 40, height: 40, borderRadius: 20 }}
+          resizeMode="contain"
+        />
+      );
+    }
+    return <LogoText>{firstLetter}</LogoText>;
+  };
+
   return (
     <CardContainer onPress={onPress} activeOpacity={0.8} {...props}>
       <LeftSection>
         <LogoContainer color="#808080">
-          <LogoText>{firstLetter}</LogoText>
+          {renderLogo()}
         </LogoContainer>
         <CompanyInfo>
           <CompanyName>{company.name}</CompanyName>
