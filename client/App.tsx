@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -14,8 +13,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
 import AppNavigator from './src/navigation';
 import * as SplashScreen from 'expo-splash-screen';
-import { PostHogProvider } from 'posthog-react-native';
-import { POSTHOG_CONFIG } from './src/utils/config';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,37 +31,12 @@ export default function App() {
     }
   }, [loaded, error]);
 
-  // Show loading screen while fonts are loading
-  if (!loaded && !error) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Loading fonts...</Text>
-      </View>
-    );
-  }
-
-  // Show error screen if font loading failed
-  if (error) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Error loading fonts</Text>
-      </View>
-    );
-  }
 
   return (
     <SafeAreaProvider>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <PostHogProvider
-            apiKey={POSTHOG_CONFIG.apiKey}
-            options={{
-              host: POSTHOG_CONFIG.host,
-              captureAppLifecycleEvents: true,
-            }}
-          >
-            <AppNavigator />
-          </PostHogProvider>
+          <AppNavigator />
         </PersistGate>
       </Provider>
     </SafeAreaProvider>

@@ -20,10 +20,6 @@ import {
 export const ValueScorePage: React.FC = () => {
   const navigation = useNavigation();
 
-  const handleBackPress = () => {
-    navigation.goBack();
-  };
-
   // Static metric data for demonstration
   const peRatioRanges: MetricRange[] = [
     {
@@ -201,7 +197,7 @@ export const ValueScorePage: React.FC = () => {
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
       <PageContainer>
         <HeaderContainer>
-          <BackButton onPress={handleBackPress}>
+          <BackButton onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="#333333" />
           </BackButton>
           <Title>Value Score</Title>

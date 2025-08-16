@@ -36,10 +36,26 @@ export const ProgressBar = styled.View<{ progress: number }>`
   overflow: hidden;
 `;
 
-export const ProgressBarFill = styled.View<{ progress: number }>`
+export const ProgressBarFill = styled.View<{ progress: number; color?: string }>`
   height: 100%;
   width: ${(props: { progress: number }) => props.progress}%;
-  background-color: ${(props: { progress: number }) => {
+  background-color: ${(props: { progress: number; color?: string }) => {
+    // Use the centralized color if provided, otherwise fall back to score-based colors
+    if (props.color) {
+      switch (props.color) {
+        case 'success':
+          return '#4CAF50';
+        case 'secondary':
+          return '#2196F3';
+        case 'warning':
+          return '#FF9800';
+        case 'danger':
+          return '#F44336';
+        default:
+          return '#333333';
+      }
+    }
+    // Fallback to score-based colors for backward compatibility
     if (props.progress >= 80) return '#4CAF50';
     if (props.progress >= 60) return '#FF9800';
     if (props.progress >= 40) return '#FFC107';

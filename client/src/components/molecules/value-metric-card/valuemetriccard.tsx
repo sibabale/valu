@@ -36,7 +36,7 @@ export const ValueMetricCard: React.FC<ValueMetricCardProps> = ({
           <ScoreLabel>Value Score:</ScoreLabel>
           <ProgressContainer>
             <ProgressBar progress={normalizedScore}>
-              <ProgressBarFill progress={normalizedScore} />
+              <ProgressBarFill progress={normalizedScore} color={color} />
             </ProgressBar>
             <ScoreValue>{normalizedScore}/100</ScoreValue>
           </ProgressContainer>
