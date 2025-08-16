@@ -96,7 +96,7 @@ export const HomePage: React.FC = () => {
         if (controller.signal.aborted) {
           return;
         }
-        
+
 
         setError('Failed to load companies');
         setCompaniesData([]);

@@ -8,10 +8,11 @@ import {
   HeaderContainer,
   BackButton,
   Title,
-  // InfoButton, // Commented out with info icon
+  InfoButton,
   SectionTitle,
 } from './companydetailspage.styles';
 import { Ionicons } from '@expo/vector-icons';
+import HelpIcon from '../../atoms/icons/help';
 import { CompanyOverviewCard } from '../../molecules/company-overview-card/companyoverviewcard';
 import { ValueMetricCard } from '../../molecules/value-metric-card/valuemetriccard';
 import { MetricCardWrapper } from '../../molecules/value-metric-card/valuemetriccard.styles';
@@ -89,9 +90,17 @@ export const CompanyDetailsPage: React.FC = () => {
 
 
 
-  // const handleInfoPress = () => {
-  //   navigation.navigate('ValueScore' as never);
-  // };
+  const handleInfoPress = () => {
+    // Track help button press
+    if (companyData && posthog) {
+      posthog.capture('help_button_pressed', {
+        company_id: companyData.id,
+        company_symbol: companyData.symbol,
+        timestamp: new Date().toISOString(),
+      });
+    }
+    navigation.navigate('ValueScore' as never);
+  };
 
   const getMetricScore = (metricKey: string, value: number): number => {
     switch (metricKey) {
@@ -137,9 +146,9 @@ export const CompanyDetailsPage: React.FC = () => {
             <Ionicons name="arrow-back" size={24} color="#333333" />
           </BackButton>
           <Title>VALU</Title>
-          {/* <InfoButton onPress={handleInfoPress}>
-            <Ionicons name="information-circle" size={24} color="#333333" />
-          </InfoButton> */}
+          <InfoButton onPress={handleInfoPress}>
+            <HelpIcon fill="#333333" />
+          </InfoButton>
         </HeaderContainer>
 
         <ContentContainer>
