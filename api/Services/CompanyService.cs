@@ -9,15 +9,15 @@ public class CompanyService : ICompanyService
     private readonly IAlphaVantageService _alphaVantageService;
     private readonly ICacheService _cache;
     private readonly ILogger<CompanyService> _logger;
-    private readonly IRecommendationService _recommendationService;
+    private readonly IScoringService _scoringService;
     private readonly string _brandfetchClientId;
 
-    public CompanyService(IAlphaVantageService alphaVantageService, ICacheService cache, ILogger<CompanyService> logger, IRecommendationService recommendationService, IConfiguration configuration)
+    public CompanyService(IAlphaVantageService alphaVantageService, ICacheService cache, ILogger<CompanyService> logger, IScoringService scoringService, IConfiguration configuration)
     {
         _alphaVantageService = alphaVantageService;
         _cache = cache;
         _logger = logger;
-        _recommendationService = recommendationService;
+        _scoringService = scoringService;
         _brandfetchClientId = configuration["Brandfetch:ClientId"] ?? string.Empty;
     }
 
@@ -227,7 +227,7 @@ public class CompanyService : ICompanyService
         var deterministicGuid = new Guid(hashBytes);
         
         // Calculate recommendation using actual financial metrics
-        var recommendation = _recommendationService.CalculateRecommendation(
+        var recommendation = _scoringService.GetRecommendation(
             overview.PERatio,
             overview.PriceToBookRatio,
             overview.ReturnOnEquityTTM,
@@ -243,8 +243,8 @@ public class CompanyService : ICompanyService
             new("profitMargin", "Profit Margin", (overview.ProfitMargin ?? 0m) * 100, "Profit Margin")
         };
 
-        // Simple score calculation based on key metrics
-        var totalScore = CalculateSimpleScore(overview);
+        // Use unified scoring service for score calculation
+        var totalScore = _scoringService.CalculateSimpleScore(overview).totalScore;
         
         // Extract domain and generate logo URL
         string? logoUrl = null;
@@ -278,45 +278,7 @@ public class CompanyService : ICompanyService
         return company;
     }
 
-    private decimal CalculateSimpleScore(AlphaVantageOverview overview)
-    {
-        decimal score = 50; // Base score
 
-        // P/E ratio scoring (lower is better, but not too low)
-        if (overview.PERatio.HasValue && overview.PERatio > 0)
-        {
-            if (overview.PERatio <= 15) score += 15;
-            else if (overview.PERatio <= 25) score += 10;
-            else if (overview.PERatio <= 35) score += 5;
-        }
-
-        // ROE scoring (higher is better)
-        if (overview.ReturnOnEquityTTM.HasValue)
-        {
-            var roe = overview.ReturnOnEquityTTM.Value * 100;
-            if (roe >= 15) score += 15;
-            else if (roe >= 10) score += 10;
-            else if (roe >= 5) score += 5;
-        }
-
-        // Profit margin scoring (higher is better)
-        if (overview.ProfitMargin.HasValue)
-        {
-            var margin = overview.ProfitMargin.Value * 100;
-            if (margin >= 20) score += 10;
-            else if (margin >= 10) score += 7;
-            else if (margin >= 5) score += 3;
-        }
-
-        // P/B ratio scoring (lower is better)
-        if (overview.PriceToBookRatio.HasValue && overview.PriceToBookRatio > 0)
-        {
-            if (overview.PriceToBookRatio <= 1.5m) score += 10;
-            else if (overview.PriceToBookRatio <= 3m) score += 5;
-        }
-
-        return Math.Min(100, Math.Max(0, score));
-    }
 
     private string? ExtractDomain(string officialSite)
     {

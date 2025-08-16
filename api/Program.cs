@@ -5,8 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddScoped<ICompanyService, CompanyService>();
-builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
-builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IScoringService, ScoringService>();
 builder.Services.AddLogging();
 
 // Add Alpha Vantage services
@@ -110,24 +109,24 @@ app.MapGet("/api/companies/search", async (
 });
 
 // Value Score endpoints
-app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IValueScoreService valueScoreService) =>
+app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IScoringService scoringService) =>
 {
-    var result = await valueScoreService.CalculateValueScoreAsync(request);
+    var result = await scoringService.CalculateValueScoreAsync(request);
     return Results.Ok(result);
 });
 
-app.MapGet("/api/value-score/{companyId}", async (Guid companyId, IValueScoreService valueScoreService) =>
+app.MapGet("/api/value-score/{companyId}", async (Guid companyId, IScoringService scoringService) =>
 {
-    var result = await valueScoreService.GetValueScoreAsync(companyId);
+    var result = await scoringService.GetValueScoreAsync(companyId);
     return result != null ? Results.Ok(result) : Results.NotFound();
 });
 
-app.MapGet("/api/value-score/top", async (int count, IValueScoreService valueScoreService) =>
+app.MapGet("/api/value-score/top", async (int count, IScoringService scoringService) =>
 {
     if (count <= 0 || count > 100)
         return Results.BadRequest("Count must be between 1 and 100");
     
-    var result = await valueScoreService.GetTopValueStocksAsync(count);
+    var result = await scoringService.GetTopValueStocksAsync(count);
     return Results.Ok(result);
 });
 
@@ -194,7 +193,7 @@ app.MapGet("/api/cache/status", async (ICacheService cacheService) =>
 });
 
 // Single company cache test endpoint
-app.MapPost("/api/cache/build-single/{symbol}", async (string symbol, ICacheBuildingService cacheBuildingService, IAlphaVantageService alphaVantageService, ICacheService cacheService, IRecommendationService recommendationService, IValueScoreService valueScoreService) =>
+app.MapPost("/api/cache/build-single/{symbol}", async (string symbol, ICacheBuildingService cacheBuildingService, IAlphaVantageService alphaVantageService, ICacheService cacheService, IScoringService scoringService) =>
 {
     try
     {
@@ -208,14 +207,14 @@ app.MapPost("/api/cache/build-single/{symbol}", async (string symbol, ICacheBuil
         }
 
         // Calculate recommendation and score (same logic as main service)
-        var recommendation = recommendationService.CalculateRecommendation(
+        var recommendation = scoringService.GetRecommendation(
             overview.PERatio,
             overview.PriceToBookRatio,
             overview.ReturnOnEquityTTM,
             overview.ProfitMargin
         );
 
-        var (_, _, _, _, totalScore) = valueScoreService.CalculateSimpleScore(overview);
+        var (_, _, _, _, totalScore) = scoringService.CalculateSimpleScore(overview);
 
         // Create Company object
         var company = new Company(

@@ -17,12 +17,6 @@ import { CompanyOverviewCard } from '../../molecules/company-overview-card/compa
 import { ValueMetricCard } from '../../molecules/value-metric-card/valuemetriccard';
 import { MetricCardWrapper } from '../../molecules/value-metric-card/valuemetriccard.styles';
 import { FinancialRatioCard } from '../../molecules/financial-ratio-card/financialratiocard';
-import {
-  getPERatioAssessment,
-  getPBRatioAssessment,
-  getROEAssessment,
-  getProfitMarginAssessment,
-} from '../../../utils/assessment';
 import { getRatioDescription } from '../../../utils/descriptions';
 import { formatFinancialValue } from '../../../utils/formatting';
 import {
@@ -30,7 +24,7 @@ import {
   calculatePBRatioScore,
   calculateROEScore,
   calculateProfitMarginScore,
-} from '../../../utils/metricScoring';
+} from '../../../utils/centralizedScoring';
 
 export const CompanyDetailsPage: React.FC = () => {
   const navigation = useNavigation();
@@ -105,13 +99,13 @@ export const CompanyDetailsPage: React.FC = () => {
   const getMetricScore = (metricKey: string, value: number): number => {
     switch (metricKey) {
       case 'pe':
-        return calculatePERatioScore(value);
+        return calculatePERatioScore(value).score;
       case 'pb':
-        return calculatePBRatioScore(value);
+        return calculatePBRatioScore(value).score;
       case 'roe':
-        return calculateROEScore(value);
+        return calculateROEScore(value).score;
       case 'profitMargin':
-        return calculateProfitMarginScore(value);
+        return calculateProfitMarginScore(value).score;
       default:
         return 0;
     }
@@ -122,14 +116,22 @@ export const CompanyDetailsPage: React.FC = () => {
     value: number
   ): { assessment: string; color: string } => {
     switch (metricName) {
-      case 'P/E Ratio':
-        return getPERatioAssessment(value);
-      case 'P/B Ratio':
-        return getPBRatioAssessment(value);
-      case 'ROE':
-        return getROEAssessment(value);
-      case 'Profit Margin':
-        return getProfitMarginAssessment(value);
+      case 'P/E Ratio': {
+        const peScore = calculatePERatioScore(value);
+        return { assessment: peScore.assessment, color: peScore.color };
+      }
+      case 'P/B Ratio': {
+        const pbScore = calculatePBRatioScore(value);
+        return { assessment: pbScore.assessment, color: pbScore.color };
+      }
+      case 'ROE': {
+        const roeScore = calculateROEScore(value);
+        return { assessment: roeScore.assessment, color: roeScore.color };
+      }
+      case 'Profit Margin': {
+        const profitScore = calculateProfitMarginScore(value);
+        return { assessment: profitScore.assessment, color: profitScore.color };
+      }
       default:
         return { assessment: '', color: '' };
     }

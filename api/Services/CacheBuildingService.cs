@@ -11,8 +11,7 @@ public interface ICacheBuildingService
 public class CacheBuildingService : ICacheBuildingService
 {
     private readonly IAlphaVantageService _alphaVantageService;
-    private readonly IRecommendationService _recommendationService;
-    private readonly IValueScoreService _valueScoreService;
+    private readonly IScoringService _scoringService;
     private readonly ICacheService _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
@@ -37,14 +36,12 @@ public class CacheBuildingService : ICacheBuildingService
 
     public CacheBuildingService(
         IAlphaVantageService alphaVantageService,
-        IRecommendationService recommendationService,
-        IValueScoreService valueScoreService,
+        IScoringService scoringService,
         ICacheService cache,
         ILogger<CacheBuildingService> logger)
     {
         _alphaVantageService = alphaVantageService;
-        _recommendationService = recommendationService;
-        _valueScoreService = valueScoreService;
+        _scoringService = scoringService;
         _cache = cache;
         _logger = logger;
     }
@@ -103,15 +100,15 @@ public class CacheBuildingService : ICacheBuildingService
                     }
 
                     // Calculate recommendation using financial metrics
-                    var recommendation = _recommendationService.CalculateRecommendation(
+                    var recommendation = _scoringService.GetRecommendation(
                         overview.PERatio,
                         overview.PriceToBookRatio,
                         overview.ReturnOnEquityTTM,
                         overview.ProfitMargin
                     );
 
-                    // Calculate score using the ValueScoreService
-                    var (_, _, _, _, totalScore) = _valueScoreService.CalculateSimpleScore(overview);
+                            // Calculate score using the ScoringService
+        var (_, _, _, _, totalScore) = _scoringService.CalculateSimpleScore(overview);
 
                     // Create ratios array from Alpha Vantage data
                     var ratios = new List<FinancialRatio>
