@@ -59,13 +59,13 @@ export const Searchbar: React.FC<SearchbarProps> = ({
     if (isFocused && !searchQuery) {
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 200,
+        duration: 400,
         useNativeDriver: true,
       }).start();
     } else {
       Animated.timing(fadeAnim, {
         toValue: 0,
-        duration: 200,
+        duration: 400,
         useNativeDriver: true,
       }).start();
     }
@@ -305,7 +305,7 @@ export const Searchbar: React.FC<SearchbarProps> = ({
         </SearchContainer>
       </Container>
 
-              <Animated.View
+      <Animated.View
           ref={dropdownRef}
           onTouchStart={handleDropdownPressIn}
           onTouchEnd={handleDropdownPressOut}
