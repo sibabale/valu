@@ -47,6 +47,10 @@ export const Searchbar: React.FC<SearchbarProps> = ({
 
   const [isFocused, setIsFocused] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+  const [spinInAnim] = useState(new Animated.Value(0));
+  const [spinOutAnim] = useState(new Animated.Value(1));
+  const [showXIcon, setShowXIcon] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<View>(null);
   const searchInputRef = useRef<any>(null);
   const isDropdownInteraction = useRef(false);
@@ -66,6 +70,27 @@ export const Searchbar: React.FC<SearchbarProps> = ({
       }).start();
     }
   }, [isFocused, searchQuery, fadeAnim]);
+
+  // Animate X icon when input is focused
+  useEffect(() => {
+    if (isFocused) {
+      // Animate in - reset out animation and animate in
+      spinOutAnim.setValue(0);
+      Animated.timing(spinInAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // Animate out - reset in animation and animate out
+      spinInAnim.setValue(0);
+      Animated.timing(spinOutAnim, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [isFocused, spinInAnim, spinOutAnim]);
 
   // Resolve search term to ticker symbol
   const resolveToTickerSymbol = (query: string): string | null => {
@@ -230,11 +255,9 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   return (
     <>
       <Container>
-        <SearchContainer>
+        <SearchContainer isFocused={isFocused} disabled={disabled}>
           <SearchIconContainer>
-            <IconContainer>
-              <SearchIcon fill="#99a1af" height="20px" width="20px" />
-            </IconContainer>
+            <SearchIcon fill="#99a1af" height="20px" width="20px" />
           </SearchIconContainer>
 
           <SearchInput
@@ -252,20 +275,37 @@ export const Searchbar: React.FC<SearchbarProps> = ({
                 addToRecent(searchQuery.trim());
               }
             }}
-            isFocused={isFocused}
+
             editable={!disabled}
           />
 
-          {(isFocused || searchQuery) && !disabled ? (
+          <Animated.View
+            style={{
+              opacity: Animated.subtract(1, spinOutAnim),
+              transform: [
+                {
+                  rotate: Animated.add(
+                    spinInAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['0deg', '90deg'],
+                    }),
+                    spinOutAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: ['90deg', '0deg'],
+                    })
+                  ),
+                },
+              ],
+            }}
+          >
             <CloseButton testID="close-button" onPress={handleClearInput}>
               <CloseIcon fill="#99a1af" height="20px" width="20px" />
             </CloseButton>
-          ) : null}
+          </Animated.View>
         </SearchContainer>
       </Container>
 
-      {isFocused && !searchQuery && !disabled && (
-        <Animated.View
+              <Animated.View
           ref={dropdownRef}
           onTouchStart={handleDropdownPressIn}
           onTouchEnd={handleDropdownPressOut}
