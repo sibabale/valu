@@ -105,7 +105,7 @@ export const Checkmark = styled.View<{ color: string }>`
   width: 16px;
   height: 16px;
   border-radius: 8px;
-  background-color: ${({ color }: { color: string }) => getColorValue(color)};
+  background-color: white;
   justify-content: center;
   align-items: center;
 `;
