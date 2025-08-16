@@ -12,7 +12,6 @@ export const HeaderContainer = styled.View`
   padding: ${theme.spacing.md}px ${theme.spacing.lg}px;
   border-bottom-width: 1px;
   border-bottom-color: #e0e0e0;
-  background-color: white;
 `;
 
 export const BackButton = styled.TouchableOpacity`
