@@ -7,8 +7,6 @@ import {
   TitleSection,
   Title,
   Description,
-  OverallScore,
-  OverallScoreText,
   RangeItem,
   RangeItemLast,
   ScoreCircle,
@@ -18,6 +16,7 @@ import {
   RangeLabel,
   RangeDescription,
   ProgressBar,
+  ProgressBarFill,
   LoadingContainer,
   LoadingText,
 } from './metricbreakdowncard.styles';
@@ -26,7 +25,6 @@ import { MetricBreakdownCardProps } from './metricbreakdowncard.interface';
 export const MetricBreakdownCard: React.FC<MetricBreakdownCardProps> = ({
   title,
   description,
-  overallScore,
   ranges,
   isLoading = false,
 }) => {
@@ -48,9 +46,6 @@ export const MetricBreakdownCard: React.FC<MetricBreakdownCardProps> = ({
           <Title>{title}</Title>
           <Description>{description}</Description>
         </TitleSection>
-        <OverallScore>
-          <OverallScoreText>{overallScore}%</OverallScoreText>
-        </OverallScore>
       </Header>
 
       {ranges.map((range, index) => {
@@ -59,23 +54,23 @@ export const MetricBreakdownCard: React.FC<MetricBreakdownCardProps> = ({
 
         return (
           <RangeComponent key={range.label}>
-            <ScoreCircle color={range.color} isActive={range.isActive}>
-              <ScoreText isActive={range.isActive}>{range.score}</ScoreText>
-              {range.isActive && (
-                <Checkmark color={range.color}>
-                  <Ionicons name="checkmark" size={10} color="white" />
-                </Checkmark>
-              )}
+                        <ScoreCircle color={range.color}>
+              <ScoreText>{range.score}</ScoreText>
+              <Checkmark color={range.color}>
+                <Ionicons name="checkmark" size={10} color="white" />
+              </Checkmark>
             </ScoreCircle>
 
             <RangeContent>
-              <RangeLabel isActive={range.isActive}>{range.label}</RangeLabel>
-              <RangeDescription isActive={range.isActive}>
+              <RangeLabel>{range.label}</RangeLabel>
+              <RangeDescription>
                 {range.description}
               </RangeDescription>
             </RangeContent>
 
-            <ProgressBar color={range.color} isActive={range.isActive} />
+            <ProgressBar color={range.color} score={range.score}>
+              <ProgressBarFill color={range.color} score={range.score} />
+            </ProgressBar>
           </RangeComponent>
         );
       })}

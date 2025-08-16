@@ -7,7 +7,6 @@ const mockProps: MetricBreakdownCardProps = {
   title: 'Price-to-Earnings (P/E) Ratio',
   description: 'How expensive the stock is compared to its yearly profits.',
   currentValue: 25.5,
-  overallScore: 25,
   ranges: [
     {
       min: 0,
@@ -15,8 +14,7 @@ const mockProps: MetricBreakdownCardProps = {
       label: 'Under 15',
       description: 'Great deal! You\'re paying a low price for each dollar of profit',
       score: 100,
-      color: 'green',
-      isActive: false,
+      color: 'success',
     },
     {
       min: 15,
@@ -24,8 +22,7 @@ const mockProps: MetricBreakdownCardProps = {
       label: '15 to 25',
       description: 'Fair price - not too expensive',
       score: 70,
-      color: 'yellow',
-      isActive: true,
+      color: 'warning',
     },
     {
       min: 25,
@@ -33,8 +30,7 @@ const mockProps: MetricBreakdownCardProps = {
       label: '25 to 35',
       description: 'Getting pricey - you\'re paying more for profits',
       score: 40,
-      color: 'orange',
-      isActive: false,
+      color: 'secondary',
     },
     {
       min: 35,
@@ -42,8 +38,7 @@ const mockProps: MetricBreakdownCardProps = {
       label: 'Above 35',
       description: 'Very expensive - high price for the profits you get',
       score: 10,
-      color: 'red',
-      isActive: false,
+      color: 'danger',
     },
     {
       min: undefined,
@@ -52,7 +47,6 @@ const mockProps: MetricBreakdownCardProps = {
       description: 'Company isn\'t making profits right now',
       score: 0,
       color: 'grey',
-      isActive: false,
     },
   ],
 };
@@ -63,7 +57,6 @@ describe('MetricBreakdownCard', () => {
 
     expect(screen.getByText('Price-to-Earnings (P/E) Ratio')).toBeTruthy();
     expect(screen.getByText('How expensive the stock is compared to its yearly profits.')).toBeTruthy();
-    expect(screen.getByText('25%')).toBeTruthy();
     expect(screen.getByText('Under 15')).toBeTruthy();
     expect(screen.getByText('15 to 25')).toBeTruthy();
     expect(screen.getByText('25 to 35')).toBeTruthy();
@@ -87,12 +80,12 @@ describe('MetricBreakdownCard', () => {
     expect(screen.getByText('0')).toBeTruthy();
   });
 
-  it('shows active range with checkmark', () => {
+  it('shows checkmarks for all ranges', () => {
     render(<MetricBreakdownCard {...mockProps} />);
 
-    // The active range should have a checkmark icon
-    const activeRange = screen.getByText('15 to 25');
-    expect(activeRange).toBeTruthy();
+    // All ranges should have checkmarks
+    const range = screen.getByText('15 to 25');
+    expect(range).toBeTruthy();
   });
 
   it('renders all range descriptions', () => {

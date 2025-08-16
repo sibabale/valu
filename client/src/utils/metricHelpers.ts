@@ -8,8 +8,7 @@ export const createPERatioRanges = (currentPERatio: number): MetricRange[] => {
       label: 'Under 15',
       description: 'Great deal! You\'re paying a low price for each dollar of profit',
       score: 100,
-      color: 'green',
-      isActive: currentPERatio > 0 && currentPERatio < 15,
+      color: 'success',
     },
     {
       min: 15,
@@ -17,8 +16,7 @@ export const createPERatioRanges = (currentPERatio: number): MetricRange[] => {
       label: '15 to 25',
       description: 'Fair price - not too expensive',
       score: 70,
-      color: 'yellow',
-      isActive: currentPERatio >= 15 && currentPERatio < 25,
+      color: 'warning',
     },
     {
       min: 25,
@@ -26,8 +24,7 @@ export const createPERatioRanges = (currentPERatio: number): MetricRange[] => {
       label: '25 to 35',
       description: 'Getting pricey - you\'re paying more for profits',
       score: 40,
-      color: 'orange',
-      isActive: currentPERatio >= 25 && currentPERatio < 35,
+      color: 'secondary',
     },
     {
       min: 35,
@@ -35,8 +32,7 @@ export const createPERatioRanges = (currentPERatio: number): MetricRange[] => {
       label: 'Above 35',
       description: 'Very expensive - high price for the profits you get',
       score: 10,
-      color: 'red',
-      isActive: currentPERatio >= 35,
+      color: 'danger',
     },
     {
       min: undefined,
@@ -45,7 +41,6 @@ export const createPERatioRanges = (currentPERatio: number): MetricRange[] => {
       description: 'Company isn\'t making profits right now',
       score: 0,
       color: 'grey',
-      isActive: currentPERatio <= 0,
     },
   ];
 
@@ -68,8 +63,7 @@ export const createPBRatioRanges = (currentPBRatio: number): MetricRange[] => {
       label: 'Under 1',
       description: 'Trading below book value - potential bargain',
       score: 100,
-      color: 'green',
-      isActive: currentPBRatio > 0 && currentPBRatio < 1,
+      color: 'success',
     },
     {
       min: 1,
@@ -77,8 +71,7 @@ export const createPBRatioRanges = (currentPBRatio: number): MetricRange[] => {
       label: '1 to 3',
       description: 'Reasonable price relative to book value',
       score: 70,
-      color: 'yellow',
-      isActive: currentPBRatio >= 1 && currentPBRatio < 3,
+      color: 'warning',
     },
     {
       min: 3,
@@ -86,8 +79,7 @@ export const createPBRatioRanges = (currentPBRatio: number): MetricRange[] => {
       label: '3 to 5',
       description: 'Premium price for book value',
       score: 40,
-      color: 'orange',
-      isActive: currentPBRatio >= 3 && currentPBRatio < 5,
+      color: 'secondary',
     },
     {
       min: 5,
@@ -95,8 +87,7 @@ export const createPBRatioRanges = (currentPBRatio: number): MetricRange[] => {
       label: 'Above 5',
       description: 'Very expensive relative to book value',
       score: 10,
-      color: 'red',
-      isActive: currentPBRatio >= 5,
+      color: 'danger',
     },
     {
       min: undefined,
@@ -105,7 +96,6 @@ export const createPBRatioRanges = (currentPBRatio: number): MetricRange[] => {
       description: 'Company has negative book value',
       score: 0,
       color: 'grey',
-      isActive: currentPBRatio <= 0,
     },
   ];
 

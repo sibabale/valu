@@ -32,8 +32,7 @@ export const ValueScorePage: React.FC = () => {
       label: 'Under 15',
       description: 'Great deal! You\'re paying a low price for each dollar of profit',
       score: 100,
-      color: 'green',
-      isActive: true, // 15.2 falls in this range
+      color: 'success',
     },
     {
       min: 15,
@@ -41,8 +40,7 @@ export const ValueScorePage: React.FC = () => {
       label: '15 to 25',
       description: 'Fair price - not too expensive',
       score: 70,
-      color: 'yellow',
-      isActive: false,
+      color: 'warning',
     },
     {
       min: 25,
@@ -50,8 +48,7 @@ export const ValueScorePage: React.FC = () => {
       label: '25 to 35',
       description: 'Getting pricey - you\'re paying more for profits',
       score: 40,
-      color: 'orange',
-      isActive: false,
+      color: 'secondary',
     },
     {
       min: 35,
@@ -59,8 +56,7 @@ export const ValueScorePage: React.FC = () => {
       label: 'Above 35',
       description: 'Very expensive - high price for the profits you get',
       score: 10,
-      color: 'red',
-      isActive: false,
+      color: 'danger',
     },
     {
       min: undefined,
@@ -69,7 +65,6 @@ export const ValueScorePage: React.FC = () => {
       description: 'Company isn\'t making profits right now',
       score: 0,
       color: 'grey',
-      isActive: false,
     },
   ];
 
@@ -80,8 +75,7 @@ export const ValueScorePage: React.FC = () => {
       label: 'Under 1',
       description: 'Trading below book value - potential bargain',
       score: 100,
-      color: 'green',
-      isActive: false,
+      color: 'success',
     },
     {
       min: 1,
@@ -89,8 +83,7 @@ export const ValueScorePage: React.FC = () => {
       label: '1 to 3',
       description: 'Reasonable price relative to book value',
       score: 70,
-      color: 'yellow',
-      isActive: true, // 1.8 falls in this range
+      color: 'warning',
     },
     {
       min: 3,
@@ -98,8 +91,7 @@ export const ValueScorePage: React.FC = () => {
       label: '3 to 5',
       description: 'Premium price for book value',
       score: 40,
-      color: 'orange',
-      isActive: false,
+      color: 'secondary',
     },
     {
       min: 5,
@@ -107,8 +99,7 @@ export const ValueScorePage: React.FC = () => {
       label: 'Above 5',
       description: 'Very expensive relative to book value',
       score: 10,
-      color: 'red',
-      isActive: false,
+      color: 'danger',
     },
     {
       min: undefined,
@@ -117,7 +108,92 @@ export const ValueScorePage: React.FC = () => {
       description: 'Company has negative book value',
       score: 0,
       color: 'grey',
-      isActive: false,
+    },
+  ];
+
+  const roeRanges: MetricRange[] = [
+    {
+      min: 20,
+      max: undefined,
+      label: 'Above 20%',
+      description: 'Excellent return on equity - very efficient use of capital',
+      score: 100,
+      color: 'success',
+    },
+    {
+      min: 15,
+      max: 20,
+      label: '15% to 20%',
+      description: 'Good return on equity - efficient capital utilization',
+      score: 80,
+      color: 'success',
+    },
+    {
+      min: 10,
+      max: 15,
+      label: '10% to 15%',
+      description: 'Moderate return on equity - reasonable performance',
+      score: 60,
+      color: 'secondary',
+    },
+    {
+      min: 0,
+      max: 10,
+      label: '0% to 10%',
+      description: 'Low return on equity - poor capital efficiency',
+      score: 40,
+      color: 'warning',
+    },
+    {
+      min: undefined,
+      max: 0,
+      label: 'Negative ROE',
+      description: 'Company is losing money on shareholder investment',
+      score: 0,
+      color: 'danger',
+    },
+  ];
+
+  const profitMarginRanges: MetricRange[] = [
+    {
+      min: 25,
+      max: undefined,
+      label: 'Above 25%',
+      description: 'Excellent profit margin - highly profitable operations',
+      score: 100,
+      color: 'success',
+    },
+    {
+      min: 15,
+      max: 25,
+      label: '15% to 25%',
+      description: 'Good profit margin - strong profitability',
+      score: 80,
+      color: 'success',
+    },
+    {
+      min: 10,
+      max: 15,
+      label: '10% to 15%',
+      description: 'Moderate profit margin - reasonable profitability',
+      score: 60,
+      color: 'secondary',
+    },
+    {
+      min: 5,
+      max: 10,
+      label: '5% to 10%',
+      description: 'Low profit margin - weak profitability',
+      score: 40,
+      color: 'warning',
+    },
+    {
+      min: 0,
+      max: 5,
+      label: '0% to 5%',
+      description: 'Very low profit margin - poor profitability',
+      score: 20,
+      color: 'danger',
     },
   ];
 
@@ -142,7 +218,6 @@ export const ValueScorePage: React.FC = () => {
               title="Price-to-Earnings (P/E) Ratio"
               description="How expensive the stock is compared to its yearly profits."
               currentValue={15.2}
-              overallScore={100}
               ranges={peRatioRanges}
             />
 
@@ -150,8 +225,21 @@ export const ValueScorePage: React.FC = () => {
               title="Price-to-Book (P/B) Ratio"
               description="How much you're paying for each dollar of book value."
               currentValue={1.8}
-              overallScore={70}
               ranges={pbRatioRanges}
+            />
+
+            <MetricBreakdownCard
+              title="Return on Equity (ROE)"
+              description="How efficiently the company uses shareholder capital to generate profits."
+              currentValue={18.5}
+              ranges={roeRanges}
+            />
+
+            <MetricBreakdownCard
+              title="Profit Margin"
+              description="How much profit the company makes from each dollar of revenue."
+              currentValue={12.5}
+              ranges={profitMarginRanges}
             />
 
             <DisclaimerSection>

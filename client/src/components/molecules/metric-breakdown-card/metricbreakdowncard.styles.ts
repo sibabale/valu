@@ -1,15 +1,16 @@
 import styled from 'styled-components/native';
+import { theme } from '../../../utils/theme';
 
 const getColorValue = (color: string): string => {
   switch (color) {
-    case 'green':
-      return '#4CAF50';
-    case 'yellow':
-      return '#FFC107';
-    case 'orange':
-      return '#FF9800';
-    case 'red':
-      return '#F44336';
+    case 'success':
+      return theme.colors.success;
+    case 'warning':
+      return theme.colors.warning;
+    case 'danger':
+      return theme.colors.danger;
+    case 'secondary':
+      return theme.colors.secondary;
     case 'grey':
       return '#cccccc';
     default:
@@ -34,6 +35,13 @@ export const Header = styled.View`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 16px;
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 16px;
+  border-bottom-width: 1px;
+  border-bottom-color: #f0f0f0;
 `;
 
 export const TitleSection = styled.View`
@@ -43,30 +51,18 @@ export const TitleSection = styled.View`
 
 export const Title = styled.Text`
   font-family: 'Space Grotesk-Bold';
-  font-size: 18px;
-  color: ${theme.colors.text.primary};
+  font-size: 14px;
+  color: #333333;
   margin-bottom: 4px;
+  font-weight: 700;
+
 `;
 
 export const Description = styled.Text`
   font-family: 'Space Grotesk-Regular';
   font-size: 14px;
-  color: ${theme.colors.text.secondary};
+  color: #666666;
   line-height: 20px;
-`;
-
-export const OverallScore = styled.View`
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  padding: 8px 12px;
-  min-width: 50px;
-  align-items: center;
-`;
-
-export const OverallScoreText = styled.Text`
-  font-family: 'Space Grotesk-Bold';
-  font-size: 16px;
-  color: ${theme.colors.text.primary};
 `;
 
 export const RangeItem = styled.View`
@@ -83,13 +79,12 @@ export const RangeItemLast = styled.View`
   padding: 12px 0;
 `;
 
-export const ScoreCircle = styled.View<{ color: string; isActive: boolean }>`
+export const ScoreCircle = styled.View<{ color: string }>`
   width: 40px;
   height: 40px;
   border-radius: 20px;
   border-width: 2px;
-  border-color: ${({ color, isActive }) => 
-    isActive ? getColorValue(color) : '#cccccc'};
+  border-color: #cccccc;
   background-color: #ffffff;
   justify-content: center;
   align-items: center;
@@ -97,11 +92,10 @@ export const ScoreCircle = styled.View<{ color: string; isActive: boolean }>`
   position: relative;
 `;
 
-export const ScoreText = styled.Text<{ isActive: boolean }>`
+export const ScoreText = styled.Text`
   font-family: 'Space Grotesk-Bold';
   font-size: 14px;
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.text.primary : theme.colors.text.secondary};
+  color: #333333;
 `;
 
 export const Checkmark = styled.View<{ color: string }>`
@@ -111,7 +105,7 @@ export const Checkmark = styled.View<{ color: string }>`
   width: 16px;
   height: 16px;
   border-radius: 8px;
-  background-color: ${({ color }) => theme.colors[color]};
+  background-color: ${({ color }) => getColorValue(color)};
   justify-content: center;
   align-items: center;
 `;
@@ -121,28 +115,33 @@ export const RangeContent = styled.View`
   margin-right: 12px;
 `;
 
-export const RangeLabel = styled.Text<{ isActive: boolean }>`
+export const RangeLabel = styled.Text`
   font-family: 'Space Grotesk-Bold';
   font-size: 14px;
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.text.primary : theme.colors.text.secondary};
+  color: #333333;
   margin-bottom: 2px;
 `;
 
-export const RangeDescription = styled.Text<{ isActive: boolean }>`
+export const RangeDescription = styled.Text`
   font-family: 'Space Grotesk-Regular';
   font-size: 12px;
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.text.primary : theme.colors.text.secondary};
+  color: #666666;
   line-height: 16px;
 `;
 
-export const ProgressBar = styled.View<{ color: string; isActive: boolean }>`
+export const ProgressBar = styled.View<{ color: string; score: number }>`
   width: 60px;
   height: 8px;
   border-radius: 4px;
-  background-color: ${({ color, isActive }) =>
-    isActive ? theme.colors[color] : theme.colors.grey.light};
+  background-color: #f0f0f0;
+  overflow: hidden;
+`;
+
+export const ProgressBarFill = styled.View<{ color: string; score: number }>`
+  width: ${({ score }) => score}%;
+  height: 100%;
+  background-color: ${({ color }) => getColorValue(color)};
+  border-radius: 4px;
 `;
 
 export const LoadingContainer = styled.View`
@@ -153,6 +152,6 @@ export const LoadingContainer = styled.View`
 export const LoadingText = styled.Text`
   font-family: 'Space Grotesk-Regular';
   font-size: 14px;
-  color: ${theme.colors.text.secondary};
+  color: #666666;
   margin-top: 8px;
 `;
