@@ -105,7 +105,7 @@ export const Checkmark = styled.View<{ color: string }>`
   width: 16px;
   height: 16px;
   border-radius: 8px;
-  background-color: ${({ color }) => getColorValue(color)};
+  background-color: ${({ color }: { color: string }) => getColorValue(color)};
   justify-content: center;
   align-items: center;
 `;
@@ -138,9 +138,9 @@ export const ProgressBar = styled.View<{ color: string; score: number }>`
 `;
 
 export const ProgressBarFill = styled.View<{ color: string; score: number }>`
-  width: ${({ score }) => score}%;
+  width: ${({ score }: { score: number }) => score}%;
   height: 100%;
-  background-color: ${({ color }) => getColorValue(color)};
+  background-color: ${({ color }: { color: string }) => getColorValue(color)};
   border-radius: 4px;
 `;
 
