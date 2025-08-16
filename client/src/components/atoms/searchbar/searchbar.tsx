@@ -50,8 +50,6 @@ export const Searchbar: React.FC<SearchbarProps> = ({
   const [spinInAnim] = useState(new Animated.Value(0));
   const [spinOutAnim] = useState(new Animated.Value(1));
   const [scaleAnim] = useState(new Animated.Value(1));
-  const [showXIcon, setShowXIcon] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<View>(null);
   const searchInputRef = useRef<any>(null);
   const isDropdownInteraction = useRef(false);
@@ -333,116 +331,115 @@ export const Searchbar: React.FC<SearchbarProps> = ({
       </Container>
 
       <Animated.View
-          ref={dropdownRef}
-          onTouchStart={handleDropdownPressIn}
-          onTouchEnd={handleDropdownPressOut}
-          style={{
-            opacity: fadeAnim,
-            transform: [
-              {
-                translateY: fadeAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-10, 0],
-                }),
-              },
-            ],
-          }}
-        >
-          <DropdownContainer>
-            <DropdownCard>
-              <DropdownContent>
-                {recentSearches.length > 0 && (
-                  <ScrollView>
-                    <SectionHeader>
-                      <IconContainer>
-                        <HistoryIcon
-                          height="16px"
-                          width="16px"
-                          fill="#1E2939"
-                        />
-                      </IconContainer>
-                      <SectionTitle>Recent</SectionTitle>
-                      <TouchableOpacity
+        ref={dropdownRef}
+        onTouchStart={handleDropdownPressIn}
+        onTouchEnd={handleDropdownPressOut}
+        style={{
+          opacity: fadeAnim,
+          transform: [
+            {
+              translateY: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [-10, 0],
+              }),
+            },
+          ],
+        }}
+      >
+        <DropdownContainer>
+          <DropdownCard>
+            <DropdownContent>
+              {recentSearches.length > 0 && (
+                <ScrollView>
+                  <SectionHeader>
+                    <IconContainer>
+                      <HistoryIcon
+                        height="16px"
+                        width="16px"
+                        fill="#1E2939"
+                      />
+                    </IconContainer>
+                    <SectionTitle>Recent</SectionTitle>
+                    <TouchableOpacity
+                      onPressIn={handleDropdownPressIn}
+                      onPress={clearRecent}
+                      style={{ marginLeft: 'auto' }}
+                    >
+                      <ClearButtonText>Clear</ClearButtonText>
+                    </TouchableOpacity>
+                  </SectionHeader>
+
+                  <TagsContainer>
+                    {recentSearches.map((search) => (
+                      <TagButton
+                        key={search}
                         onPressIn={handleDropdownPressIn}
-                        onPress={clearRecent}
-                        style={{ marginLeft: 'auto' }}
+                        onPress={() => {
+                          handleSearch(search);
+
+                          // Track recent search selection
+                          if (posthog) {
+                            posthog.capture('recent_search_selected', {
+                              search_term: search,
+                              timestamp: new Date().toISOString(),
+                            });
+                          }
+
+                          Keyboard.dismiss();
+                          setIsFocused(false);
+                        }}
                       >
-                        <ClearButtonText>Clear</ClearButtonText>
-                      </TouchableOpacity>
-                    </SectionHeader>
+                        <TagText>{search.toUpperCase()}</TagText>
+                      </TagButton>
+                    ))}
+                  </TagsContainer>
+                </ScrollView>
+              )}
 
-                    <TagsContainer>
-                      {recentSearches.map((search) => (
-                        <TagButton
-                          key={search}
-                          onPressIn={handleDropdownPressIn}
-                          onPress={() => {
-                            handleSearch(search);
+              {stocksToShow && stocksToShow.length > 0 && (
+                <ScrollView>
+                  <SectionHeader>
+                    <IconContainer>
+                      <TrendUpIcon
+                        height="16px"
+                        width="16px"
+                        fill="#1E2939"
+                      />
+                    </IconContainer>
+                    <SectionTitle>Popular</SectionTitle>
+                  </SectionHeader>
 
-                            // Track recent search selection
-                            if (posthog) {
-                              posthog.capture('recent_search_selected', {
-                                search_term: search,
-                                timestamp: new Date().toISOString(),
-                              });
-                            }
+                  <TagsContainer>
+                    {stocksToShow.map((stock) => (
+                      <TagButton
+                        key={stock}
+                        onPressIn={handleDropdownPressIn}
+                        onPress={() => {
+                          handleSearch(stock);
+                          dispatch(addRecentSearch(stock));
 
-                            Keyboard.dismiss();
-                            setIsFocused(false);
-                          }}
-                        >
-                          <TagText>{search.toUpperCase()}</TagText>
-                        </TagButton>
-                      ))}
-                    </TagsContainer>
-                  </ScrollView>
-                )}
+                          // Track popular stock selection
+                          if (posthog) {
+                            posthog.capture('popular_stock_selected', {
+                              stock_symbol: stock,
+                              timestamp: new Date().toISOString(),
+                            });
+                          }
 
-                {stocksToShow && stocksToShow.length > 0 && (
-                  <ScrollView>
-                    <SectionHeader>
-                      <IconContainer>
-                        <TrendUpIcon
-                          height="16px"
-                          width="16px"
-                          fill="#1E2939"
-                        />
-                      </IconContainer>
-                      <SectionTitle>Popular</SectionTitle>
-                    </SectionHeader>
-
-                    <TagsContainer>
-                      {stocksToShow.map((stock) => (
-                        <TagButton
-                          key={stock}
-                          onPressIn={handleDropdownPressIn}
-                          onPress={() => {
-                            handleSearch(stock);
-                            dispatch(addRecentSearch(stock));
-
-                            // Track popular stock selection
-                            if (posthog) {
-                              posthog.capture('popular_stock_selected', {
-                                stock_symbol: stock,
-                                timestamp: new Date().toISOString(),
-                              });
-                            }
-
-                            Keyboard.dismiss();
-                            setIsFocused(false);
-                          }}
-                        >
-                          <TagText>{stock}</TagText>
-                        </TagButton>
-                      ))}
-                    </TagsContainer>
-                  </ScrollView>
-                )}
-              </DropdownContent>
-            </DropdownCard>
-          </DropdownContainer>
-        </Animated.View>
-      )}
-    </>
-  );
+                          Keyboard.dismiss();
+                          setIsFocused(false);
+                        }}
+                      >
+                        <TagText>{stock}</TagText>
+                      </TagButton>
+                    ))}
+                  </TagsContainer>
+                </ScrollView>
+              )}
+            </DropdownContent>
+          </DropdownCard>
+        </DropdownContainer>
+             </Animated.View>
+     </>
+   );
 };
