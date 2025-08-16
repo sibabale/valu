@@ -51,10 +51,47 @@ export const CompanyList: React.FC<CompanyListProps> = ({
     }
   }, [companies]);
 
+  const [loadingText, setLoadingText] = useState('');
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Simple loading animation
+  useEffect(() => {
+    if (isLoading) {
+      const messages = [
+        'Finding hidden gems...',
+        'Digging for diamonds...',
+        'Hunting for bargains...',
+        'Uncovering treasures...',
+        'Seeking undervalued stars...',
+        'Mining for gold...',
+        'Discovering value...',
+        'Scouting for deals...'
+      ];
+
+      const currentMessage = messages[messageIndex];
+      let charIndex = 0;
+
+      const typeMessage = () => {
+        if (charIndex < currentMessage.length) {
+          setLoadingText(currentMessage.slice(0, charIndex + 1));
+          charIndex++;
+          setTimeout(typeMessage, 100);
+        } else {
+          setTimeout(() => {
+            setMessageIndex((prev) => (prev + 1) % messages.length);
+            setLoadingText('');
+          }, 2000);
+        }
+      };
+
+      typeMessage();
+    }
+  }, [isLoading, messageIndex]);
+
   if (isLoading) {
     return (
       <EmptyContainer>
-        <EmptyText>Loading companies...</EmptyText>
+        <EmptyText>{loadingText}</EmptyText>
       </EmptyContainer>
     );
   }
