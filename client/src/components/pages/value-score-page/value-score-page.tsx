@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { usePostHog } from 'posthog-react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { MetricBreakdownCard } from '../../molecules/metric-breakdown-card/metricbreakdowncard';
 import { MetricRange } from '../../molecules/metric-breakdown-card/metricbreakdowncard.interface';
@@ -19,6 +20,16 @@ import {
 
 export const ValueScorePage: React.FC = () => {
   const navigation = useNavigation();
+  const posthog = usePostHog();
+
+  // Track value score page view
+  useEffect(() => {
+    if (posthog) {
+      posthog.capture('value_score_page_viewed', {
+        timestamp: new Date().toISOString(),
+      });
+    }
+  }, [posthog]);
 
   // Static metric data for demonstration
   const peRatioRanges: MetricRange[] = [
@@ -204,7 +215,22 @@ export const ValueScorePage: React.FC = () => {
         </HeaderContainer>
 
         <ContentContainer>
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            onScroll={(event) => {
+              const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+              const scrollPercentage = contentOffset.y / (contentSize.height - layoutMeasurement.height);
+
+              // Track when user scrolls to disclaimer section (roughly 80% down)
+              if (posthog && scrollPercentage > 0.8) {
+                posthog.capture('disclaimer_section_viewed', {
+                  scroll_percentage: scrollPercentage,
+                  timestamp: new Date().toISOString(),
+                });
+              }
+            }}
+            scrollEventThrottle={16}
+          >
             <Subtitle>
               Our proprietary scoring system evaluates stocks across multiple
               financial metrics to provide a comprehensive value assessment.
@@ -256,6 +282,8 @@ export const ValueScorePage: React.FC = () => {
                 of these metrics
               </DisclaimerText>
             </DisclaimerSection>
+
+
           </ScrollView>
         </ContentContainer>
       </PageContainer>

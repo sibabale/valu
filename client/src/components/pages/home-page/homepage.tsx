@@ -37,8 +37,14 @@ export const HomePage: React.FC = () => {
         timestamp: new Date().toISOString(),
         version: '1.0.0',
       });
+
+      // Track session start
+      posthog.capture('session_started', {
+        timestamp: new Date().toISOString(),
+        companies_count: companiesData.length,
+      });
     }
-  }, [posthog]);
+  }, [posthog, companiesData.length]);
 
   // Fetch companies from API
   useEffect(() => {
@@ -146,7 +152,7 @@ export const HomePage: React.FC = () => {
     }, 100); // Small delay to ensure state is set
 
     return () => clearTimeout(timer);
-  }, [companiesData.length, searchAnim]); // Run when companies data changes
+  }, [companiesData.length, searchAnim, posthog]); // Run when companies data changes
 
   // Handle search filtering separately
   useEffect(() => {
@@ -163,8 +169,19 @@ export const HomePage: React.FC = () => {
         }
       );
       setFilteredCompanies(filtered);
+
+      // Track search results
+      if (posthog && searchQuery && searchQuery.length >= 2) {
+        posthog.capture('search_results_displayed', {
+          query: searchQuery.toLowerCase(),
+          results_count: filtered.length,
+          total_companies: companiesData.length,
+          search_ratio: filtered.length / companiesData.length,
+          timestamp: new Date().toISOString(),
+        });
+      }
     }
-  }, [searchQuery, companiesData]);
+  }, [searchQuery, companiesData, posthog]);
 
   const handleCompanyPress = (company: Company) => {
     // Track company viewed event
