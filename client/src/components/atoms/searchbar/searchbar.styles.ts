@@ -6,16 +6,23 @@ export const Container = styled.View`
   width: 100%;
 `;
 
-export const SearchContainer = styled.View`
-  position: relative;
+export const SearchContainer = styled.View<{ isFocused: boolean; disabled?: boolean }>`
+  flex-direction: row;
+  align-items: center;
+  height: 47px;
+  border-radius: 24px;
+  border: ${(props: { isFocused: boolean; disabled?: boolean }) =>
+    props.disabled ? '1px solid #e5e7eb' : props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
+  background-color: ${(props: { disabled?: boolean }) => props.disabled ? '#f9fafb' : '#ffffff'};
+  padding: 0 16px;
+  gap: 12px;
 `;
 
 export const SearchIconContainer = styled.View`
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-6px);
-  z-index: 1;
+  width: 16px;
+  height: 16px;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const IconContainer = styled.View`
@@ -25,27 +32,21 @@ export const IconContainer = styled.View`
   align-items: center;
 `;
 
-export const SearchInput = styled.TextInput<{ isFocused: boolean; disabled?: boolean }>`
+export const SearchInput = styled.TextInput<{ disabled?: boolean }>`
+  flex: 1;
   height: 47px;
-  border-radius: 24px;
-  border: ${(props: { isFocused: boolean; disabled?: boolean }) =>
-    props.disabled ? '1px solid #e5e7eb' : props.isFocused ? '2px solid #d1d5db' : '1px solid #e5e7eb'};
-  background-color: ${(props: { disabled?: boolean }) => props.disabled ? '#f9fafb' : '#ffffff'};
-  padding: 0 48px 0 48px;
   font-size: 18px;
   font-family: 'Space Grotesk';
   color: ${(props: { disabled?: boolean }) => props.disabled ? '#9ca3af' : '#1f2937'};
+  background-color: transparent;
 `;
 
 export const CloseButton = styled(TouchableOpacity)`
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-17px);
-  padding: 8px;
-  height: auto;
+  width: 16px;
+  height: 16px;
   justify-content: center;
   align-items: center;
+  padding: 8px;
 `;
 
 export const ClearButton = styled(TouchableOpacity)`

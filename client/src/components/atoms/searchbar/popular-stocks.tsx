@@ -50,7 +50,7 @@ export const PopularStocks: React.FC<PopularStocksProps> = ({
   onStockSelect,
   selectedStock,
 }) => {
-  const popularStocks = ['AAPL', 'GOOGL', 'MSFT', 'SPOT'];
+  const popularStocks = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
 
   return (
     <Container>

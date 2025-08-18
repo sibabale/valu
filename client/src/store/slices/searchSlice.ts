@@ -7,7 +7,7 @@ interface SearchState {
 
 const initialState: SearchState = {
   recentSearches: [],
-  popularStocks: ['AAPL', 'GOOGL', 'MSFT', 'SPOT'],
+  popularStocks: ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'],
 };
 
 const searchSlice = createSlice({

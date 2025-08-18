@@ -55,8 +55,6 @@ export const Subtitle = styled.Text`
 `;
 
 export const Content = styled.View`
-  border-top-width: 1px;
-  border-top-color: #f0f0f0;
   background-color: #ffffff;
   margin: 0 16px;
 `;

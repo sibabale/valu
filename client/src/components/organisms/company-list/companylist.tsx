@@ -1,5 +1,5 @@
-import React from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, Animated } from 'react-native';
 import { CompanyListProps } from './companylist.interface';
 import { ListContainer, EmptyContainer, EmptyText } from './companylist.styles';
 import { CompanyCard } from '../../molecules/company-card/companycard';
@@ -11,10 +11,87 @@ export const CompanyList: React.FC<CompanyListProps> = ({
   isLoading = false,
   error = null,
 }) => {
+  const [displayedCompanies, setDisplayedCompanies] = useState<any[]>([]);
+  const [animatedCompanies, setAnimatedCompanies] = useState<Animated.Value[]>([]);
+
+  // Reset displayed companies when new data comes in
+  useEffect(() => {
+    if (companies && companies.length > 0) {
+      // Clear any existing timeouts
+      const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+      // Start with empty array
+      setDisplayedCompanies([]);
+      setAnimatedCompanies([]);
+
+      // Populate one by one with animation
+      companies.forEach((company, index) => {
+        const timeout = setTimeout(() => {
+          setDisplayedCompanies(prev => [...prev, { ...company, animationId: Date.now() + index }]);
+
+          // Create animation value for this company
+          const animValue = new Animated.Value(0);
+          setAnimatedCompanies(prev => [...prev, animValue]);
+
+          // Animate the new company in
+          Animated.timing(animValue, {
+            toValue: 1,
+            duration: 400,
+            useNativeDriver: true,
+          }).start();
+        }, index * 100); // 100ms delay between each company
+
+        timeouts.push(timeout);
+      });
+
+      // Cleanup function
+      return () => {
+        timeouts.forEach(clearTimeout);
+      };
+    }
+  }, [companies]);
+
+  const [loadingText, setLoadingText] = useState('');
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Simple loading animation
+  useEffect(() => {
+    if (isLoading) {
+      const messages: string[] = [
+        "Checking moats...",
+        "Weighing businesses...",
+        "Measuring value...",
+        "Pricing power...",
+        "Counting cash...",
+        "Scouting bargains...",
+        "Reading filings...",
+        "Studying history..."
+      ];
+
+      const currentMessage = messages[messageIndex];
+      let charIndex = 0;
+
+      const typeMessage = () => {
+        if (charIndex < currentMessage.length) {
+          setLoadingText(currentMessage.slice(0, charIndex + 1));
+          charIndex++;
+          setTimeout(typeMessage, 100);
+        } else {
+          setTimeout(() => {
+            setMessageIndex((prev) => (prev + 1) % messages.length);
+            setLoadingText('');
+          }, 2000);
+        }
+      };
+
+      typeMessage();
+    }
+  }, [isLoading, messageIndex]);
+
   if (isLoading) {
     return (
       <EmptyContainer>
-        <EmptyText>Loading companies...</EmptyText>
+        <EmptyText>{loadingText}</EmptyText>
       </EmptyContainer>
     );
   }
@@ -45,14 +122,36 @@ export const CompanyList: React.FC<CompanyListProps> = ({
           paddingHorizontal: 20,
         }}
       >
-        {companies.map(company => {
+        {displayedCompanies.map((company, index) => {
+          const animValue = animatedCompanies[index];
+
           return (
-            <View key={company.id} style={{ marginBottom: 8 }}>
+            <Animated.View
+              key={company.animationId || `${company.id}-${index}`}
+              style={{
+                marginBottom: 8,
+                opacity: animValue || 0,
+                transform: [
+                  {
+                    translateY: animValue ? animValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [50, 0],
+                    }) : 50,
+                  },
+                  {
+                    scale: animValue ? animValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0.9, 1],
+                    }) : 0.9,
+                  },
+                ],
+              }}
+            >
               <CompanyCard
                 company={company}
                 onPress={() => onCompanyPress?.(company)}
               />
-            </View>
+            </Animated.View>
           );
         })}
       </ScrollView>

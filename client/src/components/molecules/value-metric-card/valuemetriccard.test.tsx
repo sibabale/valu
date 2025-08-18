@@ -46,7 +46,8 @@ describe('ValueMetricCard', () => {
   it('renders score value', () => {
     render(<ValueMetricCard {...defaultProps} />);
 
-    expect(screen.getByText('75/100')).toBeTruthy();
+    // Score starts at 0 and animates when expanded
+    expect(screen.getByText('0/100')).toBeTruthy();
   });
 
   it('renders with color prop', () => {

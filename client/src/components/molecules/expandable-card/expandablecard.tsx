@@ -39,6 +39,7 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
   const rotationValue = useRef(
     new Animated.Value(defaultExpanded ? 1 : 0)
   ).current;
+  const lineAnim = useRef(new Animated.Value(0)).current;
 
   const toggleExpanded = () => {
     const customLayoutAnimation = {
@@ -61,6 +62,18 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
       easing: Easing.bezier(0.25, 0.46, 0.45, 0.94),
       useNativeDriver: true,
     }).start();
+
+    // Animate line when expanding
+    if (!isExpanded) {
+      lineAnim.setValue(0);
+      Animated.timing(lineAnim, {
+        toValue: 1,
+        duration: 1200,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      lineAnim.setValue(0);
+    }
 
     const newState = !isExpanded;
     setIsExpanded(newState);
@@ -93,6 +106,17 @@ export const ExpandableCard: React.FC<ExpandableCardProps> = ({
 
       {isExpanded && (
         <Content>
+          <Animated.View
+            style={{
+              height: 1,
+              backgroundColor: '#f0f0f0',
+              width: lineAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0%', '100%'],
+              }),
+              alignSelf: 'center',
+            }}
+          />
           <ContentWrapper>{children}</ContentWrapper>
         </Content>
       )}
