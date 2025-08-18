@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IScoringService, ScoringService>();
+builder.Services.AddScoped<IValueScoreService, ValueScoreService>();
 builder.Services.AddLogging();
 
 // Add Alpha Vantage services
@@ -109,24 +110,24 @@ app.MapGet("/api/companies/search", async (
 });
 
 // Value Score endpoints
-app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IScoringService scoringService) =>
+app.MapPost("/api/value-score/calculate", async (CalculateValueScoreRequest request, IValueScoreService valueScoreService) =>
 {
-    var result = await scoringService.CalculateValueScoreAsync(request);
+    var result = await valueScoreService.CalculateValueScoreAsync(request);
     return Results.Ok(result);
 });
 
-app.MapGet("/api/value-score/{companyId}", async (Guid companyId, IScoringService scoringService) =>
+app.MapGet("/api/value-score/{companyId}", async (Guid companyId, IValueScoreService valueScoreService) =>
 {
-    var result = await scoringService.GetValueScoreAsync(companyId);
+    var result = await valueScoreService.GetValueScoreAsync(companyId);
     return result != null ? Results.Ok(result) : Results.NotFound();
 });
 
-app.MapGet("/api/value-score/top", async (int count, IScoringService scoringService) =>
+app.MapGet("/api/value-score/top", async (int count, IValueScoreService valueScoreService) =>
 {
     if (count <= 0 || count > 100)
         return Results.BadRequest("Count must be between 1 and 100");
     
-    var result = await scoringService.GetTopValueStocksAsync(count);
+    var result = await valueScoreService.GetTopValueStocksAsync(count);
     return Results.Ok(result);
 });
 

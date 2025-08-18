@@ -15,8 +15,7 @@ public class CacheBuildingService : ICacheBuildingService
     private readonly ICacheService _cache;
     private readonly ILogger<CacheBuildingService> _logger;
 
-    // Rate limit tracking
-    private int _requestsThisMinute = 0;
+    // Rate limit tracking (currently handled by AlphaVantageService)
     private DateTime _lastMinuteReset = DateTime.UtcNow;
 
     // Initial 20 companies - balanced sectors

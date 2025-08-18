@@ -85,17 +85,17 @@ public class RedisCacheService : ICacheService, IDisposable
         }
     }
 
-    public async Task<IEnumerable<string>> GetAllKeysAsync(string pattern = "*")
+    public Task<IEnumerable<string>> GetAllKeysAsync(string pattern = "*")
     {
         try
         {
             var server = _redis.GetServer(_redis.GetEndPoints().First());
             var keys = server.Keys(pattern: pattern);
-            return keys.Select(k => k.ToString()).ToList();
+            return Task.FromResult(keys.Select(k => k.ToString()).ToList() as IEnumerable<string>);
         }
         catch
         {
-            return Enumerable.Empty<string>();
+            return Task.FromResult(Enumerable.Empty<string>());
         }
     }
 
